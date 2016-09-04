@@ -1,0 +1,15 @@
+
+#include <Vector2.h>
+#include <Defines.h>
+
+using namespace igad;
+
+Vector2 Vector2::RandomUnit()
+{
+    float rad = RandInRange(-Pi, Pi);
+    return Vector2( cosf(rad), sinf(rad));
+}
+
+Vector2 Vector2::Zero(0, 0);
+
+// end
