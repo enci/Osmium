@@ -1,4 +1,4 @@
-#include <Label.h>
+#include <Graphics/Label.h>
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb/stb_truetype.h>
@@ -6,7 +6,7 @@
 
 #include <Defines.h>
 #include <Utils.h>
-#include <OpenGL.h>
+#include <Graphics/OpenGL.h>
 
 #define _CRT_SECURE_NO_WARNINGS
 

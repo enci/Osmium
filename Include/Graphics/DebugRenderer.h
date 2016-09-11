@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Color.h>
-#include <Shader.h>
-#include <Vector3.h>
-#include <Matrix44.h>
+#include <Graphics/Color.h>
+#include <Graphics/Shader.h>
+#include <Math/Vector3.h>
+#include <Math/Matrix44.h>
 
 namespace igad
 {

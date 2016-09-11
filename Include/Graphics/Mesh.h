@@ -1,9 +1,9 @@
 #pragma once
 
 #include <vector>
-#include <OpenGL.h>
-#include <Vector3.h>
-#include <Vector2.h>
+#include <Graphics/OpenGL.h>
+#include <Math/Vector3.h>
+#include <Math/Vector2.h>
 
 namespace igad
 {

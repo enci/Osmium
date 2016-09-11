@@ -1,4 +1,4 @@
-#include "Color.h"
+#include <Graphics/Color.h>
 #include <sstream>
 
 #define bswap_32(x) ((((x) & 0xFF000000) >> 24) | \

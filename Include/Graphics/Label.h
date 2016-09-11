@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Texture.h>
-#include <Vector2.h>
+#include <Graphics/Texture.h>
+#include <Math/Vector2.h>
 
 namespace igad
 {

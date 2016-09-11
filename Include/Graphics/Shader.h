@@ -4,11 +4,10 @@
 #include <map>
 #include <memory>
 
-#include <OpenGL.h>
-#include <Matrix44.h>
-#include <Vector3.h>
-#include <Vector2.h>
-
+#include <Graphics/OpenGL.h>
+#include <Math/Matrix44.h>
+#include <Math/Vector3.h>
+#include <Math/Vector2.h>
 
 namespace igad
 {

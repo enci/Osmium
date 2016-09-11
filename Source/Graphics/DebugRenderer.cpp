@@ -1,9 +1,10 @@
-#include <DebugRenderer.h>
+#include <Graphics/DebugRenderer.h>
 #include <Defines.h>
-#include <Shader.h>
-#include <OpenGL.h>
+#include <Graphics/Shader.h>
+#include <Graphics/OpenGL.h>
 
 using namespace igad;
+using namespace std;
 
 // Actualy creates a new DebugDraw, but the real work is in the Init not the ctor
 // This serves as a manager

@@ -1,11 +1,9 @@
-#include <Shader.h>
+#include <Graphics/Shader.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <Texture.h>
+#include <Graphics/Texture.h>
 #include <Utils.h>
-#include <Color.h>
-#include <OpenGL.h>
-#include <glad/glad.h>
+#include <Graphics/Color.h>
 
 using namespace std;
 using namespace igad;

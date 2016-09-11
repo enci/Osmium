@@ -1,7 +1,6 @@
-#include <Texture.h>
+#include <Graphics/Texture.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
-
 using namespace igad;
 
 Texture::Texture(const std::string& filename)

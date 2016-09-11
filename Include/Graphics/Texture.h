@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <OpenGL.h>
+#include <Graphics/OpenGL.h>
 
 namespace igad
 {

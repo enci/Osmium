@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Matrix44.h>
-#include <Mesh.h>
-#include <Shader.h>
-#include <Texture.h>
+#include <Math/Matrix44.h>
+#include <Graphics/Mesh.h>
+#include <Graphics/Shader.h>
+#include <Graphics/Texture.h>
 #include <unordered_map>
 
 namespace igad

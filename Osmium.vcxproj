@@ -153,36 +153,35 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Color.h" />
-    <ClInclude Include="Include\DebugRenderer.h" />
+    <ClInclude Include="Include\Graphics\Color.h" />
+    <ClInclude Include="Include\Graphics\DebugRenderer.h" />
     <ClInclude Include="Include\Defines.h" />
-    <ClInclude Include="Include\Label.h" />
-    <ClInclude Include="Include\Matrix33.h" />
-    <ClInclude Include="Include\Matrix44.h" />
-    <ClInclude Include="Include\Mesh.h" />
-    <ClInclude Include="Include\OpenGL.h" />
-    <ClInclude Include="Include\Renderer.h" />
-    <ClInclude Include="Include\Shader.h" />
-    <ClInclude Include="Include\Texture.h" />
+    <ClInclude Include="Include\Graphics\Label.h" />
+    <ClInclude Include="Include\Math\Matrix33.h" />
+    <ClInclude Include="Include\Math\Matrix44.h" />
+    <ClInclude Include="Include\Graphics\Mesh.h" />
+    <ClInclude Include="Include\Graphics\OpenGL.h" />
+    <ClInclude Include="Include\Graphics\Renderer.h" />
+    <ClInclude Include="Include\Graphics\Shader.h" />
+    <ClInclude Include="Include\Graphics\Texture.h" />
     <ClInclude Include="Include\Utils.h" />
-    <ClInclude Include="Include\Vector2.h" />
-    <ClInclude Include="Include\Vector3.h" />
-    <ClInclude Include="Include\Vector4.h" />
+    <ClInclude Include="Include\Math\Vector2.h" />
+    <ClInclude Include="Include\Math\Vector3.h" />
+    <ClInclude Include="Include\Math\Vector4.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Color.cpp" />
-    <ClCompile Include="Source\DebugRenderer.cpp" />
-    <ClCompile Include="Source\Label.cpp" />
-    <ClCompile Include="Source\Matrix33.cpp" />
-    <ClCompile Include="Source\Matrix44.cpp" />
-    <ClCompile Include="Source\Mesh.cpp" />
-    <ClCompile Include="Source\Renderer.cpp" />
-    <ClCompile Include="Source\Shader.cpp" />
-    <ClCompile Include="Source\Texture.cpp" />
+    <ClCompile Include="Source\Graphics\Color.cpp" />
+    <ClCompile Include="Source\Graphics\DebugRenderer.cpp" />
+    <ClCompile Include="Source\Graphics\Label.cpp" />
+    <ClCompile Include="Source\Math\Matrix33.cpp" />
+    <ClCompile Include="Source\Math\Matrix44.cpp" />
+    <ClCompile Include="Source\Graphics\Mesh.cpp" />
+    <ClCompile Include="Source\Graphics\Renderer.cpp" />
+    <ClCompile Include="Source\Graphics\Shader.cpp" />
+    <ClCompile Include="Source\Graphics\Texture.cpp" />
     <ClCompile Include="Source\Utils.cpp" />
-    <ClCompile Include="Source\Vector2.cpp" />
-    <ClCompile Include="Source\Vector3.cpp" />
-    <ClCompile Include="Source\Vector4.cpp" />
+    <ClCompile Include="Source\Math\Vector2.cpp" />
+    <ClCompile Include="Source\Math\Vector3.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

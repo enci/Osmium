@@ -1,10 +1,10 @@
 #pragma once
 
 #include <string>
-#include <Vector3.h>
-#include <Vector2.h>
-#include <Matrix33.h>
-#include <Matrix44.h>
+#include <Math/Vector3.h>
+#include <Math/Vector2.h>
+#include <Math/Matrix33.h>
+#include <Math/Matrix44.h>
 
 namespace igad
 {
