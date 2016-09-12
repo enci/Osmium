@@ -1,5 +1,4 @@
-#include "stdafx.h"
-#include "PerlinNoise.h"
+#include <Graphics/PerlinNoise.h>
 
 // This is the new and improved, C(2) continuous interpolant
 // fifth degree polynomial

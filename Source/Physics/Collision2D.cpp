@@ -1,6 +1,5 @@
-#include "stdafx.h"
-#include <Collision2D.h>
-#include <Physics2D.h>
+#include <Physics/Collision2D.h>
+#include <Physics/Physics2D.h>
 
 using namespace igad;
 

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <Component.h>
-#include <Entity.h>
-#include <World.h>
-#include <Shader.h>
-#include <Color.h>
-#include <Transform.h>
+#include <Core/Component.h>
+#include <Core/Entity.h>
+#include <Core/World.h>
+#include <Graphics/Shader.h>
+#include <Graphics/Color.h>
+#include <Core/Transform.h>
 
 namespace igad
 {

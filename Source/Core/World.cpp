@@ -1,6 +1,5 @@
-#include "stdafx.h"
-#include <World.h>
-#include <Entity.h>
+#include <Core/World.h>
+#include <Core/Entity.h>
 #include <algorithm>
 
 using namespace std;

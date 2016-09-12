@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Render.h>
-#include <Mesh.h>
+#include <Graphics/Render.h>
+#include <Graphics/Mesh.h>
 
 namespace igad
 {

@@ -1,11 +1,10 @@
-#include "stdafx.h"
-#include <Physics2D.h>
-#include <Entity.h>
-#include <World.h>
-#include <Transform.h>
+#include <Physics/Physics2D.h>
+#include <Core/Entity.h>
+#include <Core/World.h>
+#include <Core/Transform.h>
 #include <algorithm>
 #include <vector>
-#include <DebugRenderer.h>
+#include <Graphics/DebugRenderer.h>
 #include <Utils.h>
 #include <Defines.h>
 

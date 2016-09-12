@@ -1,9 +1,10 @@
 #pragma once
-#include <Entity.h>
-#include <Collision2D.h>
-#include <Transform.h>
+
+#include <Core/Entity.h>
+#include <Physics/Collision2D.h>
+#include <Core/Transform.h>
 #include <Utils.h> 
-#include <Matrix33.h>
+#include <Math/Matrix33.h>
 
 namespace igad
 {

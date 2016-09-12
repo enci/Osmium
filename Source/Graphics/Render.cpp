@@ -1,9 +1,8 @@
-#include "stdafx.h"
-#include <Render.h>
-#include <Entity.h>
+#include <Graphics/Render.h>
+#include <Core/Entity.h>
 #include <algorithm>
-#include <Transform.h>
-#include <Shader.h>
+#include <Core/Transform.h>
+#include <Graphics/Shader.h>
 
 using namespace igad;
 
