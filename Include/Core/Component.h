@@ -59,10 +59,10 @@ inline T* ComponentContainer<E>::GetComponent()
 {
 	for (auto& c : _components)
 	{
-		//uint n = c.get()->GetTypeID();
-		//uint id = T::GetCount();
-		uint id = T::GetID();
-		LOG("Get Component ID: %u", id);
+		// uint n = c.get()->GetTypeID();
+		// uint id = T::GetCount();
+		// uint id = T::GetID();
+		// LOG("Get Component ID: %u", id);
 		T* found = dynamic_cast<T*>(c.get());
 		if (found)
 			return  found;
