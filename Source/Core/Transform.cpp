@@ -1,5 +1,4 @@
-#include "stdafx.h"
-#include <Transform.h>
+#include <Core/Transform.h>
 
 using namespace igad;
 

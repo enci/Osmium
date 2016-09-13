@@ -1,5 +1,4 @@
-#include "stdafx.h"
-#include "Device.h"
+#include <Core/Device.h>
 
 using namespace igad;
 

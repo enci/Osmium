@@ -1,5 +1,5 @@
-#include <MeshRenderer.h>
-#include <Transform.h>
+#include <Graphics/MeshRenderer.h>
+#include <Core/Transform.h>
 
 using namespace igad;
 

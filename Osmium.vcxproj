@@ -156,6 +156,7 @@
     <ClInclude Include="Include\Core\Component.h" />
     <ClInclude Include="Include\Core\Device.h" />
     <ClInclude Include="Include\Core\Entity.h" />
+    <ClInclude Include="Include\Core\IDable.h" />
     <ClInclude Include="Include\Core\Transform.h" />
     <ClInclude Include="Include\Core\World.h" />
     <ClInclude Include="Include\Graphics\Color.h" />
@@ -182,6 +183,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Core\Device.cpp" />
     <ClCompile Include="Source\Core\Entity.cpp" />
+    <ClCompile Include="Source\Core\IDable.cpp" />
     <ClCompile Include="Source\Core\Transform.cpp" />
     <ClCompile Include="Source\Core\World.cpp" />
     <ClCompile Include="Source\Graphics\Color.cpp" />

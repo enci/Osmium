@@ -1,5 +1,4 @@
-#include "stdafx.h"
-#include "Entity.h"
+#include <Core/Entity.h>
 
 using namespace igad;
 
