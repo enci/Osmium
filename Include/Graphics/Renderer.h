@@ -5,15 +5,32 @@
 #include <Graphics/Shader.h>
 #include <Graphics/Texture.h>
 #include <unordered_map>
+#include <Core/Component.h>
+#include <Core/World.h>
 
 namespace igad
 {
 
-class Renderer
+class MeshRenderer : public Component<Entity>
 {
 public:
-	Renderer(Shader* shader);
+	MeshRenderer(Entity& entity) : Component(entity) {}
+	void Init(Mesh*	mesh, Texture* texture) { _mesh = mesh, _texture = texture; }
+	Mesh* GetMesh() { return _mesh; }
+	Texture* GetTexture() { return _texture; }
+
+private:
+	Mesh*	_mesh = nullptr;
+	Texture* _texture = nullptr;
+};
+
+class Renderer : public Component<World>
+{
+public:
+	Renderer(World& world) : Component<World>(world) {}
 	~Renderer();
+
+	void Init(Shader* shader);
 	
 	void Begin(const Matrix44& view, const Matrix44& projection);
 
@@ -23,15 +40,14 @@ public:
 	void End();
 
 protected:
-	Shader*	_shader;
-	ShaderParameter* _projParam;
-	ShaderParameter* _modelParam;
-	ShaderParameter* _viewParam;
-	ShaderParameter* _textureParam;
-	ShaderAttribute* _positionAttrib;
-	ShaderAttribute* _normalAttrib;
-	ShaderAttribute* _textureAttrib;
-
+	Shader*			 _shader = nullptr;
+	ShaderParameter* _projParam	= nullptr;
+	ShaderParameter* _modelParam = nullptr;
+	ShaderParameter* _viewParam	= nullptr;
+	ShaderParameter* _textureParam = nullptr;
+	ShaderAttribute* _positionAttrib = nullptr;
+	ShaderAttribute* _normalAttrib = nullptr;
+	ShaderAttribute* _textureAttrib = nullptr;
 
 	struct VAOEntry
 	{

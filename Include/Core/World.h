@@ -3,6 +3,7 @@
 #include <set>
 #include <vector>
 #include <memory>
+
 #include <Core/Entity.h>
 
 namespace igad
@@ -34,26 +35,11 @@ public:
 	/// Updates the entities
 	virtual void Update(float dt);
 
-	/// Updates the entities
-	virtual void PostUpdate(float dt);
-
-	// TODO: Remove maybe
+	/// Render the entities
 	virtual void Render() {}
-
-	// TODO: Remove maybe
-	virtual bool IsDone() { return false; }
-
+	
 	/// Removes and deletes all entities in this container
 	void Clear();
-
-	/// Commits changes (add/remove) to the entities
-	//void Commit();
-
-	/// Get a single entity with an ID
-	// Entity* GetEntityByID(int id);
-
-	/// Get the first entity with a name (names might not be unique)
-	// Entity* GetEntityByName(std::string name);
 
 	/// Get the first entity of a certain type
 	template<class T>

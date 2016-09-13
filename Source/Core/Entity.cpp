@@ -2,11 +2,8 @@
 
 using namespace igad;
 
-uint Entity::_nextValidID = 0;
-
 Entity::Entity(World& world)
-	: _ID(GetNextValidID())
-	, _name("")
+	: _name("")
 	, _world(world)	
 {}
 

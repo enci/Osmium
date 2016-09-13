@@ -169,39 +169,17 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Gameplay\Ammo.h" />
-    <ClInclude Include="Gameplay\Asteroid.h" />
-    <ClInclude Include="Gameplay\Blasteroids.h" />
-    <ClInclude Include="Gameplay\BlasteroidsAssets.h" />
-    <ClInclude Include="Gameplay\BlasteroidsCamera.h" />
-    <ClInclude Include="Gameplay\Crate.h" />
-    <ClInclude Include="Gameplay\Crystal.h" />
-    <ClInclude Include="Gameplay\ParticleSystem.h" />
-    <ClInclude Include="Gameplay\Projectiles.h" />
-    <ClInclude Include="Gameplay\Push.h" />
-    <ClInclude Include="Gameplay\Spaceship.h" />
-    <ClInclude Include="Gameplay\Wrapper.h" />
+    <ClInclude Include="Gameplay\PlanetsAssets.h" />
+    <ClInclude Include="Gameplay\PlanetWorld.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="UI\ScoreScreen.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\External\glad\src\glad.c" />
-    <ClCompile Include="Gameplay\Ammo.cpp" />
-    <ClCompile Include="Gameplay\Asteroid.cpp" />
-    <ClCompile Include="Gameplay\Blasteroids.cpp" />
-    <ClCompile Include="Gameplay\BlasteroidsAssets.cpp" />
-    <ClCompile Include="Gameplay\BlasteroidsCamera.cpp" />
-    <ClCompile Include="Gameplay\Crate.cpp" />
-    <ClCompile Include="Gameplay\Crystal.cpp" />
-    <ClCompile Include="Gameplay\ParticleSystem.cpp" />
-    <ClCompile Include="Gameplay\Projectiles.cpp" />
-    <ClCompile Include="Gameplay\Push.cpp" />
-    <ClCompile Include="Gameplay\Spaceship.cpp" />
-    <ClCompile Include="Gameplay\Wrapper.cpp" />
+    <ClCompile Include="Gameplay\PlanetsAssets.cpp" />
+    <ClCompile Include="Gameplay\PlanetWorld.cpp" />
     <ClCompile Include="Planets.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="UI\ScoreScreen.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

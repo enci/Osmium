@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Osmium", "..\Osmium.vcxproj", "{4B507F03-ED5F-4A65-9BBB-412B28867CF9}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Planets", "Planets\Planets.vcxproj", "{3E45B9EA-396B-4C95-9946-C68959A638BE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4B507F03-ED5F-4A65-9BBB-412B28867CF9} = {4B507F03-ED5F-4A65-9BBB-412B28867CF9}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

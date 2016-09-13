@@ -1,14 +1,12 @@
 #include "stdafx.h"
-//#include <vld.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-//#include "Asteroids.h"
-
 #include <iostream>
 #include <Core/Device.h>
-#include "Gameplay/Blasteroids.h"
-#include "UI/ScoreScreen.h"
+#include <Core/World.h>
+#include <Graphics/DebugRenderer.h>
+#include <Core/Transform.h>
+#include "Gameplay/PlanetWorld.h"
 
 using namespace igad;
 
@@ -22,6 +20,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 }
+
 
 int main(void)
 {
@@ -40,14 +39,12 @@ int main(void)
 	GLFWwindow* window;
 	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-	//window = glfwCreateWindow(mode->width, mode->height, "GLSL workshop", glfwGetPrimaryMonitor(), nullptr);
-	window = glfwCreateWindow(1920, 1080, "GLSL workshop", nullptr, nullptr);
-	// window = glfwCreateWindow(640, 360, "Blasteroids", nullptr, nullptr);
+	window = glfwCreateWindow(1280, 720, "GLSL workshop", nullptr, nullptr);
 
 	int major = glfwGetWindowAttrib(window, GLFW_CONTEXT_VERSION_MAJOR);
 	int minor = glfwGetWindowAttrib(window, GLFW_CONTEXT_VERSION_MINOR);
 	int revision = glfwGetWindowAttrib(window, GLFW_CONTEXT_REVISION);
-	std::cout << "OpenGL Version " << major << "." << minor << "." << revision << std::endl;
+	cout << "OpenGL Version " << major << "." << minor << "." << revision << endl;
 
 	if (!window)
 	{
@@ -60,7 +57,7 @@ int main(void)
 
 	if (!gladLoadGLLoader(GLADloadproc(glfwGetProcAddress)))
 	{
-		std::cout << "Failed to initialize OpenGL context" << std::endl;
+		cout << "Failed to initialize OpenGL context" << endl;
 		return -1;
 	}
 	InitDebugMessages();
@@ -73,48 +70,23 @@ int main(void)
 	auto lastFrame = glfwGetTime();
 
 	pDevice = new Device(window);
-	igad::World* world = nullptr;
-	float timer = 2.0f;
-	int worldkind = 0;
+	World* world = new PlanetWorld();
 
 	while (!glfwWindowShouldClose(window))
 	{
-		if (world == nullptr)
-		{
-			if (worldkind % 2 == 0)
-				world = new Blasteroids();
-			else
-				world = new ScoreScreen();
-
-			worldkind++;
-		}
-
 		auto currentFrame = glfwGetTime();
 		auto deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
 		glViewport(0, 0, width, height);
-
-		if (deltaTime > 0.033f)
-			deltaTime = 0.033f;
-
+		igad::Color bg("000a38");
+		glClearColor(bg.r / 255.0f, bg.g / 255.0f, bg.b / 255.0f, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_TEST);
+		
 		world->Update(deltaTime);
 		world->Render();
-
-
-		if (world->IsDone())
-		{
-			if (timer > 0)
-			{
-				timer -= deltaTime;
-			}
-			else
-			{
-				timer = 2.0f;
-				delete world;
-				world = nullptr;
-			}
-		}
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

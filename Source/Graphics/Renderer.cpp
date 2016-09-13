@@ -5,23 +5,26 @@ using namespace igad;
 
 const uint deleteCount = 4;
 
-igad::Renderer::Renderer(Shader* shader) : _shader(shader)
-{
-	_projParam = shader->GetParameter("u_projection");
-	_modelParam = shader->GetParameter("u_model");
-	_viewParam = shader->GetParameter("u_view");
-	_textureParam = shader->GetParameter("u_texture");
-	
-	_positionAttrib = shader->GetAttribute("a_position");
-	_normalAttrib = shader->GetAttribute("a_normal");
-	_textureAttrib = shader->GetAttribute("a_texture");
-}
-
 Renderer::~Renderer()
 {
 	for (auto& entry : _vaos)
 		glDeleteVertexArrays(1, &entry.second.vao);
 }
+
+void Renderer::Init(Shader* shader)
+{
+	_shader = shader;
+
+	_projParam = shader->GetParameter("u_projection");
+	_modelParam = shader->GetParameter("u_model");
+	_viewParam = shader->GetParameter("u_view");
+	_textureParam = shader->GetParameter("u_texture");
+
+	_positionAttrib = shader->GetAttribute("a_position");
+	_normalAttrib = shader->GetAttribute("a_normal");
+	_textureAttrib = shader->GetAttribute("a_texture");
+}
+
 
 void Renderer::Begin(const Matrix44& view, const Matrix44& projection)
 {

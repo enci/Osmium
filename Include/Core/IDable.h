@@ -9,16 +9,7 @@ namespace igad
 	class IDableBase
 	{	
 	protected:
-
-	public:
 		static uint _count;
-
-		/*
-		IDableBase()
-		{
-			static uint dymmu = _count;
-		}
-		*/
 	};
 
 	template<typename T>
@@ -34,8 +25,6 @@ namespace igad
 
 	public:
 
-		///
-		/// Get the type ID
 		// ReSharper disable once CppMemberFunctionMayBeStatic
 		uint GetTypeID() const { return _id; }
 
