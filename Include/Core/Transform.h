@@ -7,6 +7,7 @@
 namespace Osm
 {
 
+/*
 class Transform : public Component<Entity>
 {
 public:
@@ -50,7 +51,7 @@ inline Transform::Transform(Entity& entity)
 {
 }
 
-	inline Matrix44 Transform::GetWorld()
+inline Matrix44 Transform::GetWorld()
 {
 	Matrix44 world = _orientation * Matrix44::CreateScale(_scale);
 	world.SetTranslation(_position);
@@ -60,5 +61,7 @@ inline Transform::Transform(Entity& entity)
 
 	return world;
 }
+
+*/
 
 }

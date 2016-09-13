@@ -3,6 +3,7 @@
 
 using namespace Osm;
 
+/*
 const uint deleteCount = 4;
 
 Renderer::~Renderer()
@@ -123,4 +124,4 @@ void Renderer::End()
 		}
 	}
 }
-
+*/

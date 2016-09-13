@@ -11,6 +11,7 @@
 namespace Osm
 {
 
+/*
 class MeshRenderer : public Component<Entity>
 {
 public:
@@ -57,5 +58,6 @@ protected:
 
 	std::unordered_map<const Mesh*, VAOEntry> _vaos;
 };
+*/
 
 }

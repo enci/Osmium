@@ -70,7 +70,6 @@ int main(void)
 	auto lastFrame = glfwGetTime();
 
 	pDevice = new Device(window);
-	World* world = new PlanetWorld();
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -84,15 +83,11 @@ int main(void)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
-		
-		world->Update(deltaTime);
-		world->Render();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
-	delete world;
 	delete pDevice;
 
 	glfwDestroyWindow(window);
