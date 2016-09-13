@@ -3,9 +3,6 @@
 
 namespace Osm
 {
-	///
-	/// This base class is shared 
-	/// 
 	class IDableBase
 	{	
 	protected:
@@ -20,7 +17,6 @@ namespace Osm
 		{			
 			static uint dymmy = ++IDableBase::_count;
 			_id = dymmy;
-			_totalNo++;
 		}
 
 	public:
@@ -30,18 +26,11 @@ namespace Osm
 
 		static uint GetID() { return _id; }
 
-		static int GetCount() { return _totalNo; }
-
 	private:
-
-		static uint _totalNo;
 
 		static uint _id;
 	};
 
 	template<typename T>
 	uint IDable<T>::_id;
-
-	template<typename T>
-	uint IDable<T>::_totalNo = 0;
 }
