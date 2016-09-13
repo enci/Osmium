@@ -6,7 +6,7 @@
                      (((x) & 0x0000FF00) << 8)  | \
                      (((x) & 0x000000FF) << 24) )
 
-using namespace igad;
+using namespace Osm;
 
 Color Color::Red        = Color(255u,	 0u,	 0u,	   255u);
 Color Color::Green      = Color(0u,      255u,   0u,       255u);

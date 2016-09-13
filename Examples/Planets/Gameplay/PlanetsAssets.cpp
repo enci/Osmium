@@ -3,7 +3,7 @@
 #include <Graphics/Shader.h>
 #include <Graphics/Texture.h>
 
-using namespace igad;
+using namespace Osm;
 
 PlanetsAssets::PlanetsAssets(World& world) : Component(world)
 {

@@ -5,7 +5,7 @@
 #include <Math/Vector3.h>
 #include <Math/Vector2.h>
 
-namespace igad
+namespace Osm
 {
 
 struct VertexFormat

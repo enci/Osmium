@@ -4,7 +4,7 @@
 #include <Core/Entity.h>
 #include <Math/Matrix44.h>
 
-namespace igad
+namespace Osm
 {
 
 class Transform : public Component<Entity>

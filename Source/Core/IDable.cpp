@@ -1,3 +1,3 @@
 #include <Core/IDable.h>
 
-igad::uint igad::IDableBase::_count = 0;
+Osm::uint Osm::IDableBase::_count = 0;

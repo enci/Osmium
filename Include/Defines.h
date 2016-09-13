@@ -11,7 +11,7 @@
 	#endif
 #endif
 
-namespace igad
+namespace Osm
 {
 
 typedef unsigned int uint;

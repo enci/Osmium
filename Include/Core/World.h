@@ -6,7 +6,7 @@
 
 #include <Core/Entity.h>
 
-namespace igad
+namespace Osm
 {
 class Entity;
 

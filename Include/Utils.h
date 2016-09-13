@@ -6,7 +6,7 @@
 #include <Math/Matrix33.h>
 #include <Math/Matrix44.h>
 
-namespace igad
+namespace Osm
 {
 
 /// Read an entire text file into a string. Only use for small files.

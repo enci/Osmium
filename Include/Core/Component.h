@@ -3,7 +3,7 @@
 #include <vector>
 #include <Core/IDable.h>
 
-namespace igad
+namespace Osm
 {
 
 template <class E>

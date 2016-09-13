@@ -8,7 +8,7 @@
 #include <Core/Transform.h>
 #include "Gameplay/PlanetWorld.h"
 
-using namespace igad;
+using namespace Osm;
 
 static void error_callback(int error, const char* description)
 {
@@ -79,7 +79,7 @@ int main(void)
 		lastFrame = currentFrame;
 
 		glViewport(0, 0, width, height);
-		igad::Color bg("000a38");
+		Osm::Color bg("000a38");
 		glClearColor(bg.r / 255.0f, bg.g / 255.0f, bg.b / 255.0f, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_CULL_FACE);

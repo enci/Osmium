@@ -3,7 +3,7 @@
 #include <algorithm>
 
 using namespace std;
-using namespace igad;
+using namespace Osm;
 
 World::~World()
 {
@@ -43,7 +43,7 @@ void World::Update(float dt)
 	_entities.erase(toRemove, _entities.end());
 }
 
-void igad::World::Clear()
+void Osm::World::Clear()
 {
 	_entities.clear();
 	_addQueue.clear();

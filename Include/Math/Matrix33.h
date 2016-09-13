@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <Math/Vector2.h> 
 
-namespace  igad
+namespace  Osm
 {
 
 /// A matrix implemetation for transforming 2D vectors,

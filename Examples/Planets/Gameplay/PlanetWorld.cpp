@@ -4,10 +4,10 @@
 #include "PlanetsAssets.h"
 #include <ctime>
 
-using namespace igad;
+using namespace Osm;
 
 
-Celesital::Celesital(igad::World& world) : Entity(world)
+Celesital::Celesital(Osm::World& world) : Entity(world)
 {
 	rot = RandInRange(-Pi, Pi);
 }
@@ -18,7 +18,7 @@ void Celesital::Update(float dt)
 	if (dist == -1.0f)
 	{
 		dist = trns->GetPosition().Magnitude();
-		vel = 5.0f / dist;
+		vel = RandInRange(3.0f, 8.0f) / dist;
 	}
 
 	rot += vel * dt;
@@ -46,28 +46,42 @@ PlanetWorld::PlanetWorld()
 	auto sunRen = sun->CreateComponent<MeshRenderer>();
 	sunRen->Init(ast->GeoSpheres[5], ast->WhiteTexture);
 
-	for(int i = 0; i < 8; i++)
+
+	size_t n = 15;
+	vector<Transform*> transforms;
+	transforms.resize(n);
+
+	for(int i = 0; i < n; i++)
 	{
+		float s = RandInRange(0.1f, 0.4f);
 
 		auto parent = CreateEntity<Celesital>();
-		auto parentTrns = parent->CreateComponent<Transform>();
-		parentTrns->SetPosition(
-			Vector3(RandInRange(-15.0f, 15.0f),
+		transforms[i] = parent->CreateComponent<Transform>();
+		if (RandInRange(0.0f, 1.0f) < 0.3f && i > 1)
+		{
+			transforms[i]->SetPosition(
+				Vector3(RandInRange(-3.0f, 3.0f),
+					0,
+					RandInRange(-3.0f, 3.0f)));
+			int p = RandInRange(0, i);
+			transforms[i]->SetParent(transforms[p]);
+			transforms[p]->SetUniformScale(2.0f);
+			s *= 0.3f;
+		}
+		else
+		{
+			transforms[i]->SetPosition(
+				Vector3(RandInRange(-15.0f, 15.0f),
 					0,
 					RandInRange(-15.0f, 15.0f)));
+		}
 
 		auto planet = CreateEntity<Entity>();
 		auto planetTrns = planet->CreateComponent<Transform>();
 		auto planetRen = planet->CreateComponent<MeshRenderer>();
-		planetRen->Init(ast->GeoSpheres[4], ast->GreyTexture);		
-		float s = RandInRange(0.1f, 0.4f);
+		planetRen->Init(ast->GeoSpheres[4], ast->GreyTexture);				
 		planetTrns->SetScale(Vector3(s, s, s));
-		planetTrns->SetParent(parentTrns);
-
-		while(RandInRange(0.0f, 1.0f) < 0.2f)
-		{
-			auto moon =	
-		}
+		planetTrns->SetParent(transforms[i]);
 	}
 }
 

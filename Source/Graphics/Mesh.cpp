@@ -5,7 +5,7 @@
 #include <Utils.h>
 
 using namespace std;
-using namespace igad;
+using namespace Osm;
 
 namespace
 {
@@ -37,14 +37,14 @@ Mesh::Mesh() : _indexCount(0), _vbo{ 0, 0 }, _vao(0)
 {
 }
 
-igad::Mesh::~Mesh()
+Osm::Mesh::~Mesh()
 {
 	ClearGL();
 }
 
 bool Mesh::Load(const string& filename)
 {
-	const std::string dataString = igad::ReadFile(filename);
+	const std::string dataString = Osm::ReadFile(filename);
 
 	if (dataString.empty())
 	{

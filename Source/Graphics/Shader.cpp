@@ -6,7 +6,7 @@
 #include <Graphics/Color.h>
 
 using namespace std;
-using namespace igad;
+using namespace Osm;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Compile shader and report success or failure
@@ -289,7 +289,7 @@ GLuint Shader::GetProgram() const
 	return _program;
 }
 
-void igad::Shader::Deactivate()
+void Osm::Shader::Deactivate()
 {
 	glUseProgram(0);
 }

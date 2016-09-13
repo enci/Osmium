@@ -1,7 +1,7 @@
 #include <Graphics/Renderer.h>
 #include <algorithm>
 
-using namespace igad;
+using namespace Osm;
 
 const uint deleteCount = 4;
 

@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-namespace igad
+namespace Osm
 {
 ///
 /// A 3d vector

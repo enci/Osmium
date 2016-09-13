@@ -1,6 +1,6 @@
 #include <Math/Vector3.h>
 
-using namespace igad;
+using namespace Osm;
 
 /// The default constructor creates a zero vector.
 Vector3::Vector3() : x(0), y(0), z(0) {}

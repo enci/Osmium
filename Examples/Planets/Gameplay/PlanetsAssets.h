@@ -4,15 +4,15 @@
 #include <Graphics/Shader.h>
 #include <Graphics/Mesh.h>
 
-class PlanetsAssets : public igad::Component<igad::World>
+class PlanetsAssets : public Osm::Component<Osm::World>
 {
 public:
-	PlanetsAssets(igad::World& world);
+	PlanetsAssets(Osm::World& world);
 	~PlanetsAssets();
 
-	igad::Shader*	BasicShader				= nullptr;
-	igad::Texture*	WhiteTexture			= nullptr;
-	igad::Texture*	GreyTexture				= nullptr;
-	igad::Mesh*		GeoSpheres[6];
+	Osm::Shader*	BasicShader				= nullptr;
+	Osm::Texture*	WhiteTexture			= nullptr;
+	Osm::Texture*	GreyTexture				= nullptr;
+	Osm::Mesh*		GeoSpheres[6];
 };
 

@@ -7,7 +7,7 @@
 
 #define OPENGL_ES 0
 
-namespace igad
+namespace Osm
 {
 #ifdef DEBUG
 

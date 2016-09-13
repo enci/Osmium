@@ -7,10 +7,10 @@
 #include <Core/Transform.h>
 
 
-class Celesital : public igad::Entity
+class Celesital : public Osm::Entity
 {
 public:
-	Celesital(igad::World& world);
+	Celesital(Osm::World& world);
 
 	virtual void Update(float dt) override;
 
@@ -21,7 +21,7 @@ private:
 	float dist = -1.0f;
 };
 
-class PlanetWorld : public igad::World
+class PlanetWorld : public Osm::World
 {
 public:
 	PlanetWorld();
@@ -29,9 +29,9 @@ public:
 	void Render() override;
 
 protected:
-	igad::Matrix44	_view;
-	igad::Matrix44	_projection;
+	Osm::Matrix44	_view;
+	Osm::Matrix44	_projection;
 
-	igad::Texture*	_texture;
-	igad::Mesh*		_mesh;
+	Osm::Texture*	_texture;
+	Osm::Mesh*		_mesh;
 };

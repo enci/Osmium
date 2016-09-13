@@ -3,7 +3,7 @@
 #include <vector>
 #include <Graphics/OpenGL.h>
 
-namespace igad
+namespace Osm
 {
 
 class Texture

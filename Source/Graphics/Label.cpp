@@ -11,7 +11,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 using namespace std;
-using namespace igad;
+using namespace Osm;
 
 const uint maxBufferWidth = 1028;
 const uint maxBufferHeight = 512;
@@ -37,7 +37,7 @@ Label::Label(	const string& labelText,
 {
 	// We'll start basic by caching just the raw font blob,
 	// at some point we could also cache the FT_Face instance.
-	auto fontdata = igad::ReadFile(fontFilename);
+	auto fontdata = Osm::ReadFile(fontFilename);
 
 #ifdef _WIN32 // defined to 32 and 64
 	FILE* file;

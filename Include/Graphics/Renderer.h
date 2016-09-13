@@ -8,7 +8,7 @@
 #include <Core/Component.h>
 #include <Core/World.h>
 
-namespace igad
+namespace Osm
 {
 
 class MeshRenderer : public Component<Entity>
