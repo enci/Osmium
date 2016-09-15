@@ -6,7 +6,7 @@
 #include <Utils.h> 
 #include <Math/Matrix33.h>
 
-namespace igad
+namespace Osm
 {
 
 ///

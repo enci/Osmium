@@ -3,7 +3,7 @@
 #include <Graphics/Render.h>
 #include <Graphics/Mesh.h>
 
-namespace igad
+namespace Osm
 {
 
 class LightShaderParameter;

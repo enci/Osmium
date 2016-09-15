@@ -6,7 +6,7 @@
 #include <Graphics/Texture.h>
 #include <unordered_map>
 
-namespace igad
+namespace Osm
 {
 
 class Renderer

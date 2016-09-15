@@ -4,7 +4,7 @@
 #include <Core/Transform.h>
 #include <Graphics/Shader.h>
 
-using namespace igad;
+using namespace Osm;
 
 void RenderManager::Render()
 {

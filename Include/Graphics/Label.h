@@ -3,7 +3,7 @@
 #include <Graphics/Texture.h>
 #include <Math/Vector2.h>
 
-namespace igad
+namespace Osm
 {
 
 class Label : public Texture

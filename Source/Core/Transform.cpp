@@ -1,6 +1,6 @@
 #include <Core/Transform.h>
 
-using namespace igad;
+using namespace Osm;
 
 Vector3 Transform::GetScale()
 {

@@ -6,7 +6,7 @@
 #include <Graphics/Color.h>
 
 using namespace std;
-using namespace igad;
+using namespace Osm;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Compile shader and report success or failure
@@ -261,7 +261,8 @@ Shader::Shader(const std::string& vertexFilename, const std::string& fragmentFil
 Shader::Shader(	const std::string& vertexFilename,
 				const std::string& geometryFilename,
 				const std::string& fragmentFilename)
-	: _program(0)
+	: Resource(RESOURCE_TYPE_SHADER)
+	,_program(0)
 {
 	bool success = Load(vertexFilename, fragmentFilename, geometryFilename);
 	if (!success)
@@ -289,7 +290,7 @@ GLuint Shader::GetProgram() const
 	return _program;
 }
 
-void igad::Shader::Deactivate()
+void Osm::Shader::Deactivate()
 {
 	glUseProgram(0);
 }

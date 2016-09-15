@@ -1,12 +1,13 @@
 #pragma once
 
 #include <string>
+#include <Defines.h>
 #include <Math/Vector3.h>
 #include <Math/Vector2.h>
 #include <Math/Matrix33.h>
 #include <Math/Matrix44.h>
 
-namespace igad
+namespace Osm
 {
 
 /// Read an entire text file into a string. Only use for small files.
@@ -20,6 +21,9 @@ std::string ReadFile(const std::string& filename);
 /// @text       Text to save
 ///
 bool SaveFile(const std::string& filename, const std::string& text);
+
+/// String hash using sdbm algorithm
+ullong StringHash(const std::string& str);
 
 /// Spherical coordinates defined with radius and two angles
 struct SphericalCoordinates

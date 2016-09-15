@@ -2,7 +2,7 @@
 #include <Math/Vector2.h>
 #include <Defines.h>
 
-using namespace igad;
+using namespace Osm;
 
 Vector2 Vector2::RandomUnit()
 {

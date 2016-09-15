@@ -2,11 +2,12 @@
 
 #include <vector>
 #include <Graphics/OpenGL.h>
+#include <Core/Resource.h>
 
-namespace igad
+namespace Osm
 {
 
-class Texture
+class Texture : public Resource
 {
 public:
 
@@ -28,9 +29,10 @@ public:
 	/// Creates a texture from RGBA provided data
 	void CreateGLTextureWithData(GLubyte* data, bool genMipMaps);
 
-protected:
-	/// Used for the label
-	Texture() {}	
+protected:	
+
+	/// Only for the Label
+	Texture() : Resource(RESOURCE_TYPE_TEXTURE) {}
 
 	GLuint _texture = 0;
 	int _width		= 0;

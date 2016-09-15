@@ -7,7 +7,7 @@
 
 #define OPENGL_ES 0
 
-namespace igad
+namespace Osm
 {
 #ifdef DEBUG
 
@@ -42,7 +42,7 @@ inline const char* GLErrorString(GLenum error)
     while ( (error = glGetError()) != GL_NO_ERROR)                  \
     {                                                               \
         LOG( "OpenGL ERROR: %s\nCHECK POINT: %s (line %d)\n",       \
-        igad::GLErrorString(error), __FILE__, __LINE__ );			\
+        Osm::GLErrorString(error), __FILE__, __LINE__ );			\
         err = true;                                                 \
     }                                                               \
     ASSERT(!err);                                                   \
@@ -242,4 +242,4 @@ static void InitDebugMessages()
 
 #define DEBUG
 
-} // igad
+} // Osm

@@ -5,7 +5,7 @@
 #include <Math/Vector3.h>
 #include <Math/Matrix44.h>
 
-namespace igad
+namespace Osm
 {
 
 ///
@@ -33,26 +33,26 @@ public:
     /// Queues a line segment for drawing
 	void AddLine(	const Vector3& from,
                     const Vector3& to,
-                    const Color& color = igad::Color::Red);
+                    const Color& color = Osm::Color::Red);
         
 	/// Queues a circle for drawing
 	void AddCircle(const Vector3& center,
                     float radius         = 1.0f,
-                    const Color& color   = igad::Color::Red,
+                    const Color& color   = Osm::Color::Red,
                     int divs             = 12);
         
     /// Queues a sphere for drawing
 	void AddAxisSphere(const Vector3& center,
                         float radius         = 1.0f,
-                        const Color& xzColor = igad::Color::Green,
-                        const Color& xyColor = igad::Color::Blue,
-                        const Color& yzColor = igad::Color::Red,
+                        const Color& xzColor = Osm::Color::Green,
+                        const Color& xyColor = Osm::Color::Blue,
+                        const Color& yzColor = Osm::Color::Red,
                         int divs             = 12);
 
     /// Queues a sphere for drawing
 	void AddSphere(const Vector3& center,
                     float radius         = 1.0f,
-                    const Color& color   = igad::Color::Red,
+                    const Color& color   = Osm::Color::Red,
                     int divs             = 12)
     { AddAxisSphere(center, radius, color, color, color,divs); }
         

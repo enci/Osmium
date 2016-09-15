@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-namespace igad
+namespace Osm
 {
 ///
 /// A 3d vector
@@ -97,5 +97,5 @@ inline Vector3 operator*(float val, const Vector3& rhs)
 	return rhs * val;
 }
 
-} // igad
+} // Osm
 

@@ -1,7 +1,7 @@
 #pragma once
 #include <Defines.h>
 
-namespace igad
+namespace Osm
 {
 	///
 	/// This base class is shared 

@@ -1,7 +1,7 @@
 #include <Physics/Collision2D.h>
 #include <Physics/Physics2D.h>
 
-using namespace igad;
+using namespace Osm;
 
 float Collision2D::SeparatingVelocity() const
 {

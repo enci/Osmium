@@ -4,8 +4,9 @@
 #include <Graphics/OpenGL.h>
 #include <Math/Vector3.h>
 #include <Math/Vector2.h>
+#include <Core/Resource.h>
 
-namespace igad
+namespace Osm
 {
 
 struct VertexFormat
@@ -15,7 +16,7 @@ struct VertexFormat
 	Vector2 Texture;
 };
 
-class Mesh
+class Mesh : public Resource
 {
 public:
 

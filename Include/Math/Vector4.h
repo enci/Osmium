@@ -4,7 +4,7 @@
 
 #include <math.h>
 
-namespace igad
+namespace Osm
 {
     /// A logical 4D vector. It stores 4 values for padding and
     /// homogenuos coordinates

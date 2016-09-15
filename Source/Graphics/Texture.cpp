@@ -1,9 +1,9 @@
 #include <Graphics/Texture.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
-using namespace igad;
+using namespace Osm;
 
-Texture::Texture(const std::string& filename)
+Texture::Texture(const std::string& filename) : Resource(RESOURCE_TYPE_TEXTURE)
 {
 	GLubyte* data = stbi_load(filename.c_str(), &_width, &_height, &_channels, 4);
 
@@ -18,7 +18,12 @@ Texture::Texture(const std::string& filename)
 	}
 }
 
-Texture::Texture(int width, int height) : _texture(0), _width(width), _height(height) {}
+Texture::Texture(int width, int height)
+	: Resource(RESOURCE_TYPE_TEXTURE)
+	, _texture(0)
+	, _width(width)
+	, _height(height)
+{}
 
 Texture::~Texture()
 {

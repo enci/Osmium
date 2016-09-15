@@ -1,8 +1,8 @@
 #include <Core/Device.h>
 
-using namespace igad;
+using namespace Osm;
 
-Device* igad::pDevice;
+Device* Osm::pDevice = nullptr;
 
 Device::Device(GLFWwindow* window) : _window(window)
 {

@@ -1,7 +1,7 @@
 #include <Graphics/MeshRenderer.h>
 #include <Core/Transform.h>
 
-using namespace igad;
+using namespace Osm;
 
 MeshRenderer::MeshRenderer(Entity& entity)
 	: Renderable(entity)	

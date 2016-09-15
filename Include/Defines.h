@@ -11,13 +11,14 @@
 	#endif
 #endif
 
-namespace igad
+namespace Osm
 {
 
 typedef unsigned int uint;
 typedef unsigned long ulong;
 typedef unsigned short ushort;
 typedef unsigned char uchar;
+typedef unsigned long long ullong;
 
 const float Pi = 3.1415926535897932384626433832795f;
 const float TwoPi = Pi * 2;

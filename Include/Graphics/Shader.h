@@ -8,8 +8,9 @@
 #include <Math/Matrix44.h>
 #include <Math/Vector3.h>
 #include <Math/Vector2.h>
+#include <Core/Resource.h>
 
-namespace igad
+namespace Osm
 {
 
 class Shader;
@@ -197,12 +198,12 @@ protected:
 ///
 /// Shader is a class representing a compiled GPU program
 ///
-class Shader
+class Shader : public Resource
 {
 public:
 	/// Create an empty shader. You will need to provide the source with LoadSource() before 
 	/// you can use the shader.
-	Shader() {}
+	Shader() : Resource(RESOURCE_TYPE_SHADER) {}
 
 	/// Create a shader with vertex and fragment programs 
 	Shader(	const std::string& vertexFilename,

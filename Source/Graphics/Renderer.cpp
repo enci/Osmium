@@ -1,11 +1,11 @@
 #include <Graphics/Renderer.h>
 #include <algorithm>
 
-using namespace igad;
+using namespace Osm;
 
 const uint deleteCount = 4;
 
-igad::Renderer::Renderer(Shader* shader) : _shader(shader)
+Osm::Renderer::Renderer(Shader* shader) : _shader(shader)
 {
 	_projParam = shader->GetParameter("u_projection");
 	_modelParam = shader->GetParameter("u_model");

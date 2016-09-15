@@ -3,13 +3,13 @@
 #include <algorithm>
 
 using namespace std;
-using namespace igad;
+using namespace Osm;
 
 World::~World()
 {
 }
 
-void igad::World::RemoveEntity(Entity * e)
+void Osm::World::RemoveEntity(Entity * e)
 {
 	_removeQueue.insert(e);
 }
@@ -50,7 +50,7 @@ void World::PostUpdate(float dt)
 		e->PostUpdate(dt);
 }
 
-void igad::World::Clear()
+void Osm::World::Clear()
 {
 	_entities.clear();
 	_addQueue.clear();

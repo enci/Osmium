@@ -3,12 +3,12 @@
 #include <Graphics/Shader.h>
 #include <Graphics/OpenGL.h>
 
-using namespace igad;
+using namespace Osm;
 using namespace std;
 
 // Actualy creates a new DebugDraw, but the real work is in the Init not the ctor
 // This serves as a manager
-DebugRenderer igad::gDebugRenderer;
+DebugRenderer Osm::gDebugRenderer;
 
 ////////////////////////////////////////////////////////////////////////////////
 // No args constructor

@@ -4,7 +4,7 @@
 #include <Defines.h>
 #include <Core/Component.h>
 
-namespace igad
+namespace Osm
 {
 
 struct Collision2D;

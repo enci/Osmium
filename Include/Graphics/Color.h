@@ -6,7 +6,7 @@
 
 using namespace std;
 
-namespace igad
+namespace Osm
 {
     class Color
     {

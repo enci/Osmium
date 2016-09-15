@@ -1,6 +1,6 @@
 #include <Core/Entity.h>
 
-using namespace igad;
+using namespace Osm;
 
 uint Entity::_nextValidID = 0;
 

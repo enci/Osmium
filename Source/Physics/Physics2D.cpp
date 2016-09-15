@@ -8,7 +8,7 @@
 #include <Utils.h>
 #include <Defines.h>
 
-using namespace igad;
+using namespace Osm;
 const float skin = 0.1f;
 
 void AABB::Clear()
@@ -83,7 +83,7 @@ Vector2 PhysicsBody2D::GetVelocityAtPoint(const Vector2& point) const
 	return _velocity + _angularVelocity * ap.Perpendicular();
 }
 
-void igad::PhysicsBody2D::AddForceAtWorldPoint(const Vector2& f, const Vector2& p)
+void Osm::PhysicsBody2D::AddForceAtWorldPoint(const Vector2& f, const Vector2& p)
 {
 	Vector2 toP = p - _position;
 	_torque += toP.Cross(f);
@@ -92,7 +92,7 @@ void igad::PhysicsBody2D::AddForceAtWorldPoint(const Vector2& f, const Vector2& 
 	gDebugRenderer.AddLine(ToVector3(p), ToVector3(p+f), Color::Purple);
 }
 
-void igad::PhysicsBody2D::AddForceAtLocalPoint(const Vector2& f, const Vector2& p)
+void Osm::PhysicsBody2D::AddForceAtLocalPoint(const Vector2& f, const Vector2& p)
 {
 	Vector2 pt = _matrix.TransformVector(p);
 	AddForceAtWorldPoint(f, pt);
@@ -140,7 +140,7 @@ const vector<Vector2>& PhysicsBody2D::GetCollisionShapeWorld() const
 	return _collisionShapeWorld;
 }
 
-void igad::PhysicsBody2D::SetPosition(const Vector2& position)
+void Osm::PhysicsBody2D::SetPosition(const Vector2& position)
 {
 	_position = position;
 	_transform->SetPosition(ToVector3(position));
@@ -170,7 +170,7 @@ void PhysicsBody2D::UpdateDerived()
 
 	_boundingBox.Clear();
 
-	for (auto i = 0; i < n; i++)
+	for (size_t i = 0; i < n; i++)
 	{
 		Vector2& v = _collisionShape[i];
 		_collisionShapeWorld[i] = _matrix.TransformVector(v);
@@ -565,7 +565,7 @@ std::vector<Vector2> GrahamScanCovexHull(vector<Vector2> vertices)
 	return hull;
 }
 
-std::vector<Vector2> igad::CreateConvexHull(const std::vector<Vector2>& vertices)
+std::vector<Vector2> Osm::CreateConvexHull(const std::vector<Vector2>& vertices)
 {
 	return GrahamScanCovexHull(vertices);
 }

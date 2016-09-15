@@ -4,9 +4,9 @@
 #include <Defines.h>
 
 using namespace std;
-using namespace igad;
+using namespace Osm;
 
-string igad::ReadFile(const string& filename)
+string Osm::ReadFile(const string& filename)
 {
 	unsigned int length;
 	char* buffer;
@@ -42,7 +42,7 @@ string igad::ReadFile(const string& filename)
 	return ret;
 }
 
-bool igad::SaveFile(const std::string& filename,
+bool Osm::SaveFile(const std::string& filename,
 	const std::string& text)
 {
 	ofstream os;
@@ -64,7 +64,24 @@ bool igad::SaveFile(const std::string& filename,
 	return true;
 }
 
-void igad::UpdateMatrix44FromMatrix33(Matrix44& output, const Matrix33& input)
+////////////////////////////////////////////////////////////////////////////////
+// Strig hashing function
+// Taken from http://www.cse.yorku.ca/~oz/hash.html (public domain)
+////////////////////////////////////////////////////////////////////////////////
+ullong Osm::StringHash(const std::string& str)
+{
+	unsigned long hash = 0;
+	int c;
+	const char* cstr = str.c_str();
+
+	while ((c = *cstr++))
+		hash = c + (hash << 6) + (hash << 16) - hash;
+
+	return hash;
+}
+
+
+void Osm::UpdateMatrix44FromMatrix33(Matrix44& output, const Matrix33& input)
 {
 	output.m[0][0] = input.m[0][0];
 	output.m[0][2] = input.m[0][1];
@@ -76,7 +93,7 @@ void igad::UpdateMatrix44FromMatrix33(Matrix44& output, const Matrix33& input)
 	output.m[3][2] = input.m[2][1];
 }
 
-igad::SphericalCoordinates igad::CartesianToSpherical(const Vector3& cvec)
+Osm::SphericalCoordinates Osm::CartesianToSpherical(const Vector3& cvec)
 {
 	SphericalCoordinates scoord;
 	scoord.r		= sqrt(cvec.x*cvec.x + cvec.y*cvec.y + cvec.z*cvec.z);
@@ -86,7 +103,7 @@ igad::SphericalCoordinates igad::CartesianToSpherical(const Vector3& cvec)
 	return scoord;
 }
 
-Vector3 igad::SphericalToCartesian(const SphericalCoordinates& scoord)
+Vector3 Osm::SphericalToCartesian(const SphericalCoordinates& scoord)
 {
 	Vector3 cvec;	
 	cvec.x = scoord.r * sin(scoord.theta) * cosf(scoord.fi);
@@ -95,7 +112,7 @@ Vector3 igad::SphericalToCartesian(const SphericalCoordinates& scoord)
 	return cvec;
 }
 
-Vector3 igad::RandomOnUnitSphere()
+Vector3 Osm::RandomOnUnitSphere()
 {
 	Vector3 v;
 	do

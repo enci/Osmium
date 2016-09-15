@@ -2,7 +2,7 @@
 
 #include <Math/Vector2.h>
 
-namespace igad
+namespace Osm
 {
 
 class PhysicsBody2D;

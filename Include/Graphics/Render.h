@@ -7,7 +7,7 @@
 #include <Graphics/Color.h>
 #include <Core/Transform.h>
 
-namespace igad
+namespace Osm
 {
 
 class Shader;
