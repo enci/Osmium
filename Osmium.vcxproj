@@ -166,6 +166,7 @@
     <ClInclude Include="Include\Defines.h" />
     <ClInclude Include="Include\Graphics\Label.h" />
     <ClInclude Include="Include\Graphics\MeshRenderer.h" />
+    <ClInclude Include="Include\Graphics\MeshTool\MeshFormat_generated.h" />
     <ClInclude Include="Include\Graphics\PerlinNoise.h" />
     <ClInclude Include="Include\Graphics\Render.h" />
     <ClInclude Include="Include\Math\Matrix33.h" />
@@ -206,6 +207,9 @@
     <ClCompile Include="Source\Utils.cpp" />
     <ClCompile Include="Source\Math\Vector2.cpp" />
     <ClCompile Include="Source\Math\Vector3.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Include\Graphics\MeshTool\MeshFormat.fbs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
