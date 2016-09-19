@@ -1,0 +1,26 @@
+struct Vec2
+{
+	x:float;
+	y:float;
+}
+
+struct Vec3
+{
+	x:float;
+	y:float;
+	z:float;
+}
+
+table Vertex
+{
+	Position:Vec3;
+	Normal:Vec3;
+	Texture:Vec2;
+}
+
+table  BinaryMesh
+{
+	IndexCount:uint;
+	Vertices:[Vertex];
+	Indices:[uint];
+}
