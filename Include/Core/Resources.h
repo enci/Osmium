@@ -14,7 +14,9 @@ public:
 	~Resources() { /* TODO: Make sure there are no resources */ }
 
 	template<typename T, typename... Args>
-	T* LoadResources(Args... args);
+	T* LoadResource(Args... args);
+
+	void ReleaseResource(Resource* res);
 
 protected:
 
@@ -34,7 +36,7 @@ protected:
 extern Resources* pResources;
 
 template<typename T, typename... Args>
-T* Resources::LoadResources(Args... args)
+T* Resources::LoadResource(Args... args)
 {	
 	ullong id = T::CalculateResourceID(args...);
 

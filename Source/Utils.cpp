@@ -70,7 +70,7 @@ bool Osm::SaveFile(const std::string& filename,
 ////////////////////////////////////////////////////////////////////////////////
 ullong Osm::StringHash(const std::string& str)
 {
-	unsigned long hash = 0;
+	ullong hash = 0;
 	int c;
 	const char* cstr = str.c_str();
 

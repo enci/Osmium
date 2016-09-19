@@ -44,7 +44,7 @@ public:
 	void Apply();
 
 	/// Get the VAO
-	GLuint GetVertexArray() const;
+//	GLuint GetVertexArray() const;
 
 	/// Getter for VBO's
 	const GLuint* GetVertexBuffers() const;
@@ -61,7 +61,7 @@ public:
 	/// Only valid if the mesh is not ready to be rendered yet
 	std::vector<GLushort>	GetIndices() const { return	_indices; }
 
-protected:
+protected:	
 
 	/// Clear 
 	void ClearGL();
@@ -80,7 +80,7 @@ protected:
 	/// [1] is indices
 	GLuint						_vbo[2];
 
-	GLuint						_vao;
+//	GLuint						_vao;
 };
 
 }

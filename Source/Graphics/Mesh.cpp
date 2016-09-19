@@ -27,16 +27,18 @@ Mesh::Mesh(const std::string& filename)
 	, _indexCount(0)
 	, _vbo{0, 0}
 {
+	_resourcePath = filename;
 	bool success = Load(filename);
 	if (!success)
 	{
+		ASSERT(false);
 		LOG("Mesh::Mesh(%s) - Unable to load mesh.", filename.c_str());
 			return;
 	}
 	Apply();
 }
 
-Mesh::Mesh() : Resource(RESOURCE_TYPE_MESH), _indexCount(0), _vbo{ 0, 0 }, _vao(0)
+Mesh::Mesh() : Resource(RESOURCE_TYPE_MESH), _indexCount(0), _vbo{ 0, 0 } //, _vao(0)
 {
 }
 
@@ -200,10 +202,12 @@ void Mesh::Apply()
 	_indices.clear();
 }
 
+/*
 GLuint Mesh::GetVertexArray() const
 {
 	return _vao;
 }
+*/
 
 const GLuint* Mesh::GetVertexBuffers() const
 {
