@@ -102,7 +102,7 @@
     <ClInclude Include="Include\Core\Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Graphics\MeshTool\MeshFormat_generated.h">
+    <ClInclude Include="Include\Graphics\MeshData\MeshData_generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -176,8 +176,8 @@
     <ClCompile Include="Source\Core\Resources.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Include\Graphics\MeshTool\MeshFormat.fbs" />
+    <ClCompile Include="External\glad\src\glad.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

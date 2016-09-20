@@ -19,33 +19,33 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{4B507F03-ED5F-4A65-9BBB-412B28867CF9}</ProjectGuid>
+    <ProjectGuid>{CF691F46-EAF6-4DFB-A17C-FEADCC4A14DF}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Osmium</RootNamespace>
+    <RootNamespace>MeshTool</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -69,20 +69,24 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>Lib\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Intermediate\$(Platform)\$(Configuration)\</IntDir>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>Lib\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Intermediate\$(Platform)\$(Configuration)\</IntDir>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>Lib\$(Platform)\$(Configuration)\</OutDir>
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>Executable\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Intermediate\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>Executable\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>Intermediate\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>Lib\$(Platform)\$(Configuration)\</OutDir>
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>Executable\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>Intermediate\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>Executable\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>Intermediate\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -91,12 +95,15 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)Include;$(ProjectDir)External;$(ProjectDir)External\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\External;$(ProjectDir)..\External\glad\include;$(ProjectDir)..\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Osmium.lib;opengl32.lib;flatbuffers.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\External\flatbuffers;$(ProjectDir)..\Lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -105,12 +112,15 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)Include;$(ProjectDir)External;$(ProjectDir)External\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\External;$(ProjectDir)..\External\glad\include;$(ProjectDir)..\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Osmium.lib;opengl32.lib;flatbuffers.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\External\flatbuffers;$(ProjectDir)..\Lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -121,14 +131,17 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)Include;$(ProjectDir)External;$(ProjectDir)External\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\External;$(ProjectDir)..\External\glad\include;$(ProjectDir)..\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Osmium.lib;opengl32.lib;flatbuffers.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\External\flatbuffers;$(ProjectDir)..\Lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,75 +152,29 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)Include;$(ProjectDir)External;$(ProjectDir)External\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\External;$(ProjectDir)..\External\glad\include;$(ProjectDir)..\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Osmium.lib;opengl32.lib;flatbuffers.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\External\flatbuffers;$(ProjectDir)..\Lib\$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Core\Component.h" />
-    <ClInclude Include="Include\Core\Device.h" />
-    <ClInclude Include="Include\Core\Entity.h" />
-    <ClInclude Include="Include\Core\IDable.h" />
-    <ClInclude Include="Include\Core\Resource.h" />
-    <ClInclude Include="Include\Core\Resources.h" />
-    <ClInclude Include="Include\Core\Transform.h" />
-    <ClInclude Include="Include\Core\World.h" />
-    <ClInclude Include="Include\Graphics\Color.h" />
-    <ClInclude Include="Include\Graphics\DebugRenderer.h" />
-    <ClInclude Include="Include\Defines.h" />
-    <ClInclude Include="Include\Graphics\Label.h" />
-    <ClInclude Include="Include\Graphics\MeshData\MeshData_generated.h" />
-    <ClInclude Include="Include\Graphics\MeshRenderer.h" />
-    <ClInclude Include="Include\Graphics\PerlinNoise.h" />
-    <ClInclude Include="Include\Graphics\Render.h" />
-    <ClInclude Include="Include\Math\Matrix33.h" />
-    <ClInclude Include="Include\Math\Matrix44.h" />
-    <ClInclude Include="Include\Graphics\Mesh.h" />
-    <ClInclude Include="Include\Graphics\OpenGL.h" />
-    <ClInclude Include="Include\Graphics\Renderer.h" />
-    <ClInclude Include="Include\Graphics\Shader.h" />
-    <ClInclude Include="Include\Graphics\Texture.h" />
-    <ClInclude Include="Include\Physics\Collision2D.h" />
-    <ClInclude Include="Include\Physics\Physics2D.h" />
-    <ClInclude Include="Include\Utils.h" />
-    <ClInclude Include="Include\Math\Vector2.h" />
-    <ClInclude Include="Include\Math\Vector3.h" />
-    <ClInclude Include="Include\Math\Vector4.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="External\glad\src\glad.c" />
-    <ClCompile Include="Source\Core\Device.cpp" />
-    <ClCompile Include="Source\Core\Entity.cpp" />
-    <ClCompile Include="Source\Core\IDable.cpp" />
-    <ClCompile Include="Source\Core\Resources.cpp" />
-    <ClCompile Include="Source\Core\Transform.cpp" />
-    <ClCompile Include="Source\Core\World.cpp" />
-    <ClCompile Include="Source\Graphics\Color.cpp" />
-    <ClCompile Include="Source\Graphics\DebugRenderer.cpp" />
-    <ClCompile Include="Source\Graphics\Label.cpp" />
-    <ClCompile Include="Source\Graphics\MeshRenderer.cpp" />
-    <ClCompile Include="Source\Graphics\PerlinNoise.cpp" />
-    <ClCompile Include="Source\Graphics\Render.cpp" />
-    <ClCompile Include="Source\Math\Matrix33.cpp" />
-    <ClCompile Include="Source\Math\Matrix44.cpp" />
-    <ClCompile Include="Source\Graphics\Mesh.cpp" />
-    <ClCompile Include="Source\Graphics\Renderer.cpp" />
-    <ClCompile Include="Source\Graphics\Shader.cpp" />
-    <ClCompile Include="Source\Graphics\Texture.cpp" />
-    <ClCompile Include="Source\Physics\Collision2D.cpp" />
-    <ClCompile Include="Source\Physics\Physics2D.cpp" />
-    <ClCompile Include="Source\Utils.cpp" />
-    <ClCompile Include="Source\Math\Vector2.cpp" />
-    <ClCompile Include="Source\Math\Vector3.cpp" />
+    <ClCompile Include="MeshTool.cpp" />
+    <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

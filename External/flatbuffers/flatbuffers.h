@@ -1201,7 +1201,7 @@ FLATBUFFERS_FINAL_CLASS
       auto stra = reinterpret_cast<const String *>(buf_->data_at(a.o));
       auto strb = reinterpret_cast<const String *>(buf_->data_at(b.o));
       return strncmp(stra->c_str(), strb->c_str(),
-                     std::min(stra->size(), strb->size()) + 1) < 0;
+                    min(stra->size(), strb->size()) + 1) < 0;
     }
     const vector_downward *buf_;
   };
