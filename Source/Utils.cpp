@@ -26,12 +26,14 @@ string Osm::ReadFile(const string& filename)
 	length = static_cast<unsigned int>(is.tellg());
 	is.seekg(0, ios::beg);
 
+	//!! Create a null terminated string !!
+
 	// allocate memory
 	buffer = new char[length + 1];
 	memset(buffer, 0, length + 1);
 
 	// read data as a block:
-	is.read(buffer, length);
+	is.read(buffer, length + 1);
 	is.close();
 
 	// NB: specifying a length parameter will solve any null byte issues, even when
@@ -78,6 +80,74 @@ ullong Osm::StringHash(const std::string& str)
 		hash = c + (hash << 6) + (hash << 16) - hash;
 
 	return hash;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// StringReplace
+// Courtesy of: http://stackoverflow.com/questions/5878775/how-to-find-and-replace-string
+////////////////////////////////////////////////////////////////////////////////
+string Osm::StringReplace(const std::string& subject,
+	const std::string& search,
+	const std::string& replace)
+{
+	std::string result(subject);
+	size_t pos = 0;
+
+	while ((pos = subject.find(search, pos)) != std::string::npos)
+	{
+		result.replace(pos, search.length(), replace);
+		pos += search.length();
+	}
+
+	return result;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// StringStartsWith
+// Determine if a string starts with a given string.
+////////////////////////////////////////////////////////////////////////////////
+bool Osm::StringStartsWith(const std::string& subject,
+	const std::string& prefix)
+{
+	// Early out, prefix is longer than the subject:
+	if (prefix.length() > subject.length())
+	{
+		return false;
+	}
+
+	// Compare per character:
+	for (int i = 0; i < prefix.length(); ++i)
+	{
+		if (subject[i] != prefix[i])
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// StringEndsWith
+// Determine if a string ends with a given string.
+////////////////////////////////////////////////////////////////////////////////
+bool Osm::StringEndsWith(const std::string& subject,
+	const std::string& suffix)
+{
+
+	// Early out test:
+	if (suffix.length() > subject.length())
+	{
+		return false;
+	}
+
+	// Resort to difficult to read C++ logic:
+	return subject.compare(
+		subject.length() - suffix.length(),
+		suffix.length(),
+		suffix
+	) == 0;
 }
 
 
