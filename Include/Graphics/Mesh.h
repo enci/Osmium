@@ -29,8 +29,8 @@ public:
 	/// Destroy 
 	~Mesh();
 
-	/// Imports an OBJ model mesh
-	bool Load(const std::string& filenam);
+	/// Imports an model mesh
+	bool Load(const std::string& filename);
 
 	/// Set the mesh vertices 
 	void SetVertices(std::vector<VertexFormat>&& vertices);
@@ -61,7 +61,27 @@ public:
 	/// Only valid if the mesh is not ready to be rendered yet
 	std::vector<GLushort>	GetIndices() const { return	_indices; }
 
+	/// Only valid if the mesh is not ready to be rendered yet
+	const std::vector<VertexFormat>& GetVertices() { return _vertices; }
+
+	/// Only valid if the mesh is not ready to be rendered yet
+	const std::vector<GLushort>&	GetIndices() { return _indices; }
+
+	struct BinaryMeshHeader
+	{
+		const char ID[13]	= "Osm::BinMesh";
+		const uint Version	= 1;
+		uint IndexCount		= 0;
+		uint VertexCount	= 0;
+	};
+
 protected:	
+
+	/// Imports an .OBJ model mesh
+	bool LoadOBJ(const std::string& filename);
+
+	/// Imports an .BINARYMESH model mesh
+	bool LoadBINMESH(const std::string& filename);
 
 	/// Clear 
 	void ClearGL();

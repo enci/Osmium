@@ -265,6 +265,7 @@ Shader::Shader(	const std::string& vertexFilename,
 	,_program(0)
 {
 	bool success = Load(vertexFilename, fragmentFilename, geometryFilename);
+	_resourcePath = vertexFilename + "\n" + geometryFilename + "\n" + fragmentFilename;
 	if (!success)
 	{
 		LOG("Unable to load shader.");
@@ -293,6 +294,18 @@ GLuint Shader::GetProgram() const
 void Osm::Shader::Deactivate()
 {
 	glUseProgram(0);
+}
+
+ullong Shader::CalculateResourceID(	const std::string& vertexFilename,
+									const std::string& fragmentFilename)
+{	
+	return CalculateResourceID(vertexFilename, "", fragmentFilename);
+}
+
+ullong Shader::CalculateResourceID(const std::string& vertexFilename, const std::string& geometryFilename, const std::string& fragmentFilename)
+{
+	string path = vertexFilename + "\n" + geometryFilename + "\n" + fragmentFilename;
+	return StringHash(path);
 }
 
 void Shader::LoadParameters()

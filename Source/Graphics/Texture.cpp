@@ -5,6 +5,7 @@ using namespace Osm;
 
 Texture::Texture(const std::string& filename) : Resource(RESOURCE_TYPE_TEXTURE)
 {
+	_resourcePath = filename;
 	GLubyte* data = stbi_load(filename.c_str(), &_width, &_height, &_channels, 4);
 
 	if(data == nullptr)

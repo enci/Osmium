@@ -3,6 +3,7 @@
 #include <sstream>
 #include <Defines.h>
 #include <Utils.h>
+#include <fstream>
 
 using namespace std;
 using namespace Osm;
@@ -40,6 +41,10 @@ Mesh::Mesh(const std::string& filename)
 
 Mesh::Mesh() : Resource(RESOURCE_TYPE_MESH), _indexCount(0), _vbo{ 0, 0 } //, _vao(0)
 {
+	// Needs this for proper ID-ing
+	static int count = 0;
+	string path = "Mesh" + to_string(++count);
+	_resourcePath = path;
 }
 
 Osm::Mesh::~Mesh()
@@ -47,7 +52,16 @@ Osm::Mesh::~Mesh()
 	ClearGL();
 }
 
-bool Mesh::Load(const string& filename)
+bool Mesh::Load(const std::string& filename)
+{
+	if (StringEndsWith(filename, ".obj"))
+		return LoadOBJ(filename);
+	if (StringEndsWith(filename, ".binarymesh"))
+		return LoadBINMESH(filename);
+	return false;
+}
+
+bool Mesh::LoadOBJ(const string& filename)
 {
 	const std::string dataString = Osm::ReadFile(filename);
 
@@ -147,6 +161,28 @@ bool Mesh::Load(const string& filename)
 
 	_vertices = move(vertexVec);
 	_indices = move(indicesVec);
+
+	return true;
+}
+
+bool Mesh::LoadBINMESH(const std::string& filename)
+{
+	ifstream fin(filename, ios::binary | ios::in);
+
+	if (!fin.is_open())
+		return false;
+
+	BinaryMeshHeader header;
+	fin.read((char*)&header, sizeof(Mesh::BinaryMeshHeader));
+	if (header.Version != 1)
+		return false;
+	
+	_vertices.resize(header.VertexCount);
+	_indices.resize(header.IndexCount);
+	auto sizeVert = sizeof(decltype(_vertices[0]));
+	auto sizeIdx = sizeof(decltype(_indices[0]));
+	fin.read((char*)&_vertices[0], _vertices.size() * sizeVert);
+	fin.read((char*)&_indices[0], _indices.size() * sizeIdx);
 
 	return true;
 }

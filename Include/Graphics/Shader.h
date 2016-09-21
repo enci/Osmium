@@ -240,6 +240,14 @@ public:
 	/// Call after drawing
 	void Deactivate();
 
+	
+	static ullong CalculateResourceID(	const std::string& vertexFilename,
+										const std::string& fragmentFilename);
+	
+	static ullong CalculateResourceID(	const std::string& vertexFilename,
+										const std::string& geometryFilename,
+										const std::string& fragmentFilename);
+
 private:
 
 	void LoadParameters();	
