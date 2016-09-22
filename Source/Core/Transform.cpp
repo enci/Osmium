@@ -1,4 +1,5 @@
 #include <Core/Transform.h>
+#include <imgui.h>
 
 using namespace Osm;
 
@@ -17,4 +18,9 @@ void Transform::SetScale(Vector3 scale)
 	scale.y /= currScale.y;
 	scale.z /= currScale.z;
 	_transform = _transform * Matrix44::CreateScale(scale);
+}
+
+void Transform::Inspect()
+{
+	//ImGui::
 }

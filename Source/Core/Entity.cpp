@@ -1,4 +1,5 @@
 #include <Core/Entity.h>
+#include <imgui.h>
 
 using namespace Osm;
 
@@ -10,6 +11,10 @@ Entity::Entity(World& world)
 	, _world(world)	
 {}
 
-//void Entity::OnContact(Collision& collision, Entity& other) {}
-
-//void Entity::OnCollision(Collision2D& collision, int body) {}
+void Entity::Inspect()
+{
+	ImGui::LabelText("Name:", _name.c_str());
+	ImGui::LabelText("ID:", std::to_string(_ID).c_str());
+	for (auto& c : _components)
+		c->Inspect();
+}

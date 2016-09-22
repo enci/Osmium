@@ -43,6 +43,8 @@ public:
 	// TODO: Remove maybe
 	virtual bool IsDone() { return false; }
 
+	virtual void Inspect();
+
 	/// Removes and deletes all entities in this container
 	void Clear();
 

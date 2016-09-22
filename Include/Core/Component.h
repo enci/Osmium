@@ -18,6 +18,8 @@ public:
 
 	E& GetEntity() const { return _entity; }
 
+	virtual void Inspect() {}
+
 protected:
 	E& _entity;
 };
@@ -38,9 +40,10 @@ public:
 	template<class T>
 	void RemoveComponent();
 
-private:
+protected:
 	std::vector<std::unique_ptr<Component<E>>> _components;
 };
+
 
 template <class E>
 template <class T>

@@ -1,5 +1,6 @@
 #include <Core/World.h>
 #include <Core/Entity.h>
+#include <imgui.h>
 #include <algorithm>
 
 using namespace std;
@@ -48,6 +49,19 @@ void World::PostUpdate(float dt)
 	// Update entites
 	for (auto& e : _entities)
 		e->PostUpdate(dt);
+}
+
+void World::Inspect()
+{
+	for (auto& e : _entities)
+	{
+		Imgui::ShowImage();
+	}
+
+	/*
+	for (auto& e : _entities)
+		e->Inspect();
+	*/
 }
 
 void Osm::World::Clear()

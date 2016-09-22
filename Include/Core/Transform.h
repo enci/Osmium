@@ -24,6 +24,8 @@ public:
 
 	void SetUniformScale(float scale) { SetScale(Vector3(scale, scale, scale)); }
 
+	void Inspect() override;
+
 protected:
 
 	Matrix44 _transform;

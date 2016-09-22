@@ -35,6 +35,8 @@ public:
 	/// For gameplay code
 	virtual void        OnCollision(Collision2D& collision, int body) {}
 
+	virtual void		Inspect();
+
 	/// Get the id of this entity
 	uint                GetID() const		{ return _ID; }
 
