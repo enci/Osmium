@@ -1,6 +1,3 @@
 [submodule "External/stb"]
 	path = External/stb
 	url = https://github.com/nothings/stb
-[submodule "External/imgui"]
-	path = External/imgui
-	url = https://github.com/ocornut/imgui
