@@ -126,6 +126,78 @@
     <ClInclude Include="External\imgui\stb_truetype.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="External\selene\selene\BaseFun.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\Class.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\ClassFun.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\Ctor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\Dtor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\ExceptionHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\ExceptionTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\Fun.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\function.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\LuaName.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\LuaRef.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\MetatableRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\Obj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\ObjFun.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\primitives.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\references.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\Registry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\ResourceHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\Selector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\State.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\traits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\Tuple.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene\util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="External\selene\selene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Utils.cpp">
