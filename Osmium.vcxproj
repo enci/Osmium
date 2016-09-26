@@ -93,7 +93,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)Include;$(ProjectDir)External;$(ProjectDir)External\imgui;$(ProjectDir)External\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Include;$(ProjectDir)External;$(SolutionDir)Osmium\External\lua;$(ProjectDir)External\imgui;$(ProjectDir)External\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -107,7 +107,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)Include;$(ProjectDir)External;$(ProjectDir)External\imgui;$(ProjectDir)External\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Include;$(ProjectDir)External;$(SolutionDir)Osmium\External\lua;$(ProjectDir)External\imgui;$(ProjectDir)External\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -123,7 +123,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)Include;$(ProjectDir)External;$(ProjectDir)External\imgui;$(ProjectDir)External\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Include;$(ProjectDir)External;$(SolutionDir)Osmium\External\lua;$(ProjectDir)External\imgui;$(ProjectDir)External\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -141,7 +141,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)Include;$(ProjectDir)External;$(ProjectDir)External\imgui;$(ProjectDir)External\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Include;$(ProjectDir)External;$(SolutionDir)Osmium\External\lua;$(ProjectDir)External\imgui;$(ProjectDir)External\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -190,6 +190,7 @@
     <ClInclude Include="Include\Core\IDable.h" />
     <ClInclude Include="Include\Core\Resource.h" />
     <ClInclude Include="Include\Core\Resources.h" />
+    <ClInclude Include="Include\Core\Scripting.h" />
     <ClInclude Include="Include\Core\Transform.h" />
     <ClInclude Include="Include\Core\World.h" />
     <ClInclude Include="Include\Graphics\Color.h" />
@@ -224,6 +225,7 @@
     <ClCompile Include="Source\Core\Entity.cpp" />
     <ClCompile Include="Source\Core\IDable.cpp" />
     <ClCompile Include="Source\Core\Resources.cpp" />
+    <ClCompile Include="Source\Core\Scripting.cpp" />
     <ClCompile Include="Source\Core\Transform.cpp" />
     <ClCompile Include="Source\Core\World.cpp" />
     <ClCompile Include="Source\Graphics\Color.cpp" />

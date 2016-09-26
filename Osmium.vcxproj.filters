@@ -198,6 +198,9 @@
     <ClInclude Include="External\selene\selene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Core\Scripting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Utils.cpp">
@@ -282,6 +285,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="External\imgui\imgui_draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Core\Scripting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
