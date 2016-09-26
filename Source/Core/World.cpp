@@ -55,13 +55,11 @@ void World::Inspect()
 {
 	for (auto& e : _entities)
 	{
-		Imgui::ShowImage();
+		//Imgui::ShowImage();
 	}
 
-	/*
 	for (auto& e : _entities)
 		e->Inspect();
-	*/
 }
 
 void Osm::World::Clear()
