@@ -55,11 +55,8 @@ void World::Inspect()
 {
 	for (auto& e : _entities)
 	{
-		//Imgui::ShowImage();
+		ImGui::TreeNode("Some ID","ID: %i", e->GetID());
 	}
-
-	for (auto& e : _entities)
-		e->Inspect();
 }
 
 void Osm::World::Clear()
