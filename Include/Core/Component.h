@@ -2,6 +2,7 @@
 #include <memory>
 #include <vector>
 #include <Core/IDable.h>
+#include <Defines.h>
 
 namespace Osm
 {
@@ -18,7 +19,10 @@ public:
 
 	E& GetEntity() const { return _entity; }
 
+#ifdef INSPECTOR
 	virtual void Inspect() {}
+#endif
+
 
 protected:
 	E& _entity;

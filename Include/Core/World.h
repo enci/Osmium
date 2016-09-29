@@ -37,29 +37,23 @@ public:
 	/// Updates the entities
 	virtual void PostUpdate(float dt);
 
-	// TODO: Remove maybe
+	/// Generic rendering method (if the rendered is moved completely
+	/// into the engine, this can go)
 	virtual void Render() {}
 
 	// TODO: Remove maybe
 	virtual bool IsDone() { return false; }
 
-	virtual void Inspect();
-
 	/// Removes and deletes all entities in this container
 	void Clear();
-
-	/// Commits changes (add/remove) to the entities
-	//void Commit();
-
-	/// Get a single entity with an ID
-	// Entity* GetEntityByID(int id);
-
-	/// Get the first entity with a name (names might not be unique)
-	// Entity* GetEntityByName(std::string name);
 
 	/// Get the first entity of a certain type
 	template<class T>
 	std::vector<T*> GetEntitiesByType();
+
+#ifdef INSPECTOR
+	virtual void Inspect();
+#endif
 
 protected:
 

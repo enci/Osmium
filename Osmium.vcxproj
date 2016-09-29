@@ -180,7 +180,6 @@
     <ClInclude Include="Include\Math\Matrix44.h" />
     <ClInclude Include="Include\Graphics\Mesh.h" />
     <ClInclude Include="Include\Graphics\OpenGL.h" />
-    <ClInclude Include="Include\Graphics\Renderer.h" />
     <ClInclude Include="Include\Graphics\Shader.h" />
     <ClInclude Include="Include\Graphics\Texture.h" />
     <ClInclude Include="Include\Physics\Collision2D.h" />
@@ -211,7 +210,6 @@
     <ClCompile Include="Source\Math\Matrix33.cpp" />
     <ClCompile Include="Source\Math\Matrix44.cpp" />
     <ClCompile Include="Source\Graphics\Mesh.cpp" />
-    <ClCompile Include="Source\Graphics\Renderer.cpp" />
     <ClCompile Include="Source\Graphics\Shader.cpp" />
     <ClCompile Include="Source\Graphics\Texture.cpp" />
     <ClCompile Include="Source\Physics\Collision2D.cpp" />

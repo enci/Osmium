@@ -11,6 +11,8 @@
 	#endif
 #endif
 
+#define INSPECTOR
+
 namespace Osm
 {
 
