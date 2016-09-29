@@ -185,6 +185,7 @@
     <ClInclude Include="Include\Graphics\Texture.h" />
     <ClInclude Include="Include\Physics\Collision2D.h" />
     <ClInclude Include="Include\Physics\Physics2D.h" />
+    <ClInclude Include="Include\Tools\Inspector.h" />
     <ClInclude Include="Include\Utils.h" />
     <ClInclude Include="Include\Math\Vector2.h" />
     <ClInclude Include="Include\Math\Vector3.h" />
@@ -216,6 +217,7 @@
     <ClCompile Include="Source\Graphics\Texture.cpp" />
     <ClCompile Include="Source\Physics\Collision2D.cpp" />
     <ClCompile Include="Source\Physics\Physics2D.cpp" />
+    <ClCompile Include="Source\Tools\Inspector.cpp" />
     <ClCompile Include="Source\Utils.cpp" />
     <ClCompile Include="Source\Math\Vector2.cpp" />
     <ClCompile Include="Source\Math\Vector3.cpp" />

@@ -4,6 +4,8 @@
 #include <Core/Device.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <imgui.h>
+#include <imgui/imgui_impl_glfw_gl3.h>
 
 using namespace Osm;
 
@@ -18,6 +20,8 @@ void CEngine::Initialize()
 	// Load a config in the future maybe?
 
 	_device = CreateComponent<GraphicsDevice>();
+
+	ImGui_ImplGlfwGL3_Init(_device->GetWindow(), true);
 }
 
 void CEngine::Shutdown()
@@ -36,6 +40,8 @@ void CEngine::Run()
 	auto lastFrame = glfwGetTime();
 	while (!glfwWindowShouldClose(_device->GetWindow()))
 	{
+		glfwPollEvents();
+
 		if (!_world)
 			continue;
 
@@ -48,6 +54,11 @@ void CEngine::Run()
 
 		glViewport(0, 0, _device->GetScreenWidth(), _device->GetScreenHeight());				
 		_world->Render();
+
+#ifdef INSPECTOR
+		Inspect();
+#endif
+
 		glfwSwapBuffers(_device->GetWindow());
 	}
 }
@@ -58,6 +69,54 @@ void CEngine::SwapWorld(World* world)
 		delete _world;
 	_world = world;
 }
+
+#ifdef INSPECTOR
+void CEngine::Inspect()
+{
+	ImGuiWindowFlags window_flags = 0;
+	window_flags |= ImGuiWindowFlags_NoTitleBar;	
+	window_flags |= ImGuiWindowFlags_MenuBar;
+
+	ImGui_ImplGlfwGL3_NewFrame();
+
+	bool p_open = true;
+
+	if (ImGui::Begin("Osmium Inspector", &p_open, window_flags))
+	{
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("Tools"))
+			{
+				ImGui::MenuItem("Engine Components", nullptr, &_show_engine_compoents);
+				// Just a reminder that this might be useful
+				// ImGui::MenuItem("Console", NULL, &show_app_console);
+				// ImGui::MenuItem("Log", NULL, &show_app_log);
+				ImGui::MenuItem("Input Debugger", nullptr, &_show_input_debug);
+				ImGui::MenuItem("World Inspector", nullptr, &_show_world_inspector);
+				ImGui::MenuItem("Profiler", nullptr, &_show_profiler);
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenuBar();
+		}
+		ImGui::End();
+	}
+
+	if (_show_world_inspector)
+	{
+		ImGui::Begin("World Inspector");
+		_world->Inspect();
+		ImGui::End();		
+	}
+
+	if(_show_profiler)
+	{
+		
+	}
+
+	ImGui::Render();
+}
+#endif
+
 
 /*
 void CEngine::Update()

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Defines.h>
 #include <Core/Component.h>
 
 namespace Osm
@@ -33,6 +34,7 @@ protected:
 //	void Render();
 
 protected:
+
 	World* _world = nullptr;
 
 	bool _initialized = false;
@@ -45,7 +47,14 @@ protected:
 
 	bool _advanceFrame;
 
+#ifdef INSPECTOR
+	void Inspect();
 
+	bool _show_engine_compoents;
+	bool _show_input_debug;
+	bool _show_world_inspector;
+	bool _show_profiler;
+#endif
 };
 
 extern CEngine Engine;

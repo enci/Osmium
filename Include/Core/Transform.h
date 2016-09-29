@@ -24,7 +24,9 @@ public:
 
 	void SetUniformScale(float scale) { SetScale(Vector3(scale, scale, scale)); }
 
-	void Inspect() override;
+#ifdef INSPECTOR
+	virtual void Inspect() override;
+#endif
 
 protected:
 

@@ -31,11 +31,12 @@ public:
 	/// For gameplay code
 	virtual void        PostUpdate(float dt) {};
 
-
 	/// For gameplay code
 	virtual void        OnCollision(Collision2D& collision, int body) {}
 
+#ifdef INSPECTOR
 	virtual void		Inspect();
+#endif
 
 	/// Get the id of this entity
 	uint                GetID() const		{ return _ID; }
