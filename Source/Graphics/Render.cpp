@@ -62,7 +62,7 @@ Renderable::Renderable(Entity& entity) :  RenderManagerComponent(entity)
 
 Camera::Camera(Entity& entity) : RenderManagerComponent(entity)
 {
-	_transform = _entity.GetComponent<Transform>();
+	_transform = _owner.GetComponent<Transform>();
 	ASSERT(_transform);
 }
 
@@ -83,6 +83,6 @@ void Camera::SetView(Matrix44 view)
 
 Light::Light(Entity& entity) : RenderManagerComponent(entity)
 {
-	_transform = _entity.GetComponent<Transform>();
+	_transform = _owner.GetComponent<Transform>();
 	ASSERT(_transform);
 }

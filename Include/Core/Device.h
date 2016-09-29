@@ -1,14 +1,17 @@
 #pragma once
-
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <Core/Engine.h>
 
 namespace Osm
 {
 
-class Device
+class GraphicsDevice : public  Component<CEngine>
 {
 public:
-	Device(GLFWwindow* window);
+	GraphicsDevice(CEngine& engine);
+
+	virtual ~GraphicsDevice();
 
 	int GetScreenWidth() const;
 
@@ -19,12 +22,11 @@ public:
 	bool GetKeyOnce(char key);
 
 protected:
-	int			_height;
-	int			_width;
-	char keyOnce[GLFW_KEY_LAST + 1];
-	GLFWwindow* _window;
+	int			_height = 0;
+	int			_width = 0;
+	float		_ratio;
+	char		_keyOnce[GLFW_KEY_LAST + 1];
+	GLFWwindow* _window = nullptr;
 };
-
-extern Device* pDevice;
 
 }

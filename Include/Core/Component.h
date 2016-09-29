@@ -11,21 +11,20 @@ template <class E>
 class Component : public IDable<Component<E>>
 {
 public:
-	explicit Component(E& entity) : _entity(entity) {}
+	explicit Component(E& entity) : _owner(entity) {}
 
 	Component(Component& other) = delete;
 
 	virtual ~Component() {}
 
-	E& GetEntity() const { return _entity; }
+	E& GetOwner() const { return _owner; }
 
 #ifdef INSPECTOR
 	virtual void Inspect() {}
 #endif
 
-
 protected:
-	E& _entity;
+	E& _owner;
 };
 
 template <class E>

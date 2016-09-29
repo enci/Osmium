@@ -22,14 +22,14 @@ enum ResourceType
 	RESOURCE_TYPE_MESH = 1 << 8,
 };
 
-class Resources;
+class ResourceManager;
 
 ///
 /// Base class to all resources, gives book keeping option to the manager
 ///
 class Resource
 {
-	friend class Resources;
+	friend class ResourceManager;
 
 public:
 
@@ -80,72 +80,5 @@ protected:
 	/// The type of this resource, as set by the constructor.
 	ResourceType                _type;
 };
-
-/*
-///
-/// Base class to all resources, gives book keeping option to the manager
-///
-template <typename T>
-class ResourceHandle
-{
-protected:
-
-	/// Type for the resource reload callback
-	typedef std::function<void(const T& res)> ReloadCallback;
-
-	/// Pointer to resource
-	T* resource;
-
-	//ReloadCallback callback;
-
-	/// Can't copy a handle
-	ResourceHandle(const ResourceHandle&) = delete;
-
-	/// Can't copy a handle
-	ResourceHandle& operator=(const ResourceHandle&) = delete;
-
-	/// Can't just create a handle. This is basically a virtual class
-	ResourceHandle(T* resource);
-
-public:
-
-	/// Destroy
-	virtual ~ResourceHandle();
-
-	/// Set a callback event for reloading the resource
-	///
-	/// @param lambda Callback function
-	///
-	void SetReloadEvent(ReloadCallback reloadCallback);
-
-	/// Allow for the usage of resource handles as resource pointers
-	const T* operator->() const { return resource; }
-
-	/// Allow for the usage of resource handles as resource pointers
-	T* operator->() { return resource; }
-};
-
-template<typename T>
-ResourceHandle<T>::ResourceHandle(T* resource)
-{
-	this->resource = resource;
-}
-
-template<typename T>
-ResourceHandle<T>::~ResourceHandle()
-{
-	resource->RemoveReloadEvent(this);
-	gResourceManager.ReleaseResource(resource);
-}
-
-template<typename T>
-void ResourceHandle<T>::SetReloadEvent(ReloadCallback reloadCallback)
-{
-	resource->AddReloadEvent(this, [this, reloadCallback](const Resource& res)
-	{
-		reloadCallback(static_cast<const T&>(res));
-	});
-}
-*/
 
 }

@@ -1,17 +1,18 @@
 #pragma once
 #include <Core/Component.h>
 #include <Core/Resource.h>
+#include <Core/Engine.h>
 #include <unordered_map>
 
 namespace Osm
 {
 
-class Resources
+class ResourceManager : public Component<CEngine>
 {
 public:
-	Resources() {}
+	ResourceManager(CEngine& engine) : Component(engine) {}
 
-	~Resources() { /* TODO: Make sure there are no resources */ }
+	~ResourceManager() { /* TODO: Make sure there are no resources */ }
 
 	template<typename T, typename... Args>
 	T* LoadResource(Args... args);
@@ -33,10 +34,8 @@ protected:
 	std::unordered_map<ullong, uint>				_refCounters;
 };
 
-extern Resources* pResources;
-
 template<typename T, typename... Args>
-T* Resources::LoadResource(Args... args)
+T* ResourceManager::LoadResource(Args... args)
 {	
 	ullong id = T::CalculateResourceID(args...);
 
@@ -52,7 +51,7 @@ T* Resources::LoadResource(Args... args)
 }
 
 template <typename T>
-T* Resources::GetLoadedResource(ullong id)
+T* ResourceManager::GetLoadedResource(ullong id)
 {
 	auto it = _resources.find(id);
 

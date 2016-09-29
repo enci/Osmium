@@ -60,7 +60,7 @@ PhysicsBody2D::PhysicsBody2D(Entity& entity)
 	ASSERT(pm);
 	pm->AddPhysicsBody(this);
 
-	_transform = GetEntity().GetComponent<Transform>();
+	_transform = GetOwner().GetComponent<Transform>();
 	ASSERT(_transform);
 	_position = ToVector2(_transform->GetPosition());
 
@@ -73,7 +73,7 @@ PhysicsBody2D::PhysicsBody2D(Entity& entity)
 
 PhysicsBody2D::~PhysicsBody2D()
 {
-	auto pm = GetEntity().GetWorld().GetComponent<PhysicsManager2D>();
+	auto pm = GetOwner().GetWorld().GetComponent<PhysicsManager2D>();
 	pm->RemovePhysicsBody(this);
 }
 
@@ -418,8 +418,8 @@ void PhysicsManager2D::CallOnCollisionEvent()
 	for (size_t i = 0; i < _collisions.size(); i++)
 	{
 		Collision2D& collision = _collisions[i];
-		Entity& e0 = collision.FirstBody->GetEntity();
-		Entity& e1 = collision.SecondBody->GetEntity();
+		Entity& e0 = collision.FirstBody->GetOwner();
+		Entity& e1 = collision.SecondBody->GetOwner();
 		e0.OnCollision(collision, 0);
 		e1.OnCollision(collision, 1);
 	}

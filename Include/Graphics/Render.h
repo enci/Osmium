@@ -59,14 +59,14 @@ public:
 
 	RenderManagerComponent(Entity& entity) : Component<Entity>(entity)
 	{
-		auto rmng = _entity.GetWorld().GetComponent<RenderManager>();
+		auto rmng = _owner.GetWorld().GetComponent<RenderManager>();
 		ASSERT(rmng);
 		rmng->Add(static_cast<T*>(this));
 	}
 
 	virtual ~RenderManagerComponent()
 	{
-		auto rmng = _entity.GetWorld().GetComponent<RenderManager>();
+		auto rmng = _owner.GetWorld().GetComponent<RenderManager>();
 		ASSERT(rmng);
 		rmng->Remove(static_cast<T*>(this));
 	}

@@ -3,9 +3,7 @@
 
 using namespace Osm;
 
-extern Resources* Osm::pResources = nullptr;
-
-void Resources::ReleaseResource(Resource* res)
+void ResourceManager::ReleaseResource(Resource* res)
 {
 	// Get id
 	auto id = res->ResourceID();

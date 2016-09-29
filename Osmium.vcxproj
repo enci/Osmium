@@ -162,6 +162,7 @@
     <ClInclude Include="External\imgui\stb_truetype.h" />
     <ClInclude Include="Include\Core\Component.h" />
     <ClInclude Include="Include\Core\Device.h" />
+    <ClInclude Include="Include\Core\Engine.h" />
     <ClInclude Include="Include\Core\Entity.h" />
     <ClInclude Include="Include\Core\IDable.h" />
     <ClInclude Include="Include\Core\Resource.h" />
@@ -196,6 +197,7 @@
     <ClCompile Include="External\imgui\imgui_draw.cpp" />
     <ClCompile Include="External\imgui\imgui_impl_glfw_gl3.cpp" />
     <ClCompile Include="Source\Core\Device.cpp" />
+    <ClCompile Include="Source\Core\Engine.cpp" />
     <ClCompile Include="Source\Core\Entity.cpp" />
     <ClCompile Include="Source\Core\IDable.cpp" />
     <ClCompile Include="Source\Core\Resources.cpp" />
