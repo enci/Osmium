@@ -9,6 +9,7 @@ namespace Osm
 class GraphicsDevice;
 class ResourceManager;
 class Inspector;
+class Profiler;
 class World;
 
 class CEngine : public ComponentContainer<CEngine>
@@ -24,6 +25,8 @@ public:
 	GraphicsDevice& Device() { return *_device; }
 
 	ResourceManager& Resources() { return *_resources; }
+
+	Profiler& GetProfiler() { return *_profiler; }
 
 	void SwapWorld(World* world);
 
@@ -43,6 +46,8 @@ protected:
 
 	ResourceManager* _resources = nullptr;
 
+	Profiler* _profiler = nullptr;
+
 	bool _paused;
 
 	bool _advanceFrame;
@@ -50,10 +55,11 @@ protected:
 #ifdef INSPECTOR
 	void Inspect();
 
-	bool _show_engine_compoents;
-	bool _show_input_debug;
-	bool _show_world_inspector;
-	bool _show_profiler;
+	bool _show_engine_compoents = false;
+	bool _show_input_debug = false;
+	bool _show_world_inspector = false;
+	bool _show_profiler = false;
+	bool _show_imgui_test = false;
 #endif
 };
 

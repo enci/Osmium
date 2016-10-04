@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
+#include <Tools/Profiler.h>
 
 using namespace Osm;
 
@@ -20,6 +21,8 @@ void CEngine::Initialize()
 	// Load a config in the future maybe?
 
 	_device = CreateComponent<GraphicsDevice>();
+
+	_profiler = CreateComponent<Profiler>();
 
 	ImGui_ImplGlfwGL3_Init(_device->GetWindow(), true);
 }
@@ -50,10 +53,18 @@ void CEngine::Run()
 		lastFrame = currentFrame;
 		if (deltaTime > 0.033f)
 			deltaTime = 0.033f;
-		_world->Update(deltaTime);
 
+		// Update
+		_profiler->StartFrame();
+		uint updateID = _profiler->StartSection("Update");
+		_world->Update(deltaTime);
+		_profiler->EndSection(updateID);
+
+
+		uint renderID = _profiler->StartSection("Render");
 		glViewport(0, 0, _device->GetScreenWidth(), _device->GetScreenHeight());				
 		_world->Render();
+		_profiler->EndSection(renderID);
 
 #ifdef INSPECTOR
 		Inspect();
@@ -94,6 +105,7 @@ void CEngine::Inspect()
 				ImGui::MenuItem("Input Debugger", nullptr, &_show_input_debug);
 				ImGui::MenuItem("World Inspector", nullptr, &_show_world_inspector);
 				ImGui::MenuItem("Profiler", nullptr, &_show_profiler);
+				ImGui::MenuItem("ImGui Test", nullptr, &_show_imgui_test);
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();
@@ -110,7 +122,13 @@ void CEngine::Inspect()
 
 	if(_show_profiler)
 	{
-		
+		_profiler->Inspect();
+	}
+
+	if (_show_imgui_test)
+	{
+		ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
+		ImGui::ShowTestWindow(&_show_imgui_test);
 	}
 
 	ImGui::Render();
