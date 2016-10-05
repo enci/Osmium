@@ -1,7 +1,9 @@
 #include <Core/Entity.h>
+#include <Utils.h>
 #include <imgui.h>
 
 using namespace Osm;
+using namespace std;
 
 uint Entity::_nextValidID = 0;
 
@@ -13,8 +15,13 @@ Entity::Entity(World& world)
 
 void Entity::Inspect()
 {
-	ImGui::LabelText("Name:", _name.c_str());
-	ImGui::LabelText("ID:", std::to_string(_ID).c_str());
 	for (auto& c : _components)
-		c->Inspect();
+	{
+		string name = typeid(*c).name();
+		name = StringReplace(name, "class ", "");
+		if (ImGui::CollapsingHeader(name.c_str()))
+		{
+			c->Inspect();
+		}
+	}
 }

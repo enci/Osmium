@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <Core/Transform.h>
 #include <Graphics/Shader.h>
+#include <imgui.h> 
 
 using namespace Osm;
 
@@ -56,6 +57,11 @@ void RenderManager::Remove(Camera* camera)
 	_cameras.erase(remove(_cameras.begin(), _cameras.end(), camera));
 }
 
+void RenderManager::Inspect()
+{
+	ImGui::Text("Total renderables: %d", _renderables.size());
+}
+
 Renderable::Renderable(Entity& entity) :  RenderManagerComponent(entity)
 {
 }
@@ -85,4 +91,19 @@ Light::Light(Entity& entity) : RenderManagerComponent(entity)
 {
 	_transform = _owner.GetComponent<Transform>();
 	ASSERT(_transform);
+}
+
+void Light::Inspect()
+{
+	float color[4] = {
+		_color.r / 255.0f,
+		_color.g / 255.0f,
+		_color.b / 255.0f,
+		_color.a / 255.0f
+	};
+	ImGui::ColorEdit4("Color", color);
+	_color.r = (char)(color[0] * 255);
+	_color.g = (char)(color[1] * 255);
+	_color.b = (char)(color[2] * 255);
+	_color.a = (char)(color[3] * 255);
 }

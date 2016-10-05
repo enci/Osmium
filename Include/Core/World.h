@@ -51,6 +51,8 @@ public:
 	template<class T>
 	std::vector<T*> GetEntitiesByType();
 
+	Entity* GetEntityByID(uint id);
+
 #ifdef INSPECTOR
 	virtual void Inspect();
 #endif

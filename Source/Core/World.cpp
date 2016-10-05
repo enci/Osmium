@@ -59,7 +59,19 @@ void Osm::World::Clear()
 	_removeQueue.clear();
 }
 
+
+Entity* World::GetEntityByID(uint id)
+{
+	for (auto& e : _entities)
+	{
+		if (e->GetID() == id)
+			return e.get();
+	}
+	return nullptr;
+}
+
 #ifdef INSPECTOR
+
 void World::Inspect()
 {
 	for (auto& c : _components)
@@ -71,18 +83,46 @@ void World::Inspect()
 			c->Inspect();
 		}
 	}
+
 	ImGui::Separator();
-	for (auto& e : _entities)
+	vector<bool> selected(_entities.size(), false);
+	static uint Id = -1;
+
+	for(int i = 0; i < _entities.size(); i++)
 	{
+		auto& e = _entities[i];
 		string name = e->GetName();
 		if (name.empty())
 			name = typeid(*e).name();
 		name = StringReplace(name, "class ", "");
 		name += " - ID:" + to_string(e->GetID());
 
+		if(ImGui::Selectable(name.c_str()))
+		{
+			Id = e->GetID();
+		}
+		/*
 		if (ImGui::TreeNode(name.c_str()))
 		{
+			ImGui::Begin("Entity Inspector");
+			e->Inspect();
+			ImGui::End();
 			ImGui::TreePop();
+		}
+		*/
+	}
+
+	if (Id != -1)
+	{
+		Entity* e = GetEntityByID(Id);
+		if (e)
+		{
+			ImGui::Begin("Entity Inspector");
+			ImGui::Text("Name: %s", e->GetName().c_str());
+			ImGui::Text("ID: %d", e->GetID());
+			ImGui::Separator();
+			e->Inspect();
+			ImGui::End();
 		}
 	}
 }

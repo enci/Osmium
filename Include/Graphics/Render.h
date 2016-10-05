@@ -40,6 +40,11 @@ public:
 
 	void Remove(Camera* camera);
 
+#ifdef INSPECTOR
+	virtual void Inspect() override;
+#endif
+
+
 protected:
 
 	std::vector<Renderable*>	_renderables;
@@ -164,6 +169,10 @@ public:
 	Vector3 GetDirection() const { return _transform->GetTransform().GetZAxis(); }
 
 	Vector3 GetPosition() const { return _transform->GetTransform().GetTranslation(); }
+
+#ifdef INSPECTOR
+	virtual void Inspect() override;
+#endif
 
 protected:
 
