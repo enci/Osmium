@@ -45,6 +45,8 @@ void MeshRenderer::SetShader(Shader* shader)
 	_fogNearParam = shader->GetParameter("u_fogNear");
 	_fogFarParam = shader->GetParameter("u_fogFar");
 	_fogExpParam = shader->GetParameter("u_fogExp");
+	_fogNearColorParam = shader->GetParameter("u_fogColorNear");
+	_fogFarColorParam = shader->GetParameter("u_fogColorFar");
 
 	for (size_t i = 0; i < kMaxDirecationalLights; i++)
 	{
@@ -76,6 +78,8 @@ void MeshRenderer::ActivateShader(	Camera* camera,
 	_fogNearParam->SetValue(camera->GetFogNear());
 	_fogFarParam->SetValue(camera->GetFogFar());
 	_fogExpParam->SetValue(camera->GetFogGamma());
+	_fogNearColorParam->SetValue(camera->GetFogNearColor());
+	_fogFarColorParam->SetValue(camera->GetFogFarColor());
 
 	int pointLightsCount = 0;
 	int dirLightsCount = 0;

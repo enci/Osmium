@@ -71,7 +71,9 @@ Camera::Camera(Entity& entity) : RenderManagerComponent(entity)
 	_transform = _owner.GetComponent<Transform>();
 	_fogNear = 80.0f;
 	_fogFar = 1500.0;
-	_fogGamma = 1.0f; 
+	_fogGamma = 1.0f;
+	_fogNearColor = Color::Black.Transparent();
+	_fogFarColor = Color::Black.Transparent();
 	ASSERT(_transform);
 }
 
@@ -103,11 +105,13 @@ void Camera::Inspect()
 	ImGui::DragFloat("Fog Near", &_fogNear);
 	ImGui::DragFloat("Fog Far", &_fogFar);
 	ImGui::DragFloat("Fog Gamma", &_fogGamma);
+	ImGui::OsmColor("Near Color", _fogNearColor);
+	ImGui::OsmColor("Far Color", _fogFarColor);
 }
 
 void Light::Inspect()
 {
-	ImGui::OsmColor("Coloe", _color);
+	ImGui::OsmColor("Color", _color);
 }
 
 #endif

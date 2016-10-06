@@ -44,7 +44,6 @@ public:
 	virtual void Inspect() override;
 #endif
 
-
 protected:
 
 	std::vector<Renderable*>	_renderables;
@@ -114,8 +113,9 @@ protected:
 /// Camera
 ///
 class Camera : public RenderManagerComponent<Camera>
-{	
+{
 public:
+
 	Camera(Entity& entity);
 
 	/// Get the projection matrix
@@ -146,13 +146,24 @@ public:
 
 	void SetFogGamma(float fogGamma) { _fogGamma = fogGamma; }
 
+	Color GetFogNearColor() const { return _fogNearColor; }
+
+	void SetFogNearColor(const Color& fogNearColor) { _fogNearColor = fogNearColor; }
+
+	Color GetFogFarColor() const { return _fogFarColor; }
+
+	void SetFogFarColor(const Color& fogFarColor) { _fogFarColor = fogFarColor; }
+
 protected:
 
 	Matrix44 _projection;
 	Transform* _transform = nullptr;
+
 	float _fogNear;
 	float _fogFar;
 	float _fogGamma;
+	Color _fogNearColor;
+	Color _fogFarColor;
 };
 
 ///
