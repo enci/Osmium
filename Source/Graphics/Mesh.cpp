@@ -201,11 +201,6 @@ void Mesh::Apply()
 {
 	ClearGL();
 
-	//glGenVertexArrays(1, &_vao);
-	//GL_GET_ERROR();
-	//glBindVertexArray(_vao);
-	//GL_GET_ERROR();
-
 	// Allocate two buffers
 	glGenBuffers(2, _vbo);
 	GL_GET_ERROR();
@@ -229,9 +224,6 @@ void Mesh::Apply()
 	GL_GET_ERROR();
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // Unbind buffer
 	GL_GET_ERROR();
-
-	//glBindVertexArray(0);
-	//GL_GET_ERROR();
 
 	_indexCount =  static_cast<uint>(_indices.size());
 	_vertices.clear();

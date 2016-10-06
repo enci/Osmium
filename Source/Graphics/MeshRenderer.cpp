@@ -16,10 +16,16 @@ MeshRenderer::~MeshRenderer()
 	glDeleteVertexArrays(1, &_vao);
 }
 
-void MeshRenderer::SetShader(Shader* shader)
+void MeshRenderer::SetMesh(Mesh* mesh)
 {
-	ASSERT(_mesh);
+	_mesh = mesh;
 
+	if(_shader)
+		CreateVAO();
+}
+
+void MeshRenderer::SetShader(Shader* shader)
+{	
 	_shader = shader;
 
 	_projParam = shader->GetParameter("u_projection");
@@ -36,6 +42,9 @@ void MeshRenderer::SetShader(Shader* shader)
 	_pointLightsCountParam = shader->GetParameter("u_pointLightsCount");
 	_diffuseParam = shader->GetParameter("u_diffuse");
 	_ambientParam = shader->GetParameter("u_ambient");
+	_fogNearParam = shader->GetParameter("u_fogNear");
+	_fogFarParam = shader->GetParameter("u_fogFar");
+	_fogExpParam = shader->GetParameter("u_fogExp");
 
 	for (size_t i = 0; i < kMaxDirecationalLights; i++)
 	{
@@ -51,53 +60,22 @@ void MeshRenderer::SetShader(Shader* shader)
 		_pointLightParams.push_back(unique_ptr<LightShaderParameter>(lprm));
 	}
 
-	glGenVertexArrays(1, &_vao);
-	GL_GET_ERROR();
-	glBindVertexArray(_vao);
-	GL_GET_ERROR();
-
-	const GLuint* vbo = _mesh->GetVertexBuffers();
-
-#ifdef DEBUG
-	if (glIsBuffer(vbo[0]) != GL_TRUE)
-	{
-		LOG("The vertex buffer is not a valid buffer (VBO).");
-	}
-	if (glIsBuffer(vbo[1]) != GL_TRUE)
-	{
-		LOG("The index buffer is not a valid buffer (VBO)");
-	}
-#endif
-
-	// Bind the buffers to the global state
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	GL_GET_ERROR();
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
-	GL_GET_ERROR();
-
-	// Default to VBO values, the pointer addresses are interpreted as byte-offsets.
-	const void* firstPosition = reinterpret_cast<const void*>(offsetof(VertexFormat, Position));
-	const void* firstNormal = reinterpret_cast<const void*>(offsetof(VertexFormat, Normal));
-	const void* firstTexture = reinterpret_cast<const void*>(offsetof(VertexFormat, Texture));
-
-	GLsizei size = sizeof(VertexFormat);
-	_positionAttrib->SetAttributePointer(3, GL_FLOAT, GL_FALSE, size, firstPosition);
-	_normalAttrib->SetAttributePointer(3, GL_FLOAT, GL_FALSE, size, firstNormal);
-	_textureAttrib->SetAttributePointer(2, GL_FLOAT, GL_FALSE, size, firstTexture);
-
-	glBindVertexArray(0);
+	if(_mesh)
+		CreateVAO();
 }
 
-void MeshRenderer::ActivateShader(	const Matrix44& view,
-									const Matrix44& proj,
+void MeshRenderer::ActivateShader(	Camera* camera,
 									const vector<Light*> lights)
 {
-	_viewMatrix = view;
-	_projectionMatrix = proj;
+	_viewMatrix = camera->GetView();
+	_projectionMatrix = camera->Projection();
 
 	_shader->Activate();
-	_projParam->SetValue(proj);
-	_viewParam->SetValue(view);
+	_projParam->SetValue(_projectionMatrix);
+	_viewParam->SetValue(_viewMatrix);
+	_fogNearParam->SetValue(camera->GetFogNear());
+	_fogFarParam->SetValue(camera->GetFogFar());
+	_fogExpParam->SetValue(camera->GetFogGamma());
 
 	int pointLightsCount = 0;
 	int dirLightsCount = 0;
@@ -142,6 +120,57 @@ void MeshRenderer::Draw()
 	GL_GET_ERROR();
 
 	glBindVertexArray(0);
+	GL_GET_ERROR();
+}
+
+bool MeshRenderer::CreateVAO()
+{
+	if (_vao != 0)
+	{
+		glBindVertexArray(0);
+		glDeleteVertexArrays(1, &_vao);
+		_vao = 0;
+	}
+
+	glGenVertexArrays(1, &_vao);
+	GL_GET_ERROR();
+	glBindVertexArray(_vao);
+	GL_GET_ERROR();
+
+	const GLuint* vbo = _mesh->GetVertexBuffers();
+
+#ifdef DEBUG
+	if (glIsBuffer(vbo[0]) != GL_TRUE)
+	{
+		LOG("The vertex buffer is not a valid buffer (VBO).");
+		return false;
+	}
+	if (glIsBuffer(vbo[1]) != GL_TRUE)
+	{
+		LOG("The index buffer is not a valid buffer (VBO)");
+		return false;
+	}
+#endif
+
+	// Bind the buffers to the global state
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+	GL_GET_ERROR();
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+	GL_GET_ERROR();
+
+	// Default to VBO values, the pointer addresses are interpreted as byte-offsets.
+	const void* firstPosition = reinterpret_cast<const void*>(offsetof(VertexFormat, Position));
+	const void* firstNormal = reinterpret_cast<const void*>(offsetof(VertexFormat, Normal));
+	const void* firstTexture = reinterpret_cast<const void*>(offsetof(VertexFormat, Texture));
+
+	GLsizei size = sizeof(VertexFormat);
+	_positionAttrib->SetAttributePointer(3, GL_FLOAT, GL_FALSE, size, firstPosition);
+	_normalAttrib->SetAttributePointer(3, GL_FLOAT, GL_FALSE, size, firstNormal);
+	_textureAttrib->SetAttributePointer(2, GL_FLOAT, GL_FALSE, size, firstTexture);
+
+	glBindVertexArray(0);
+
+	return true;
 }
 
 LightShaderParameter::LightShaderParameter(Shader* shader, const string& name) :

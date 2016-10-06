@@ -42,10 +42,17 @@
 
 //---- Tip: You can add extra functions within the ImGui:: namespace, here or in your own headers files.
 //---- e.g. create variants of the ImGui::Value() helper for your low-level math types, or your own widgets/helpers.
-/*
+
+// Forwad declarations
+// Implementations in 
+namespace Osm
+{
+	class Color;
+}
+
 namespace ImGui
 {
-    void    Value(const char* prefix, const MyMatrix44& v, const char* float_format = NULL);
+	//   void    Value(const char* prefix, const MyMatrix44& v, const char* float_format = NULL);
+	void OsmColor(const char* label, Osm::Color& color, bool showAplha = true);
 }
-*/
 

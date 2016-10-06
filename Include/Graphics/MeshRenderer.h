@@ -25,7 +25,7 @@ public:
 
 	Mesh* GetMesh() { return _mesh; }
 
-	void SetMesh(Mesh* mesh) { _mesh = mesh; }
+	void SetMesh(Mesh* mesh);
 
 	virtual void SetShader(Shader* shader) override;
 
@@ -44,13 +44,15 @@ public:
 	void SetAmbient(Color ambient) { _ambient = ambient; }
 
 	virtual	void ActivateShader(
-		const Matrix44& view,
-		const Matrix44& proj,
+		Camera* camera,
 		const std::vector<Light*> lights) override;
 
 	virtual void Draw() override;
 
 protected:
+
+	bool CreateVAO();
+
 	GLuint	_vao = 0;
 	Mesh*	_mesh = nullptr;
 	Texture* _texture = nullptr;
@@ -65,6 +67,9 @@ protected:
 	ShaderParameter* _eyePosParam = nullptr;
 	ShaderParameter* _diffuseParam = nullptr;
 	ShaderParameter* _ambientParam = nullptr;
+	ShaderParameter* _fogNearParam = nullptr;
+	ShaderParameter* _fogFarParam = nullptr;
+	ShaderParameter* _fogExpParam = nullptr;
 	ShaderAttribute* _positionAttrib = nullptr;
 	ShaderAttribute* _normalAttrib = nullptr;
 	ShaderAttribute* _textureAttrib = nullptr;

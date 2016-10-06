@@ -99,8 +99,6 @@ protected:
 	/// [0] is vertices
 	/// [1] is indices
 	GLuint						_vbo[2];
-
-//	GLuint						_vao;
 };
 
 }

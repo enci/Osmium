@@ -99,8 +99,7 @@ public:
 	/// Gets called to activate a shader. Will not get called
 	/// for every Renderable, but only when switching shaders
 	virtual	void ActivateShader(
-		const Matrix44& view,
-		const Matrix44& proj,
+		Camera* camera,
 		const std::vector<Light*> lights) = 0;
 
 	/// Used for the actual draw-call. Will get called
@@ -115,9 +114,8 @@ protected:
 /// Camera
 ///
 class Camera : public RenderManagerComponent<Camera>
-{
+{	
 public:
-
 	Camera(Entity& entity);
 
 	/// Get the projection matrix
@@ -132,10 +130,29 @@ public:
 	/// Set the view matrix. This will affect the trasform of the Camera
 	void SetView(Matrix44 view);
 
+#ifdef INSPECTOR
+	virtual void Inspect() override;
+#endif
+
+	float GetFogNear() const { return _fogNear; }
+
+	void SetFogNear(float fogNear) { _fogNear = fogNear; }
+
+	float GetFogFar() const { return _fogFar; }
+
+	void SetFogFar(float fogFar) { _fogFar = fogFar; }
+
+	float GetFogGamma() const { return _fogGamma; }
+
+	void SetFogGamma(float fogGamma) { _fogGamma = fogGamma; }
+
 protected:
 
 	Matrix44 _projection;
 	Transform* _transform = nullptr;
+	float _fogNear;
+	float _fogFar;
+	float _fogGamma;
 };
 
 ///

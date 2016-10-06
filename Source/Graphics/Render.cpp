@@ -20,7 +20,7 @@ void RenderManager::Render()
 		{
 			if (renderer->GetShader() != activeShader)
 			{
-				renderer->ActivateShader(view, projection, _lights);
+				renderer->ActivateShader(c, _lights);
 			}
 			renderer->Draw();
 		}
@@ -69,6 +69,9 @@ Renderable::Renderable(Entity& entity) :  RenderManagerComponent(entity)
 Camera::Camera(Entity& entity) : RenderManagerComponent(entity)
 {
 	_transform = _owner.GetComponent<Transform>();
+	_fogNear = 80.0f;
+	_fogFar = 1500.0;
+	_fogGamma = 1.0f; 
 	ASSERT(_transform);
 }
 
@@ -93,17 +96,19 @@ Light::Light(Entity& entity) : RenderManagerComponent(entity)
 	ASSERT(_transform);
 }
 
+#ifdef INSPECTOR
+
+void Camera::Inspect()
+{
+	ImGui::DragFloat("Fog Near", &_fogNear);
+	ImGui::DragFloat("Fog Far", &_fogFar);
+	ImGui::DragFloat("Fog Gamma", &_fogGamma);
+}
+
 void Light::Inspect()
 {
-	float color[4] = {
-		_color.r / 255.0f,
-		_color.g / 255.0f,
-		_color.b / 255.0f,
-		_color.a / 255.0f
-	};
-	ImGui::ColorEdit4("Color", color);
-	_color.r = (char)(color[0] * 255);
-	_color.g = (char)(color[1] * 255);
-	_color.b = (char)(color[2] * 255);
-	_color.a = (char)(color[3] * 255);
+	ImGui::OsmColor("Coloe", _color);
 }
+
+#endif
+
