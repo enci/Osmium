@@ -83,18 +83,6 @@ void Profiler::Inspect()
 
 			p.y += sz + spacing;
 			ImGui::SetCursorScreenPos(p);
-
-			//p.y += sz + spacing;
-
-			//x = p.x + 4;
-
-			// time *= 1000;
-			// ImGui::Text("Section: %s took: %f", section.Name.c_str(), time);
-
-			// ImGui::
-
-			// ImGui::ProgressBar()
-			// section.EndTime = glfwGetTime();
 		}
 
 		float lowY = ImGui::GetCursorScreenPos().y;
