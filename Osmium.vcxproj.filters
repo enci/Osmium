@@ -99,9 +99,6 @@
     <ClInclude Include="Include\Core\Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Graphics\MeshData\MeshData_generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="External\imgui\imgui.h">
       <Filter>Header Files</Filter>
     </ClInclude>

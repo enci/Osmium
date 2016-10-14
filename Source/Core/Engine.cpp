@@ -71,6 +71,9 @@ void CEngine::Run()
 #endif
 
 		glfwSwapBuffers(_device->GetWindow());
+
+		_event.
+
 	}
 }
 

@@ -173,7 +173,6 @@
     <ClInclude Include="Include\Graphics\DebugRenderer.h" />
     <ClInclude Include="Include\Defines.h" />
     <ClInclude Include="Include\Graphics\Label.h" />
-    <ClInclude Include="Include\Graphics\MeshData\MeshData_generated.h" />
     <ClInclude Include="Include\Graphics\MeshRenderer.h" />
     <ClInclude Include="Include\Graphics\PerlinNoise.h" />
     <ClInclude Include="Include\Graphics\Render.h" />

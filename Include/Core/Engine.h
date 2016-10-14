@@ -2,6 +2,7 @@
 
 #include <Defines.h>
 #include <Core/Component.h>
+#include <functional>
 
 namespace Osm
 {
@@ -30,6 +31,8 @@ public:
 
 	void SwapWorld(World* world);
 
+	void QueueEvent(std::function<void(void)> e) { _event = e; }
+
 protected:
 
 //	void Update();
@@ -51,6 +54,8 @@ protected:
 	bool _paused;
 
 	bool _advanceFrame;
+
+	std::function<void(void)> _event;
 
 #ifdef INSPECTOR
 	void Inspect();
