@@ -45,6 +45,12 @@ void CEngine::Run()
 	{
 		glfwPollEvents();
 
+		if (_event)
+		{
+			_event();
+			_event = nullptr;
+		}
+
 		if (!_world)
 			continue;
 
@@ -71,17 +77,17 @@ void CEngine::Run()
 #endif
 
 		glfwSwapBuffers(_device->GetWindow());
-
-		_event.
-
 	}
 }
 
 void CEngine::SwapWorld(World* world)
 {
-	if (_world)
-		delete _world;
-	_world = world;
+	QueueEvent([this, world]()
+	{
+		if (_world)
+			delete _world;
+		_world = world;
+	});
 }
 
 #ifdef INSPECTOR

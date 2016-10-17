@@ -39,7 +39,10 @@ Mesh::Mesh(const std::string& filename)
 	Apply();
 }
 
-Mesh::Mesh() : Resource(RESOURCE_TYPE_MESH), _indexCount(0), _vbo{ 0, 0 } //, _vao(0)
+Mesh::Mesh()
+	: Resource(RESOURCE_TYPE_MESH)
+	, _indexCount(0)
+	, _vbo{ 0, 0 }
 {
 	// Needs this for proper ID-ing
 	static int count = 0;

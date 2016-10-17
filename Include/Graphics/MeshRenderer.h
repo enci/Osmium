@@ -49,6 +49,11 @@ public:
 
 	virtual void Draw() override;
 
+#ifdef INSPECTOR
+	virtual void Inspect() override;
+#endif#endif
+
+
 protected:
 
 	bool CreateVAO();

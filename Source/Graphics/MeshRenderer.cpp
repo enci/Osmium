@@ -1,5 +1,6 @@
 #include <Graphics/MeshRenderer.h>
 #include <Core/Transform.h>
+#include <imgui/imgui.h>
 
 using namespace Osm;
 
@@ -143,6 +144,13 @@ bool MeshRenderer::CreateVAO()
 
 	const GLuint* vbo = _mesh->GetVertexBuffers();
 
+	// Bind the buffers to the global state
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+	GL_GET_ERROR();
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+	GL_GET_ERROR();
+
+	
 #ifdef DEBUG
 	if (glIsBuffer(vbo[0]) != GL_TRUE)
 	{
@@ -155,12 +163,6 @@ bool MeshRenderer::CreateVAO()
 		return false;
 	}
 #endif
-
-	// Bind the buffers to the global state
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	GL_GET_ERROR();
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
-	GL_GET_ERROR();
 
 	// Default to VBO values, the pointer addresses are interpreted as byte-offsets.
 	const void* firstPosition = reinterpret_cast<const void*>(offsetof(VertexFormat, Position));
@@ -176,6 +178,19 @@ bool MeshRenderer::CreateVAO()
 
 	return true;
 }
+
+
+#ifdef INSPECTOR
+
+void MeshRenderer::Inspect()
+{
+	ImGui::OsmColor("Diffuse", _diffuse);
+	ImGui::OsmColor("Ambient", _ambient);
+}
+
+#endif
+
+
 
 LightShaderParameter::LightShaderParameter(Shader* shader, const string& name) :
 	_positionParam(shader->GetParameter(name + ".position")),
@@ -199,3 +214,5 @@ void LightShaderParameter::SetValue(const Light& light)
 		_positionParam->SetValue(pos);
 	}
 }
+
+
