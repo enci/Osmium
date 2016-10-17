@@ -107,6 +107,7 @@ void Camera::Inspect()
 	ImGui::DragFloat("Fog Gamma", &_fogGamma);
 	ImGui::OsmColor("Near Color", _fogNearColor);
 	ImGui::OsmColor("Far Color", _fogFarColor);
+	ImGui::OsmColor("Clear Color", _clearColor);
 }
 
 void Light::Inspect()

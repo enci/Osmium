@@ -154,6 +154,10 @@ public:
 
 	void SetFogFarColor(const Color& fogFarColor) { _fogFarColor = fogFarColor; }
 
+	Color GetClearColor() const { return _clearColor; }
+
+	void SetClearColor(const Color& clearColor) { _clearColor = clearColor; }
+
 protected:
 
 	Matrix44 _projection;
@@ -164,6 +168,7 @@ protected:
 	float _fogGamma;
 	Color _fogNearColor;
 	Color _fogFarColor;
+	Color _clearColor;
 };
 
 ///
