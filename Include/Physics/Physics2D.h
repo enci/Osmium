@@ -170,6 +170,9 @@ public:
 	/// Get bounding box
 	const AABB& GetBoundingBox() const { return _boundingBox; }
 
+#ifdef INSPECTOR
+	virtual void Inspect() override;
+#endif
 
 
 private:

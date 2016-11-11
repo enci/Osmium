@@ -146,6 +146,13 @@ void Osm::PhysicsBody2D::SetPosition(const Vector2& position)
 	_transform->SetPosition(ToVector3(position));
 }
 
+#ifdef INSPECTOR
+void PhysicsBody2D::Inspect()
+{
+//	ImGui::
+}
+#endif
+
 void PhysicsBody2D::UpdateDerived()
 {	
 	if (!_initialized)
