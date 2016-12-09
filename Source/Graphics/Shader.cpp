@@ -198,7 +198,7 @@ void ShaderParameter::SetValue(const Texture &texture)
 		return;
 
 	ASSERT(_type == GL_SAMPLER_2D);
-	// Use texture with index sampler. GL_TEXTURE1 = GL_TEXTURE10+1 is always true
+	// Use texture with index sampler. GL_TEXTURE1 = GL_TEXTURE1+1 is always true
 	glActiveTexture(GL_TEXTURE0 + _sampler);
 	GL_GET_ERROR();
 	// Work with this texture

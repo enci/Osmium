@@ -2,6 +2,7 @@
 #include <Core/Resources.h>
 #include <Core/World.h>
 #include <Core/Device.h>
+#include <Input/Input.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
@@ -9,6 +10,7 @@
 #include <Tools/Profiler.h>
 
 using namespace Osm;
+using namespace std;
 
 CEngine Osm::Engine;
 
@@ -16,11 +18,13 @@ void CEngine::Initialize()
 {
 	_initialized = true;
 
-	_resources = CreateComponent<ResourceManager>();	
+	_resources = CreateComponent<ResourceManager>();		
 
 	// Load a config in the future maybe?
 
 	_device = CreateComponent<GraphicsDevice>();
+
+	_input = CreateComponent<InputManager>();
 
 	_profiler = CreateComponent<Profiler>();
 
@@ -52,7 +56,7 @@ void CEngine::Run()
 		}
 
 		if (!_world)
-			continue;
+			continue;		
 
 		auto currentFrame = glfwGetTime();
 		auto deltaTime = currentFrame - lastFrame;
@@ -61,10 +65,13 @@ void CEngine::Run()
 			deltaTime = 0.033f;
 
 		// Update
-		_profiler->StartFrame();
-		uint updateID = _profiler->StartSection("Update");
-		_world->Update(deltaTime);
-		_profiler->EndSection(updateID);
+		if (!_paused)
+		{
+			_profiler->StartFrame();
+			uint updateID = _profiler->StartSection("Update");
+			_world->Update(deltaTime);
+			_profiler->EndSection(updateID);
+		}
 
 
 		uint renderID = _profiler->StartSection("Render");
@@ -115,6 +122,7 @@ void CEngine::Inspect()
 				ImGui::MenuItem("World Inspector", nullptr, &_show_world_inspector);
 				ImGui::MenuItem("Profiler", nullptr, &_show_profiler);
 				ImGui::MenuItem("ImGui Test", nullptr, &_show_imgui_test);
+				ImGui::MenuItem("Pause", nullptr, &_paused);
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();
@@ -138,6 +146,19 @@ void CEngine::Inspect()
 	{
 		ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
 		ImGui::ShowTestWindow(&_show_imgui_test);
+	}
+
+	if(_show_engine_compoents)
+	{		
+		for (auto& c : _components)
+		{
+			string name = typeid(*c).name();
+			name = StringReplace(name, "class ", "");
+			if (ImGui::CollapsingHeader(name.c_str()))
+			{
+				c->Inspect();
+			}
+		}
 	}
 
 	ImGui::Render();

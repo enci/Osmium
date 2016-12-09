@@ -176,6 +176,7 @@
     <ClInclude Include="Include\Graphics\MeshRenderer.h" />
     <ClInclude Include="Include\Graphics\PerlinNoise.h" />
     <ClInclude Include="Include\Graphics\Render.h" />
+    <ClInclude Include="Include\Input\Input.h" />
     <ClInclude Include="Include\Math\Matrix33.h" />
     <ClInclude Include="Include\Math\Matrix44.h" />
     <ClInclude Include="Include\Graphics\Mesh.h" />
@@ -211,6 +212,7 @@
     <ClCompile Include="Source\Graphics\MeshRenderer.cpp" />
     <ClCompile Include="Source\Graphics\PerlinNoise.cpp" />
     <ClCompile Include="Source\Graphics\Render.cpp" />
+    <ClCompile Include="Source\Input\Input.cpp" />
     <ClCompile Include="Source\Math\Matrix33.cpp" />
     <ClCompile Include="Source\Math\Matrix44.cpp" />
     <ClCompile Include="Source\Graphics\Mesh.cpp" />

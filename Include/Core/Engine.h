@@ -12,6 +12,7 @@ class ResourceManager;
 class Inspector;
 class Profiler;
 class World;
+class InputManager;
 
 class CEngine : public ComponentContainer<CEngine>
 {
@@ -26,6 +27,8 @@ public:
 	GraphicsDevice& Device() { return *_device; }
 
 	ResourceManager& Resources() { return *_resources; }
+
+	InputManager& Input() { return *_input; }
 
 	Profiler& GetProfiler() { return *_profiler; }
 
@@ -48,6 +51,8 @@ protected:
 	GraphicsDevice* _device = nullptr;
 
 	ResourceManager* _resources = nullptr;
+
+	InputManager* _input = nullptr;
 
 	Profiler* _profiler = nullptr;
 
