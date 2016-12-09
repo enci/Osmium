@@ -65,12 +65,13 @@ void CEngine::Run()
 			deltaTime = 0.033f;
 
 		// Update
-		if (!_paused)
+		if (!_paused || _advanceFrame)
 		{
 			_profiler->StartFrame();
 			uint updateID = _profiler->StartSection("Update");
 			_world->Update(deltaTime);
 			_profiler->EndSection(updateID);
+			_advanceFrame = false;
 		}
 
 
@@ -101,7 +102,7 @@ void CEngine::SwapWorld(World* world)
 void CEngine::Inspect()
 {
 	ImGuiWindowFlags window_flags = 0;
-	window_flags |= ImGuiWindowFlags_NoTitleBar;	
+	//window_flags |= ImGuiWindowFlags_NoTitleBar;	
 	window_flags |= ImGuiWindowFlags_MenuBar;
 
 	ImGui_ImplGlfwGL3_NewFrame();
@@ -110,6 +111,14 @@ void CEngine::Inspect()
 
 	if (ImGui::Begin("Osmium Inspector", &p_open, window_flags))
 	{
+		// Paused button
+		if(!_paused)
+			_paused = ImGui::Button("Pause");
+		else
+			_paused = !ImGui::Button("Resume");
+		ImGui::SameLine();
+		_advanceFrame = ImGui::Button("Step");
+
 		if (ImGui::BeginMenuBar())
 		{
 			if (ImGui::BeginMenu("Tools"))
