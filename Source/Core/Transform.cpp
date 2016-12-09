@@ -3,21 +3,23 @@
 
 using namespace Osm;
 
-Vector3 Transform::GetScale()
+void Transform::SetLocal(Matrix44 view)
 {
-	float sx = _transform.GetXAxis().Magnitude();
-	float sy = _transform.GetYAxis().Magnitude();
-	float sz = _transform.GetZAxis().Magnitude();
-	return Vector3(sx, sy, sz);
-}
+	Vector3 x = view.GetXAxis();
+	Vector3 y = view.GetYAxis();
+	Vector3 z = view.GetZAxis();
 
-void Transform::SetScale(Vector3 scale)
-{
-	Vector3 currScale = GetScale();
-	scale.x /= currScale.x;
-	scale.y /= currScale.y;
-	scale.z /= currScale.z;
-	_transform = _transform * Matrix44::CreateScale(scale);
+	float sx = x.Magnitude();
+	float sy = y.Magnitude();
+	float sz = z.Magnitude();
+
+	x *= 1.0f / sx;
+	y *= 1.0f / sy;
+	z *= 1.0f / sz;
+
+	_scale = Vector3(sx, sy, sz);
+	_position = view.GetTranslation();
+	_orientation.SetOrientation(x, y, z);
 }
 
 void Transform::Inspect()

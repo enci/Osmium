@@ -79,17 +79,16 @@ Camera::Camera(Entity& entity) : RenderManagerComponent(entity)
 
 Matrix44 Camera::GetView()
 {
-	Matrix44 view = _transform->GetTransform();
+	Matrix44 view = _transform->GetWorld();
 	view.Invert();
 	return view;
 }
 
 void Camera::SetView(Matrix44 view)
 {
-	Matrix44& trns = _transform->GetTransform();
-	Matrix44 temp = view;
-	temp.Invert();
-	trns = temp;
+	ASSERT(!_transform->GetParent());
+	view.Invert();
+	_transform->SetLocal(view);
 }
 
 Light::Light(Entity& entity) : RenderManagerComponent(entity)

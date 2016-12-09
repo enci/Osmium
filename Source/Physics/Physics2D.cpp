@@ -101,9 +101,8 @@ void Osm::PhysicsBody2D::AddForceAtLocalPoint(const Vector2& f, const Vector2& p
 void PhysicsBody2D::UpdateBody(float dt)
 {
 	_position = ToVector2(_transform->GetPosition());
-	_size = Vector2(
-		_transform->GetTransform().GetXAxis().Magnitude(),
-		_transform->GetTransform().GetZAxis().Magnitude());
+
+	_size = ToVector2(_transform->GetPosition());
 	if (!_initialized)
 	{
 		_initialized = true;
@@ -198,7 +197,17 @@ void PhysicsBody2D::UpdateTransform()
 	if (!_initialized)
 		return;
 
-	UpdateMatrix44FromMatrix33(_transform->GetTransform(), _matrix);
+	_transform->SetPosition(ToVector3(_position));
+	_transform->SetOrientation(Matrix44::CreateRotateY(_orientation));
+	_transform->SetScale(ToVector3(_size));
+
+	// _orientation
+	// _matrix
+	//Matrix44 rotation;
+	//UpdateMatrix44FromMatrix33(rotation, _matrix);
+
+	//transform->Set
+	// UpdateMatrix44FromMatrix33(_transform->GetTransform(), _matrix);
 	DebugRenderShape();
 }
 
@@ -521,7 +530,7 @@ std::vector<Vector2> GrahamScanCovexHull(vector<Vector2> vertices)
 	if (vertices.size() < 3)
 		return vertices;
 
-	int min = 0;
+	size_t min = 0;
 	for (size_t i = 1; i < vertices.size(); i++)
 	{
 		if (vertices[i].y < vertices[min].y)

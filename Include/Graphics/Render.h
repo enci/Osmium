@@ -199,9 +199,9 @@ public:
 
 	void SetAttenuation(float attenuation) { _attenuation = attenuation; }
 
-	Vector3 GetDirection() const { return _transform->GetTransform().GetZAxis(); }
+	Vector3 GetDirection() const { return _transform->GetOrientation().GetZAxis(); }
 
-	Vector3 GetPosition() const { return _transform->GetTransform().GetTranslation(); }
+	Vector3 GetPosition() const { return _transform->GetPosition(); }
 
 #ifdef INSPECTOR
 	virtual void Inspect() override;

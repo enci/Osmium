@@ -104,7 +104,7 @@ void MeshRenderer::ActivateShader(	Camera* camera,
 
 void MeshRenderer::Draw()
 {
-	const Matrix44& model = GetOwner().GetComponent<Transform>()->GetTransform();
+	const Matrix44& model = GetOwner().GetComponent<Transform>()->GetWorld();
 	Matrix44 modelView = _viewMatrix * model;
 	Matrix44 modelViewProjection = _projectionMatrix * modelView;
 	Vector3 eyePos = -1.0f * _viewMatrix.GetTranslation();
