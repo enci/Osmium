@@ -14,7 +14,7 @@ InputManager::InputManager(CEngine& engine)
 #ifdef INSPECTOR
 void InputManager::Inspect()
 {
-	for (size_t joy = GLFW_JOYSTICK_1; joy < GLFW_JOYSTICK_LAST; joy++)
+	for (int joy = GLFW_JOYSTICK_1; joy < GLFW_JOYSTICK_LAST; joy++)
 	{
 		int present = glfwJoystickPresent(joy);
 		if(present)

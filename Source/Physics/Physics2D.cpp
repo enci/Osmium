@@ -102,7 +102,7 @@ void PhysicsBody2D::UpdateBody(float dt)
 {
 	_position = ToVector2(_transform->GetPosition());
 
-	_size = ToVector2(_transform->GetPosition());
+	_size = ToVector2(_transform->GetScale());
 	if (!_initialized)
 	{
 		_initialized = true;
@@ -148,7 +148,6 @@ void Osm::PhysicsBody2D::SetPosition(const Vector2& position)
 #ifdef INSPECTOR
 void PhysicsBody2D::Inspect()
 {
-//	ImGui::
 }
 #endif
 
@@ -199,15 +198,7 @@ void PhysicsBody2D::UpdateTransform()
 
 	_transform->SetPosition(ToVector3(_position));
 	_transform->SetOrientation(Matrix44::CreateRotateY(_orientation));
-	_transform->SetScale(ToVector3(_size));
 
-	// _orientation
-	// _matrix
-	//Matrix44 rotation;
-	//UpdateMatrix44FromMatrix33(rotation, _matrix);
-
-	//transform->Set
-	// UpdateMatrix44FromMatrix33(_transform->GetTransform(), _matrix);
 	DebugRenderShape();
 }
 
