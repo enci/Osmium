@@ -3,6 +3,7 @@
 #include <Core/World.h>
 #include <Core/Device.h>
 #include <Input/Input.h>
+#include <Audio/Audio.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <imgui.h>
@@ -27,6 +28,8 @@ void CEngine::Initialize()
 	_input = CreateComponent<InputManager>();
 
 	_profiler = CreateComponent<Profiler>();
+
+	_audio = CreateComponent<AudioManager>();
 
 	ImGui_ImplGlfwGL3_Init(_device->GetWindow(), true);
 }

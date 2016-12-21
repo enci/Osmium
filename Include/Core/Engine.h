@@ -13,6 +13,7 @@ class Inspector;
 class Profiler;
 class World;
 class InputManager;
+class AudioManager;
 
 class CEngine : public ComponentContainer<CEngine>
 {
@@ -55,6 +56,8 @@ protected:
 	InputManager* _input = nullptr;
 
 	Profiler* _profiler = nullptr;
+
+	AudioManager* _audio = nullptr;
 
 	bool _paused;
 
