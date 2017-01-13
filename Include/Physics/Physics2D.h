@@ -154,6 +154,10 @@ public:
 	/// Set restitution factor
 	void    SetRestitutuion(float r) { _restitution = r; }
 
+	/// Calculate world 
+	Vector2 GetToWorld(const Vector2& local) const;
+	//const Matrix33& GetTransform() { return _transform; }
+
 	/// Update body - integrate forces
 	void UpdateBody(float dt);
 

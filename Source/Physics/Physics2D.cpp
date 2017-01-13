@@ -92,10 +92,15 @@ void Osm::PhysicsBody2D::AddForceAtWorldPoint(const Vector2& f, const Vector2& p
 	gDebugRenderer.AddLine(ToVector3(p), ToVector3(p+f), Color::Purple);
 }
 
-void Osm::PhysicsBody2D::AddForceAtLocalPoint(const Vector2& f, const Vector2& p)
+void PhysicsBody2D::AddForceAtLocalPoint(const Vector2& f, const Vector2& p)
 {
 	Vector2 pt = _matrix.TransformVector(p);
 	AddForceAtWorldPoint(f, pt);
+}
+
+Vector2 PhysicsBody2D::GetToWorld(const Vector2& local) const
+{
+	return _matrix.TransformVector(local);
 }
 
 void PhysicsBody2D::UpdateBody(float dt)
