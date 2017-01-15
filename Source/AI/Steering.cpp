@@ -1,5 +1,6 @@
 #include <AI/Steering.h>
 #include <Graphics/DebugRenderer.h>
+#include <imgui.h>
 
 using namespace Osm;
 
@@ -31,6 +32,10 @@ SteeringOutput Steering::GetSteering()
 	{
 		so += OffsetPursuit(Agent, Offset);
 	}
+	if (IsOn(STEERING_WANDER))
+	{
+		so += Wander();
+	}
 
 	return so;
 }
@@ -54,6 +59,8 @@ SteeringOutput Steering::Seek(Vector2& targetPos)
 	so.Linear = targetPos - _physicsBody->GetPosition();
 	so.Linear.Normalize();
 	so.Linear *= MaxAccelearation;
+
+	gDebugRenderer.AddLine(ToVector3(_physicsBody->GetPosition()), ToVector3(targetPos));
 
 	return so;
 }
@@ -118,6 +125,56 @@ SteeringOutput Steering::OffsetPursuit(const PhysicsBody2D* agent, const Vector2
 
 	return Seek(target);
 }
+
+SteeringOutput Osm::Steering::Wander()
+{
+	SteeringOutput so;
+
+	// This behavior is dependent on the update rate, so this line must
+	// be included when using time independent framerate.
+	float JitterThisTimeSlice = WanderJitter * 0.016f; // m_pVehicle->TimeElapsed();
+
+	// First, add a small random vector to the target's position
+	_wanderTarget += Vector2(	RandInRange(-1.0f, 1.0f) * JitterThisTimeSlice,
+								RandInRange(-1.0f, 1.0f) * JitterThisTimeSlice);
+
+	// Reproject this new vector back on to a unit circle
+	_wanderTarget.Normalize();
+
+	//increase the length of the vector to the same as the radius
+	//of the wander circle
+	_wanderTarget *= WanderRadius;
+
+	//move the target into a position WanderDist in front of the agent
+	Vector2 target = _wanderTarget + Vector2(0, WanderDistance);
+
+	//project the target into world space
+	target = _physicsBody->GetToWorld(target);
+
+	Vector2 center = _physicsBody->GetToWorld(Vector2(0, WanderDistance));
+
+	gDebugRenderer.AddCircle(ToVector3(center), WanderRadius);
+
+	gDebugRenderer.AddCircle(ToVector3(target), 0.5f, Color::Yellow);
+
+	// And steer towards it
+	so.Linear = target - _physicsBody->GetPosition();
+
+	return so;
+}
+
+
+#ifdef INSPECTOR
+void Steering::Inspect()
+{
+	ImGui::InputFloat("Max Accelearation", &MaxAccelearation);
+	ImGui::InputFloat("Max Force", &MaxForce);
+	ImGui::InputFloat("Max Speed", &MaxSpeed);
+	ImGui::InputFloat("Wander Jitter", &WanderJitter);
+	ImGui::InputFloat("Wander Radius", &WanderRadius);
+	ImGui::InputFloat("Wander Distance", &WanderDistance);
+}
+#endif
 
 /*
 PhysicsBody2D& SteeringBehaviour::GetPhysicsBody() const

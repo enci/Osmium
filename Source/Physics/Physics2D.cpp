@@ -7,6 +7,7 @@
 #include <Graphics/DebugRenderer.h>
 #include <Utils.h>
 #include <Defines.h>
+#include <imgui.h>
 
 using namespace Osm;
 const float skin = 0.1f;
@@ -153,6 +154,11 @@ void Osm::PhysicsBody2D::SetPosition(const Vector2& position)
 #ifdef INSPECTOR
 void PhysicsBody2D::Inspect()
 {
+	ImGui::InputFloat("Mass", &_mass);
+	ImGui::InputFloat("Linear Damping", &_linearDamping);
+	ImGui::InputFloat("Angular Damping", &_angularDamping);
+	ImGui::InputFloat("Restitution", &_restitution);
+	ImGui::InputFloat("Moment Of Inertia", &_momentOfInertia);	
 }
 #endif
 

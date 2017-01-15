@@ -32,9 +32,9 @@ GraphicsDevice::GraphicsDevice(CEngine& engine) : Component(engine)
 	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
 	//_window = glfwCreateWindow(mode->width, mode->height, "Blastastic", glfwGetPrimaryMonitor(), nullptr);
-	// _window = glfwCreateWindow(1920, 1080, "Blastastic", nullptr, nullptr);
+	_window = glfwCreateWindow(1920, 1080, "Blastastic", nullptr, nullptr);
 	// _window = glfwCreateWindow(640, 360, "Blastastic", nullptr, nullptr);
-	_window = glfwCreateWindow(1280, 720, "Blastastic", nullptr, nullptr);
+	//_window = glfwCreateWindow(1280, 720, "Blastastic", nullptr, nullptr);
 
 	int major = glfwGetWindowAttrib(_window, GLFW_CONTEXT_VERSION_MAJOR);
 	int minor = glfwGetWindowAttrib(_window, GLFW_CONTEXT_VERSION_MINOR);

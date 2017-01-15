@@ -54,6 +54,12 @@ public:
 
 	float MaxSpeed = 10.0f;
 
+	float WanderJitter = 50.0f;
+
+	float WanderRadius = 5.0f;
+
+	float WanderDistance = 15.0f;
+
 	Vector2 Target;
 
 	PhysicsBody2D* Agent = nullptr;
@@ -68,19 +74,19 @@ protected:
 	// Calculates and sums the steering forces from any active behaviors
 	SteeringOutput CalculatePrioritized();
 
-	//this behavior moves the agent towards a target position
+	// This behavior moves the agent towards a target position
 	SteeringOutput Seek(Vector2& targetPos);
 
-	//this behavior returns a vector that moves the agent away
-	//from a target position
+	// This behavior returns a vector that moves the agent away
+	// from a target position
 	// SteeringOutput Flee(Vector2& targetPos);
 
-	//this behavior is similar to seek but it attempts to arrive 
-	//at the target position with a zero velocity
+	// this behavior is similar to seek but it attempts to arrive 
+	// at the target position with a zero velocity
 	SteeringOutput Arrive(Vector2& targetPos, float deceleration);
 
-	//this behavior predicts where an agent will be in time T and seeks
-	//towards that point to intercept it.
+	// This behavior predicts where an agent will be in time T and seeks
+	// towards that point to intercept it.
 	// SteeringOutput Pursuit(const Vehicle* agent);
 
 	//this behavior maintains a position, in the direction of offset
@@ -90,8 +96,8 @@ protected:
 	//this behavior attempts to evade a pursuer
 	// SteeringOutput Evade(const Vehicle* agent);
 
-	//this behavior makes the agent wander about randomly
-	//SteeringOutput Wander();
+	// This behavior makes the agent wander about randomly
+	SteeringOutput Wander();
 
 	//this returns a steering force which will attempt to keep the agent 
 	//away from any obstacles it may encounter
@@ -121,11 +127,16 @@ protected:
 	// SteeringOutput Separation(const std::vector<Vehicle*> &agents);
 	// SteeringOutput Alignment(const std::vector<Vehicle*> &agents);	
 
+#ifdef INSPECTOR
+	virtual void Inspect() override;
+#endif
+
 protected:
 
 	uint				_flags;
 	PhysicsManager2D*	_physicsManager = nullptr;
 	PhysicsBody2D*		_physicsBody = nullptr;
+	Vector2				_wanderTarget;
 };
 
 }
