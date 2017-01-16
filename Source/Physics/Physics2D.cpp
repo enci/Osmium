@@ -263,6 +263,25 @@ void PhysicsManager2D::RemovePhysicsBody(PhysicsBody2D* body)
 	_bodies.erase(remove(_bodies.begin(), _bodies.end(), body));
 }
 
+vector<PhysicsBody2D*> PhysicsManager2D::GetInRadius(const Vector2& position, float radius)
+{
+	vector<PhysicsBody2D*> neighbours;
+
+	// gDebugRenderer.AddCircle(ToVector3(position), radius);
+	
+	for(auto b : _bodies)
+	{
+		auto d = b->GetPosition() - position;
+		if (d.Magnitude() < radius)
+		{
+			neighbours.push_back(b);
+			//gDebugRenderer.AddLine(ToVector3(position), ToVector3(b->GetPosition()));
+		}
+	}
+
+	return neighbours;
+}
+
 //
 // Collision detection
 //

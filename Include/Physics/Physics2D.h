@@ -227,7 +227,10 @@ public:
 	void UpdatePhysics(float dt);
 		 
 	void AddPhysicsBody(PhysicsBody2D* body);
+
 	void RemovePhysicsBody(PhysicsBody2D* body);
+
+	std::vector<PhysicsBody2D*> GetInRadius(const Vector2& position, float radius);
 
 private:
 	/// Get all the collisions this frame

@@ -7,13 +7,6 @@
 namespace Osm
 {
 
-struct SteeringOutput
-{
-	Vector2	Linear		= Vector2();
-	float	Angular		= 0.0f;
-	void operator+=(SteeringOutput rhs);
-};
-
 enum BehaviorType
 {
 	STEERING_NONE				= 1 << 0,
@@ -23,7 +16,7 @@ enum BehaviorType
 	STEERING_WANDER				= 1 << 4,
 	STEERING_COHESION			= 1 << 5,
 	STEERING_SEPARATION			= 1 << 6,
-	STEERING_ALLIGNMENT			= 1 << 7,
+	STEERING_ALIGNMENT			= 1 << 7,
 	STEERING_OBSTACLE_AVOIDANCE	= 1 << 8,
 	STEERING_WALL_AVOIDANCE		= 1 << 9,
 	STEERING_FOLLOW_PATH		= 1 << 10,
@@ -35,12 +28,12 @@ enum BehaviorType
 	STEERING_OFFSET_PURSUIT		= 1 << 16,
 };
 
-class Steering :	public Component<Entity>
+class Steering : public Component<Entity>
 {
 public:
 	Steering(Entity& entity);
 
-	SteeringOutput GetSteering();
+	Vector2 GetSteering();
 
 	void TurnOn(uint bt)		{ _flags |= bt; }
 
@@ -60,22 +53,42 @@ public:
 
 	float WanderDistance = 15.0f;
 
+	float FlockingRadius = 15.0f;
+
+	float ArriveAcceleration = 3.0f;
+
 	Vector2 Target;
 
 	PhysicsBody2D* Agent = nullptr;
 
 	Vector2 Offset;
 
+	// Weights
+	float SeekWeight = 1.0f;
+	float FleeWeight = 1.0f;
+	float ArriveWeight = 1.0f;
+	float CohesionWeight = 1.0f;
+	float SeparationWeight = 1.0f;
+	float ObstacleAvoidanceWeight = 1.0f;
+	float WallAvoidanceWeight = 1.0f;
+	float PursuitWeight = 1.0f;
+	float EvadeWeight = 1.0f;
+	float FoollowPathWeight = 1.0f;
+	float HideWeight = 1.0f;
+	float OffsetPursuitWeight = 1.0f;
+
 protected:
 
-	// Calculates and sums the steering forces from any active behaviors
-	SteeringOutput CalculateWeightedSum();
+	bool AccumulateForce(Vector2 addForce);
 
 	// Calculates and sums the steering forces from any active behaviors
-	SteeringOutput CalculatePrioritized();
+	void CalculateWeightedSum();
+
+	// Calculates and sums the steering forces from any active behaviors
+	void CalculatePrioritized();
 
 	// This behavior moves the agent towards a target position
-	SteeringOutput Seek(Vector2& targetPos);
+	Vector2 Seek(Vector2& targetPos);
 
 	// This behavior returns a vector that moves the agent away
 	// from a target position
@@ -83,7 +96,7 @@ protected:
 
 	// this behavior is similar to seek but it attempts to arrive 
 	// at the target position with a zero velocity
-	SteeringOutput Arrive(Vector2& targetPos, float deceleration);
+	Vector2 Arrive(Vector2& targetPos, float deceleration);
 
 	// This behavior predicts where an agent will be in time T and seeks
 	// towards that point to intercept it.
@@ -91,13 +104,13 @@ protected:
 
 	//this behavior maintains a position, in the direction of offset
 	//from the target vehicle
-	SteeringOutput OffsetPursuit(const PhysicsBody2D* agent, const Vector2& offset);
+	Vector2 OffsetPursuit(const PhysicsBody2D* agent, const Vector2& offset);
 
 	//this behavior attempts to evade a pursuer
 	// SteeringOutput Evade(const Vehicle* agent);
 
 	// This behavior makes the agent wander about randomly
-	SteeringOutput Wander();
+	Vector2 Wander();
 
 	//this returns a steering force which will attempt to keep the agent 
 	//away from any obstacles it may encounter
@@ -123,16 +136,22 @@ protected:
 
 	// -- Group Behaviors -- //
 
-	// SteeringOutput Cohesion(const std::vector<Vehicle*> &agents);
-	// SteeringOutput Separation(const std::vector<Vehicle*> &agents);
-	// SteeringOutput Alignment(const std::vector<Vehicle*> &agents);	
+	Vector2 Cohesion(const std::vector<PhysicsBody2D*> &agents);
+
+	Vector2 Separation(const std::vector<PhysicsBody2D*> &agents);
+
+	Vector2 Alignment(const std::vector<PhysicsBody2D*> &agents);
+
+	void DebugRender();
 
 #ifdef INSPECTOR
 	virtual void Inspect() override;
+	bool _inspect = false;
 #endif
 
 protected:
 
+	Vector2				_current;
 	uint				_flags;
 	PhysicsManager2D*	_physicsManager = nullptr;
 	PhysicsBody2D*		_physicsBody = nullptr;

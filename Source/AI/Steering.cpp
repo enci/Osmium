@@ -1,75 +1,114 @@
 #include <AI/Steering.h>
 #include <Graphics/DebugRenderer.h>
 #include <imgui.h>
+#include <Core/World.h>
 
 using namespace Osm;
-
-void SteeringOutput::operator+=(SteeringOutput rhs)
-{
-	Linear += rhs.Linear;
-	Angular += rhs.Angular;
-}
 
 Steering::Steering(Entity& entity)
 	: Component(entity)
 	, _flags(STEERING_NONE)
 {
+	_physicsManager = GetOwner().GetWorld().GetComponent<PhysicsManager2D>();
 	_physicsBody = entity.GetComponent<PhysicsBody2D>();
 }
 
-SteeringOutput Steering::GetSteering()
+Vector2 Steering::GetSteering()
 {
-	SteeringOutput so;
-	if(IsOn(STEERING_SEEK))
+	CalculatePrioritized();
+	DebugRender();
+	return _current;
+}
+
+bool Steering::AccumulateForce(Vector2 add)
+{
+	// Calculate how much steering force the vehicle has used so far
+	float  magnitudeSoFar = _current.Magnitude();
+
+	// Calculate how much steering force remains to be used by this vehicle
+	float magnitudeRemaining = MaxForce - magnitudeSoFar;
+
+	// Return false if there is no more force left to use
+	if (magnitudeRemaining <= 0.0) return false;
+
+	// Calculate the magnitude of the force we want to add
+	double magnitudeToAdd = add.Magnitude();
+
+	// If the magnitude of the sum of ForceToAdd and the running total
+	// does not exceed the maximum force available to this vehicle, just
+	// add together. Otherwise add as much of the ForceToAdd vector is
+	// possible without going over the max.
+	if (magnitudeToAdd < magnitudeRemaining)
 	{
-		so += Seek(Target);
+		_current += add;
 	}
-	if(IsOn(STEERING_ARRIVE))
+	else
 	{
-		so += Arrive(Target, 3.0f);
+		// Add it to the steering force
+		add.Normalize();
+		_current += add * magnitudeRemaining;
+	}
+
+	return true;
+}
+
+void Steering::CalculateWeightedSum()
+{
+}
+
+void Steering::CalculatePrioritized()
+{	
+	_current.Clear();
+	vector<PhysicsBody2D*> neighbors;
+	if (IsOn(STEERING_SEPARATION) || IsOn(STEERING_ALIGNMENT) || IsOn(STEERING_COHESION))
+	{
+		Vector2 v = _physicsBody->GetPosition();
+		neighbors = _physicsManager->GetInRadius(v, FlockingRadius);
+	}
+
+
+	Vector2 force;
+
+	if (IsOn(STEERING_SEEK))
+	{
+		force = Seek(Target);
+		if (!AccumulateForce(force)) return;
+	}
+	if (IsOn(STEERING_ARRIVE))
+	{
+		force += Arrive(Target, ArriveAcceleration);
+		if (!AccumulateForce(force)) return;
 	}
 	if (IsOn(STEERING_OFFSET_PURSUIT))
 	{
-		so += OffsetPursuit(Agent, Offset);
+		force += OffsetPursuit(Agent, Offset);
+		if (!AccumulateForce(force)) return;
 	}
 	if (IsOn(STEERING_WANDER))
 	{
-		so += Wander();
+		force += Wander();
+		if (!AccumulateForce(force)) return;
 	}
-
-	return so;
+	if (IsOn(STEERING_COHESION))
+	{
+		force += Cohesion(neighbors);
+		if (!AccumulateForce(force)) return;
+	}
 }
 
-SteeringOutput Steering::CalculateWeightedSum()
+Vector2 Steering::Seek(Vector2& targetPos)
 {
-	SteeringOutput so;
-	return so;
+	Vector2 seek = targetPos - _physicsBody->GetPosition();
+	seek.Normalize();
+	seek *= MaxAccelearation;
+	return seek;
 }
 
-SteeringOutput Steering::CalculatePrioritized()
-{
-	SteeringOutput so;	
-	return so;
-}
-
-SteeringOutput Steering::Seek(Vector2& targetPos)
-{
-	SteeringOutput so;
-
-	so.Linear = targetPos - _physicsBody->GetPosition();
-	so.Linear.Normalize();
-	so.Linear *= MaxAccelearation;
-
-	gDebugRenderer.AddLine(ToVector3(_physicsBody->GetPosition()), ToVector3(targetPos));
-
-	return so;
-}
-
-SteeringOutput Steering::Arrive(Vector2& targetPos, float deceleration)
+Vector2 Steering::Arrive(Vector2& targetPos, float deceleration)
 {
 	Vector2 toTarget = Target - _physicsBody->GetPosition();
 
-	SteeringOutput so;
+	Vector2 arrive;
 
 	// Calculate the distance to the target
 	double dist = toTarget.Magnitude();
@@ -92,16 +131,16 @@ SteeringOutput Steering::Arrive(Vector2& targetPos, float deceleration)
 		// of calculating its length: dist.
 		Vector2 desiredVelocity = toTarget * speed / dist;
 
-		so.Linear = (desiredVelocity - _physicsBody->GetVelocity());
+		arrive = (desiredVelocity - _physicsBody->GetVelocity());
 	}
 
-	return so;
+	return arrive;
 }
 
-SteeringOutput Steering::OffsetPursuit(const PhysicsBody2D* agent, const Vector2& offset)
+Vector2 Steering::OffsetPursuit(const PhysicsBody2D* agent, const Vector2& offset)
 {
 	if (agent == nullptr)
-		return SteeringOutput();
+		return Vector2();
 
 	// Get vehicle coordinate frame
 	Vector2 target = agent->GetToWorld(offset);		
@@ -126,9 +165,9 @@ SteeringOutput Steering::OffsetPursuit(const PhysicsBody2D* agent, const Vector2
 	return Seek(target);
 }
 
-SteeringOutput Osm::Steering::Wander()
+Vector2 Steering::Wander()
 {
-	SteeringOutput so;
+	Vector2 wander;
 
 	// This behavior is dependent on the update rate, so this line must
 	// be included when using time independent framerate.
@@ -158,21 +197,77 @@ SteeringOutput Osm::Steering::Wander()
 	gDebugRenderer.AddCircle(ToVector3(target), 0.5f, Color::Yellow);
 
 	// And steer towards it
-	so.Linear = target - _physicsBody->GetPosition();
+	wander = target - _physicsBody->GetPosition();
 
-	return so;
+	return wander;
 }
 
+Vector2 Steering::Cohesion(const std::vector<PhysicsBody2D*>& agents)
+{
+	Vector2 cohesion;
+
+	// First find the center of mass of all the agents
+	Vector2 centerOfMass, steeringForce;
+
+	size_t neighborCount = 0;
+
+	// Iterate through the neighbors and sum up all the position vectors
+	for(auto a : agents)
+	{
+		if(a != _physicsBody && a != Agent)
+		{
+			centerOfMass += a->GetPosition();
+			neighborCount++;
+		}
+	}
+
+	if (neighborCount > 0)
+	{
+		// The center of mass is the average of the sum of positions
+		centerOfMass *= 1.0f / (float)neighborCount;
+
+		//now seek towards that position
+		cohesion = Seek(centerOfMass);
+	}
+
+	cohesion.Normalize();
+	
+	return cohesion;
+}
+
+void Steering::DebugRender()
+{
+	if (_inspect)
+	{
+		auto pos = _physicsBody->GetPosition();
+		gDebugRenderer.AddCircle(
+			ToVector3(pos),
+			_physicsBody->GetRaduis(),
+			Color::Purple);
+		gDebugRenderer.AddLine(
+			ToVector3(pos),
+			ToVector3(pos + _current),
+			Color::Orange);
+	}
+	_inspect = false;
+}
 
 #ifdef INSPECTOR
 void Steering::Inspect()
 {
+	_inspect = true;
+
 	ImGui::InputFloat("Max Accelearation", &MaxAccelearation);
 	ImGui::InputFloat("Max Force", &MaxForce);
 	ImGui::InputFloat("Max Speed", &MaxSpeed);
 	ImGui::InputFloat("Wander Jitter", &WanderJitter);
 	ImGui::InputFloat("Wander Radius", &WanderRadius);
 	ImGui::InputFloat("Wander Distance", &WanderDistance);
+
+	float maxed = _current.Magnitude() / MaxSpeed;
+	ImGui::ProgressBar(maxed);
+	// ImGui::SameLine();
+	//ImGui::LabelText("Total Used ","");	
 }
 #endif
 
