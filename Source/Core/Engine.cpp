@@ -15,6 +15,11 @@ using namespace std;
 
 CEngine Osm::Engine;
 
+void EngineOptions::LoadFromFile(const std::string& file)
+{
+
+}
+
 void CEngine::Initialize()
 {
 	_initialized = true;

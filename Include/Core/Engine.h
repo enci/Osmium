@@ -15,6 +15,16 @@ class World;
 class InputManager;
 class AudioManager;
 
+struct EngineOptions
+{
+	int ScreenWidth = 1920;
+	int ScreenHeight = 1080;
+	std::string ResourcePath = "";
+	std::string SavePath = "";
+
+	void LoadFromFile(const std::string& file);
+};
+
 class CEngine : public ComponentContainer<CEngine>
 {
 public:
@@ -25,13 +35,13 @@ public:
 
 	void Run();
 
-	GraphicsDevice& Device() { return *_device; }
+	GraphicsDevice& Device() const { return *_device; }
 
-	ResourceManager& Resources() { return *_resources; }
+	ResourceManager& Resources() const { return *_resources; }
 
-	InputManager& Input() { return *_input; }
+	InputManager& Input() const { return *_input; }
 
-	Profiler& GetProfiler() { return *_profiler; }
+	Profiler& GetProfiler() const { return *_profiler; }
 
 	void SwapWorld(World* world);
 
@@ -59,9 +69,9 @@ protected:
 
 	AudioManager* _audio = nullptr;
 
-	bool _paused;
+	bool _paused = false;
 
-	bool _advanceFrame;
+	bool _advanceFrame = false;
 
 	std::function<void(void)> _event;
 
