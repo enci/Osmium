@@ -63,7 +63,7 @@ void Steering::CalculatePrioritized()
 	if (IsOn(STEERING_SEPARATION) || IsOn(STEERING_ALIGNMENT) || IsOn(STEERING_COHESION))
 	{
 		Vector2 v = _physicsBody->GetPosition();
-		neighbors = _physicsManager->GetInRadius(v, FlockingRadius);
+		neighbors = GetFlockingNeighbors();
 	}
 
 
@@ -71,27 +71,37 @@ void Steering::CalculatePrioritized()
 
 	if (IsOn(STEERING_SEEK))
 	{
-		force = Seek(Target);
+		force = Seek(Target) * SeekWeight;
 		if (!AccumulateForce(force)) return;
 	}
 	if (IsOn(STEERING_ARRIVE))
 	{
-		force += Arrive(Target, ArriveAcceleration);
+		force += Arrive(Target, ArriveAcceleration)* ArriveWeight;
 		if (!AccumulateForce(force)) return;
 	}
 	if (IsOn(STEERING_OFFSET_PURSUIT))
 	{
-		force += OffsetPursuit(Agent, Offset);
+		force += OffsetPursuit(Agent, Offset) * OffsetPursuitWeight;
+		if (!AccumulateForce(force)) return;
+	}	
+	if (IsOn(STEERING_COHESION))
+	{
+		force += Cohesion(neighbors) * CohesionWeight;
+		if (!AccumulateForce(force)) return;
+	}
+	if (IsOn(STEERING_SEPARATION))
+	{
+		//force += Separation(neighbors) * SeparationWeight;
+		//if (!AccumulateForce(force)) return;
+	}
+	if (IsOn(STEERING_ALIGNMENT))
+	{
+		force += Alignment(neighbors) * AlignmentWeight;
 		if (!AccumulateForce(force)) return;
 	}
 	if (IsOn(STEERING_WANDER))
 	{
-		force += Wander();
-		if (!AccumulateForce(force)) return;
-	}
-	if (IsOn(STEERING_COHESION))
-	{
-		force += Cohesion(neighbors);
+		force += Wander() * WanderWeight;
 		if (!AccumulateForce(force)) return;
 	}
 }
@@ -202,6 +212,23 @@ Vector2 Steering::Wander()
 	return wander;
 }
 
+vector<PhysicsBody2D*> Steering::GetFlockingNeighbors()
+{
+	vector<PhysicsBody2D*> neighbors;
+	Vector2 v = _physicsBody->GetPosition();
+	neighbors = _physicsManager->GetInRadius(v, FlockingRadius);
+	if (FlockingTag != 0)
+	{
+		remove_if(	neighbors.begin(), 
+					neighbors.end(), 
+					[this](PhysicsBody2D* b)
+		{
+			return b->GetOwner().GetTag() != FlockingTag;
+		});
+	}
+	return neighbors;
+}
+
 Vector2 Steering::Cohesion(const std::vector<PhysicsBody2D*>& agents)
 {
 	Vector2 cohesion;
@@ -235,6 +262,69 @@ Vector2 Steering::Cohesion(const std::vector<PhysicsBody2D*>& agents)
 	return cohesion;
 }
 
+Vector2 Steering::Separation(const std::vector<PhysicsBody2D*>& agents)
+{
+	Vector2 steeringForce;
+
+	
+	// iterate through the neighbors and sum up all the position vectors
+	for (auto a : agents)
+	{
+		// make sure this agent isn't included in the calculations and that
+		// the agent being examined is close enough
+		if (a != _physicsBody && a != Agent)
+		{
+			Vector2 toAgent =_physicsBody->GetPosition() - a->GetPosition();
+
+			// scale the force inversely proportional to the agents distance  
+			// from its neighbor.
+			float d = toAgent.Magnitude();
+			toAgent.Normalize();
+			steeringForce += toAgent / d;
+		}
+
+	}
+
+	return -1.0f * steeringForce;
+}
+
+Vector2 Steering::Alignment(const std::vector<PhysicsBody2D*>& agents)
+{
+	//This will record the average heading of the neighbors
+	Vector2 averageHeading;
+
+	//This count the number of vehicles in the neighborhood
+	float neighborCount = 0.0;
+
+	Vector2 currentHeading = _physicsBody->GetFroward();
+	currentHeading.Normalize();
+
+	//iterate through the neighbors and sum up all the position vectors
+	for (auto a : agents)
+	{
+		// make sure this agent isn't included in the calculations and that
+		// the agent being examined is close enough
+		if (a != _physicsBody && a != Agent)
+		{
+			Vector2 heading = a->GetFroward();
+			heading.Normalize();
+			averageHeading += heading;
+			neighborCount++;
+		}
+
+	}
+
+	// If the neighborhood contained one or more vehicles, average their
+	// heading vectors.
+	if (neighborCount > 0.0)
+	{
+		averageHeading *= 1.0f / neighborCount;
+		averageHeading -= currentHeading;
+	}
+
+	return averageHeading;
+}
+
 void Steering::DebugRender()
 {
 	if (_inspect)
@@ -248,6 +338,10 @@ void Steering::DebugRender()
 			ToVector3(pos),
 			ToVector3(pos + _current),
 			Color::Orange);
+		gDebugRenderer.AddCircle(
+			ToVector3(pos),
+			FlockingRadius,
+			Color::Purple);
 	}
 	_inspect = false;
 }

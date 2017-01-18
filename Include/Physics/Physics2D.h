@@ -154,9 +154,11 @@ public:
 	/// Set restitution factor
 	void    SetRestitutuion(float r) { _restitution = r; }
 
-	/// Calculate world 
+	/// Calculate world space vector
 	Vector2 GetToWorld(const Vector2& local) const;
-	//const Matrix33& GetTransform() { return _transform; }
+
+	/// Get the forward vector
+	Vector2 GetFroward() const;
 
 	/// Update body - integrate forces
 	void UpdateBody(float dt);
@@ -177,7 +179,6 @@ public:
 #ifdef INSPECTOR
 	virtual void Inspect() override;
 #endif
-
 
 private:
 
@@ -225,11 +226,14 @@ public:
 
 	/// Integrate, get collisions, run events and resolve collisions
 	void UpdatePhysics(float dt);
-		 
+
+	/// Add a body to the manager. No need to ever call this, it's automatic
 	void AddPhysicsBody(PhysicsBody2D* body);
 
+	/// Removes a body from the manager. No need to ever call this, it's automatic
 	void RemovePhysicsBody(PhysicsBody2D* body);
 
+	/// Get all bodies in the specified reariuis arround the given postion
 	std::vector<PhysicsBody2D*> GetInRadius(const Vector2& position, float radius);
 
 private:

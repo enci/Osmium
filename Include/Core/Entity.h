@@ -48,7 +48,13 @@ public:
 	void SetName(const std::string& name)	{ _name = name; }
 
 	/// Get the world this entity lives in
-	World& GetWorld() const					{ return _world; };
+	World& GetWorld() const					{ return _world; }
+
+	/// Get a generic tag
+	uint GetTag() const					{ return _tag; }
+
+	/// Set a generic tag
+	void SetTag(uint tag)				{ _tag = tag; }
 
 private:
 
@@ -72,6 +78,9 @@ private:
 	/// This is the next valid ID. Each time a Entity2D is instantiated
 	/// this value is updated
 	static uint			_nextValidID;
+
+	/// Just a generic tag
+	uint				_tag = 0;
 };
 
 }

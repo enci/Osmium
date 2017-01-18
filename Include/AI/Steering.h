@@ -24,7 +24,8 @@ enum BehaviorType
 	STEERING_EVADE				= 1 << 12,
 	STEERING_INTERPOSE			= 1 << 13,
 	STEERING_HIDE				= 1 << 14,
-	STEERING_FLOCK				= 1 << 15, // ? Merge from others
+	//STEERING_FLOCK				= 1 << 15, // ? Merge from others
+	STEERING_FLOCK				= STEERING_COHESION | STEERING_SEPARATION | STEERING_ALIGNMENT,
 	STEERING_OFFSET_PURSUIT		= 1 << 16,
 };
 
@@ -57,16 +58,19 @@ public:
 
 	float ArriveAcceleration = 3.0f;
 
+	uint FlockingTag = 0;
+
 	Vector2 Target;
 
 	PhysicsBody2D* Agent = nullptr;
 
-	Vector2 Offset;
+	Vector2 Offset;	
 
 	// Weights
 	float SeekWeight = 1.0f;
 	float FleeWeight = 1.0f;
 	float ArriveWeight = 1.0f;
+	float WanderWeight = 1.0f;
 	float CohesionWeight = 1.0f;
 	float SeparationWeight = 1.0f;
 	float ObstacleAvoidanceWeight = 1.0f;
@@ -76,6 +80,7 @@ public:
 	float FoollowPathWeight = 1.0f;
 	float HideWeight = 1.0f;
 	float OffsetPursuitWeight = 1.0f;
+	float AlignmentWeight = 10.0f;
 
 protected:
 
@@ -135,6 +140,8 @@ protected:
 
 
 	// -- Group Behaviors -- //
+
+	std::vector<PhysicsBody2D*> GetFlockingNeighbors();
 
 	Vector2 Cohesion(const std::vector<PhysicsBody2D*> &agents);
 

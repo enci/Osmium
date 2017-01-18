@@ -104,6 +104,11 @@ Vector2 PhysicsBody2D::GetToWorld(const Vector2& local) const
 	return _matrix.TransformVector(local);
 }
 
+Vector2 PhysicsBody2D::GetFroward() const
+{
+	return _matrix.TransformNormal(Vector2(0.0f, 1.0f));
+}
+
 void PhysicsBody2D::UpdateBody(float dt)
 {
 	_position = ToVector2(_transform->GetPosition());
@@ -114,6 +119,8 @@ void PhysicsBody2D::UpdateBody(float dt)
 		_initialized = true;
 		UpdateDerived();
 	}
+
+	gDebugRenderer.AddLine( ToVector3(_position), ToVector3(_position + _force), Color::White );
 
 	Vector2 accel = _force / _mass;
 	_velocity += accel * dt;
