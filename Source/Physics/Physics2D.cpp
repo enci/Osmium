@@ -70,6 +70,8 @@ PhysicsBody2D::PhysicsBody2D(Entity& entity)
 	_size = Vector2(-1.0f, -1.0f);
 	_torque = 0.0f;
 	_angularDamping = 1.0f;
+
+	UpdateBody(0.0f);
 }
 
 PhysicsBody2D::~PhysicsBody2D()
@@ -112,7 +114,6 @@ Vector2 PhysicsBody2D::GetFroward() const
 void PhysicsBody2D::UpdateBody(float dt)
 {
 	_position = ToVector2(_transform->GetPosition());
-
 	_size = ToVector2(_transform->GetScale());
 	if (!_initialized)
 	{

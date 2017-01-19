@@ -66,6 +66,8 @@ public:
 
 	Vector2 Offset;	
 
+	float FleeDistance = 40.0f;
+
 	// Weights
 	float SeekWeight = 1.0f;
 	float FleeWeight = 1.0f;
@@ -97,7 +99,7 @@ protected:
 
 	// This behavior returns a vector that moves the agent away
 	// from a target position
-	// SteeringOutput Flee(Vector2& targetPos);
+	Vector2 Flee(Vector2& targetPos);
 
 	// this behavior is similar to seek but it attempts to arrive 
 	// at the target position with a zero velocity
@@ -112,7 +114,7 @@ protected:
 	Vector2 OffsetPursuit(const PhysicsBody2D* agent, const Vector2& offset);
 
 	//this behavior attempts to evade a pursuer
-	// SteeringOutput Evade(const Vehicle* agent);
+	Vector2 Evade(const PhysicsBody2D* agent);
 
 	// This behavior makes the agent wander about randomly
 	Vector2 Wander();

@@ -66,7 +66,6 @@ void Steering::CalculatePrioritized()
 		neighbors = GetFlockingNeighbors();
 	}
 
-
 	Vector2 force;
 
 	if (IsOn(STEERING_SEEK))
@@ -91,8 +90,8 @@ void Steering::CalculatePrioritized()
 	}
 	if (IsOn(STEERING_SEPARATION))
 	{
-		//force += Separation(neighbors) * SeparationWeight;
-		//if (!AccumulateForce(force)) return;
+		force += Separation(neighbors) * SeparationWeight;
+		if (!AccumulateForce(force)) return;
 	}
 	if (IsOn(STEERING_ALIGNMENT))
 	{
@@ -112,6 +111,21 @@ Vector2 Steering::Seek(Vector2& targetPos)
 	seek.Normalize();
 	seek *= MaxAccelearation;
 	return seek;
+}
+
+Vector2 Steering::Flee(Vector2& targetPos)
+{
+	/*
+	Vector2D DesiredVelocity = Vec2DNormalize(m_pVehicle->Pos() - TargetPos)
+		* m_pVehicle->MaxSpeed();
+	return (DesiredVelocity - m_pVehicle->Velocity());
+	*/
+
+	Vector2 flee = targetPos - _physicsBody->GetPosition();
+	flee.Normalize();
+	flee *= MaxAccelearation;
+	flee = flee - _physicsBody->GetVelocity();
+	return flee;
 }
 
 Vector2 Steering::Arrive(Vector2& targetPos, float deceleration)
@@ -165,7 +179,7 @@ Vector2 Steering::OffsetPursuit(const PhysicsBody2D* agent, const Vector2& offse
 	// and the pursuer; and is inversely proportional to the sum of the
 	// agent's velocities
 	float LookAheadTime = toTarget.Magnitude() /
-		(MaxSpeed + agent->GetVelocity().Magnitude());
+		(MaxSpeed + agent->GetVelocity().Magnitude()) * 0.1f;
 
 	// Now seek to the predicted future position of the evader
 	target = target + agent->GetVelocity() * LookAheadTime;
@@ -173,6 +187,29 @@ Vector2 Steering::OffsetPursuit(const PhysicsBody2D* agent, const Vector2& offse
 	gDebugRenderer.AddCircle(ToVector3(target));
 
 	return Seek(target);
+}
+
+Vector2 Steering::Evade(const PhysicsBody2D* agent)
+{
+	/*
+	// Not necessary to include the check for facing direction this time
+
+	Vector2D ToPursuer = pursuer->Pos() - m_pVehicle->Pos();
+
+	//uncomment the following two lines to have Evade only consider pursuers 
+	//within a 'threat range'
+	const double ThreatRange = 100.0;
+	if (ToPursuer.LengthSq() > ThreatRange * ThreatRange) return Vector2D();
+
+	//the lookahead time is propotional to the distance between the pursuer
+	//and the pursuer; and is inversely proportional to the sum of the
+	//agents' velocities
+	double LookAheadTime = ToPursuer.Length() /
+		(m_pVehicle->MaxSpeed() + pursuer->Speed());
+
+	//now flee away from predicted future position of the pursuer
+	return Flee(pursuer->Pos() + pursuer->Velocity() * LookAheadTime);
+	*/
 }
 
 Vector2 Steering::Wander()
@@ -279,13 +316,16 @@ Vector2 Steering::Separation(const std::vector<PhysicsBody2D*>& agents)
 			// scale the force inversely proportional to the agents distance  
 			// from its neighbor.
 			float d = toAgent.Magnitude();
-			toAgent.Normalize();
-			steeringForce += toAgent / d;
+			if (d > 0.01)
+			{
+				toAgent.Normalize();
+				steeringForce += toAgent / d;
+			}
 		}
 
 	}
 
-	return -1.0f * steeringForce;
+	return steeringForce;
 }
 
 Vector2 Steering::Alignment(const std::vector<PhysicsBody2D*>& agents)

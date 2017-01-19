@@ -21,6 +21,10 @@ public:
 
 	~InputManager() {}
 
+	//bool IsInputDown();
+
+
+
 #ifdef INSPECTOR
 	virtual void Inspect() override;
 #endif
