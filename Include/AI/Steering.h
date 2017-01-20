@@ -66,7 +66,7 @@ public:
 
 	Vector2 Offset;	
 
-	float FleeDistance = 40.0f;
+	float EvadeDistance = 35.0f;
 
 	// Weights
 	float SeekWeight = 1.0f;

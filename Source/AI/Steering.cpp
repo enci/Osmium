@@ -57,7 +57,7 @@ void Steering::CalculateWeightedSum()
 }
 
 void Steering::CalculatePrioritized()
-{	
+{
 	_current.Clear();
 	vector<PhysicsBody2D*> neighbors;
 	if (IsOn(STEERING_SEPARATION) || IsOn(STEERING_ALIGNMENT) || IsOn(STEERING_COHESION))
@@ -70,12 +70,17 @@ void Steering::CalculatePrioritized()
 
 	if (IsOn(STEERING_SEEK))
 	{
-		force = Seek(Target) * SeekWeight;
+		force += Seek(Target) * SeekWeight;
 		if (!AccumulateForce(force)) return;
 	}
 	if (IsOn(STEERING_ARRIVE))
 	{
 		force += Arrive(Target, ArriveAcceleration)* ArriveWeight;
+		if (!AccumulateForce(force)) return;
+	}
+	if (IsOn(STEERING_EVADE))
+	{
+		force += Evade(Agent);
 		if (!AccumulateForce(force)) return;
 	}
 	if (IsOn(STEERING_OFFSET_PURSUIT))
@@ -191,25 +196,23 @@ Vector2 Steering::OffsetPursuit(const PhysicsBody2D* agent, const Vector2& offse
 
 Vector2 Steering::Evade(const PhysicsBody2D* agent)
 {
-	/*
 	// Not necessary to include the check for facing direction this time
-
-	Vector2D ToPursuer = pursuer->Pos() - m_pVehicle->Pos();
+	Vector2 toPursuer = agent->GetPosition() - _physicsBody->GetPosition();
 
 	//uncomment the following two lines to have Evade only consider pursuers 
 	//within a 'threat range'
-	const double ThreatRange = 100.0;
-	if (ToPursuer.LengthSq() > ThreatRange * ThreatRange) return Vector2D();
+	if (toPursuer.SquareMagnitude() > EvadeDistance * EvadeDistance)
+		return Vector2();
 
 	//the lookahead time is propotional to the distance between the pursuer
 	//and the pursuer; and is inversely proportional to the sum of the
 	//agents' velocities
-	double LookAheadTime = ToPursuer.Length() /
-		(m_pVehicle->MaxSpeed() + pursuer->Speed());
+	float lookAheadTime = toPursuer.Magnitude() / (MaxSpeed + agent->GetVelocity().Magnitude());
+	lookAheadTime *= 0.1f;
 
 	//now flee away from predicted future position of the pursuer
-	return Flee(pursuer->Pos() + pursuer->Velocity() * LookAheadTime);
-	*/
+	Vector2 target = agent->GetPosition() + agent->GetVelocity() * lookAheadTime;
+	return -1.0f * Flee(target);
 }
 
 Vector2 Steering::Wander()
