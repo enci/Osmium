@@ -217,6 +217,50 @@ Vector2 Steering::Evade(const PhysicsBody2D* agent)
 
 Vector2 Steering::Wander()
 {
+
+	Vector2 fwd = _physicsBody->GetVelocity();
+	fwd.Normalize();
+	Matrix33 transform;
+	transform.SetTransform(
+		fwd.Perpendicular(),
+		Vector2(1.0f, 1.0f),
+		_physicsBody->GetPosition());
+
+	Vector2 wander;
+
+	// This behavior is dependent on the update rate, so this line must
+	// be included when using time independent framerate.
+	float JitterThisTimeSlice = WanderJitter * 0.016f; // m_pVehicle->TimeElapsed();
+
+													   // First, add a small random vector to the target's position
+	_wanderTarget += Vector2(RandInRange(-1.0f, 1.0f) * JitterThisTimeSlice,
+		RandInRange(-1.0f, 1.0f) * JitterThisTimeSlice);
+
+	// Reproject this new vector back on to a unit circle
+	_wanderTarget.Normalize();
+
+	//increase the length of the vector to the same as the radius
+	//of the wander circle
+	_wanderTarget *= WanderRadius;
+
+	//move the target into a position WanderDist in front of the agent
+	//Vector2 target = _wanderTarget + Vector2(0, WanderDistance);
+	Vector2 target = _wanderTarget + Vector2(0, WanderDistance);
+
+	//project the target into world space
+	target = transform.TransformVector(target); // _physicsBody->GetToWorld(target);
+
+	//Vector2 center = _physicsBody->GetToWorld(Vector2(0, WanderDistance));
+	Vector2 center = transform.TransformVector(Vector2(0, WanderDistance));
+
+	gDebugRenderer.AddCircle(ToVector3(center), WanderRadius);
+
+	gDebugRenderer.AddCircle(ToVector3(target), 0.5f, Color::Yellow);
+
+	// And steer towards it
+	wander = target - _physicsBody->GetPosition();
+
+	/*
 	Vector2 wander;
 
 	// This behavior is dependent on the update rate, so this line must
@@ -235,6 +279,7 @@ Vector2 Steering::Wander()
 	_wanderTarget *= WanderRadius;
 
 	//move the target into a position WanderDist in front of the agent
+	//Vector2 target = _wanderTarget + Vector2(0, WanderDistance);
 	Vector2 target = _wanderTarget + Vector2(0, WanderDistance);
 
 	//project the target into world space
@@ -248,6 +293,7 @@ Vector2 Steering::Wander()
 
 	// And steer towards it
 	wander = target - _physicsBody->GetPosition();
+	*/
 
 	return wander;
 }
