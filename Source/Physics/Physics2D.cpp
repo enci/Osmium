@@ -106,7 +106,7 @@ Vector2 PhysicsBody2D::GetToWorld(const Vector2& local) const
 	return _matrix.TransformVector(local);
 }
 
-Vector2 PhysicsBody2D::GetFroward() const
+Vector2 PhysicsBody2D::GetForward() const
 {
 	return _matrix.TransformNormal(Vector2(0.0f, 1.0f));
 }

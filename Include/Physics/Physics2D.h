@@ -158,7 +158,7 @@ public:
 	Vector2 GetToWorld(const Vector2& local) const;
 
 	/// Get the forward vector
-	Vector2 GetFroward() const;
+	Vector2 GetForward() const;
 
 	/// Update body - integrate forces
 	void UpdateBody(float dt);

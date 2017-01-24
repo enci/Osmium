@@ -217,12 +217,13 @@ Vector2 Steering::Evade(const PhysicsBody2D* agent)
 
 Vector2 Steering::Wander()
 {
-
 	Vector2 fwd = _physicsBody->GetVelocity();
+	if (fwd.SquareMagnitude() < 0.001)
+		fwd = _physicsBody->GetForward();
 	fwd.Normalize();
 	Matrix33 transform;
 	transform.SetTransform(
-		fwd.Perpendicular(),
+		fwd,
 		Vector2(1.0f, 1.0f),
 		_physicsBody->GetPosition());
 
@@ -385,7 +386,7 @@ Vector2 Steering::Alignment(const std::vector<PhysicsBody2D*>& agents)
 	//This count the number of vehicles in the neighborhood
 	float neighborCount = 0.0;
 
-	Vector2 currentHeading = _physicsBody->GetFroward();
+	Vector2 currentHeading = _physicsBody->GetForward();
 	currentHeading.Normalize();
 
 	//iterate through the neighbors and sum up all the position vectors
@@ -395,7 +396,7 @@ Vector2 Steering::Alignment(const std::vector<PhysicsBody2D*>& agents)
 		// the agent being examined is close enough
 		if (a != _physicsBody && a != Agent)
 		{
-			Vector2 heading = a->GetFroward();
+			Vector2 heading = a->GetForward();
 			heading.Normalize();
 			averageHeading += heading;
 			neighborCount++;
