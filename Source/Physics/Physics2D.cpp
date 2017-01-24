@@ -12,6 +12,8 @@
 using namespace Osm;
 const float skin = 0.1f;
 
+#define PACK_TO_64(i,j) (((i) & 0x00000000FFFFFFFF) | ((j) << 32));
+
 void AABB::Clear()
 {
 	Min.x = FLT_MAX;
@@ -121,7 +123,7 @@ void PhysicsBody2D::UpdateBody(float dt)
 		UpdateDerived();
 	}
 
-	gDebugRenderer.AddLine( ToVector3(_position), ToVector3(_position + _force), Color::White );
+	//gDebugRenderer.AddLine( ToVector3(_position), ToVector3(_position + _force), Color::White );
 
 	Vector2 accel = _force / _mass;
 	_velocity += accel * dt;
@@ -240,9 +242,269 @@ void PhysicsBody2D::DebugRenderShape()
 	//_boundingBox.DebugRender();
 }
 
+MultiGrid::MultiGrid(const std::vector<PhysicsBody2D*>& bodies)
+{
+	// Collect all entities
+	for (auto b : bodies)
+	{		
+		Vector2 pos = b->GetPosition();
+		int64_t idx = GetIndex(pos);
+
+		auto& v = _grid[idx];
+		v.push_back(b);
+	}
+}
+
+vector<PhysicsBody2D*> MultiGrid::GetNeighbours(PhysicsBody2D* body)
+{
+	Vector2 pos = body->GetPosition();
+	float fi = pos.x / _cellSize;
+	float fj = pos.y / _cellSize;
+	//float fi, fj;
+	//float fx = modf(x, &fi);
+	//float fy = modf(y, &fj);
+
+	int64_t i = (int64_t)round(fi);
+	int64_t j = (int64_t)round(fj);
+
+	float ri = fi - i;
+	float rj = fj - j;
+
+	int ifrom = ri < 0.0f ? i - 1 : i;
+	int jfrom = rj < 0.0f ? j - 1 : j;
+	int ito =  ri > 0.0f ? i + 1 : i;
+	int jto = rj > 0.0f ? ;
+
+
+}
+
+
+void MultiGrid::DebugRender()
+{
+	for (auto cell : _grid)
+	{
+		uint64_t idx = cell.first;
+
+		int i = (int)(idx & 0x00000000FFFFFFFF);
+		int j = (int)(idx >> 32);		
+
+		Vector2 pos(i * _cellSize, j * _cellSize);
+
+		gDebugRenderer.AddCircle(ToVector3(pos));
+
+
+		auto& v = cell.second;
+		for (auto b : v)
+		{
+			gDebugRenderer.AddLine(
+				ToVector3(b->GetPosition()),
+				ToVector3(pos));
+		}
+
+		// cell.second->GetPosition();
+	}
+}
+
+AutoGrid::AutoGrid(const std::vector<PhysicsBody2D*>& bodies)
+{
+	// Set initial values
+	_min.x = FLT_MAX;
+	_min.y = FLT_MAX;
+	_max.x = FLT_MIN;
+	_max.y = FLT_MIN;
+	//float maxsize = FLT_MIN;
+	float maxSizeX = FLT_MIN;
+	float maxSizeY = FLT_MIN;
+
+	// Go over all entities for find the bounds of the world
+	for (auto* b : bodies)
+	{
+		// Get the size
+		//float r = b->GetRadius();
+
+		// If no collision, then skip this entitiy
+		//if (r <= 0)
+		//	continue;
+
+		// Track max size
+		//if (2 * r > maxsize)
+		//	maxsize = 2 * r;
+
+		// Build the grid size
+		// Vector2 pos = b->GetPosition();
+
+		auto bb = b->GetBoundingBox();
+
+		if(!bb.IsValid())
+			continue;
+
+		if (bb.Max.x > _max.x)
+			_max.x = bb.Max.x;
+		if (bb.Max.y > _max.y)
+			_max.y = bb.Max.y;
+		if (bb.Min.x < _min.x)
+			_min.x = bb.Min.x;		
+		if (bb.Min.y < _min.y)
+			_min.y = bb.Min.y;
+
+		float dx = bb.Max.x - bb.Min.x;
+		float dy = bb.Max.y - bb.Min.y;
+
+		if (dx > maxSizeX) maxSizeX = dx;
+		if (dx > maxSizeY) maxSizeY = dy;
+	}
+
+	float sizex = _max.x - _min.x;
+	float sizey = _max.y - _min.y;
+
+	//    float gx = sizex / maxsize;
+	_gridx = (int)floor(sizex / maxSizeX);
+	_gridy = (int)floor(sizey / maxSizeY);
+
+	// Resize grid
+	_grid.resize(_gridx);
+	for (int i = 0; i < _gridx; i++)
+		_grid[i].resize(_gridy);
+
+	// Collect all entities
+	for (auto* b : bodies)
+	{
+		// Get the size
+		float r = b->GetRadius();
+
+		// If no collision, then skip this entitiy
+		if (r <= 0)
+			continue;
+
+		// Build the grid size
+		Vector2 pos = b->GetPosition();
+		pos = pos - _min;
+		int i = (pos.x / sizex) * _gridx;
+		int j = (pos.y / sizey) * _gridy;
+
+		// Add to 
+		_grid[i][j].push_back(b);
+	}
+}
+
+vector<PhysicsBody2D*> AutoGrid::GetNeighbours(PhysicsBody2D* body)
+{
+	vector<PhysicsBody2D*> neighbours;
+	float sizex = _max.x - _min.x;
+	float sizey = _max.y - _min.y;
+
+	Vector2 pos = body->GetPosition();
+	pos = pos - _min;
+	int idx = (pos.x / sizex) * _gridx;
+	int jdx = (pos.y / sizey) * _gridy;
+	//
+	int ifrom = idx <= 0 ? 0 : idx - 1;
+	int jfrom = jdx <= 0 ? 0 : jdx - 1;
+	int ito = (idx >= (_gridx - 1)) ? (_gridx - 1) : (idx + 1);
+	int jto = (jdx >= (_gridy - 1)) ? (_gridy - 1) : (jdx + 1);
+
+	for (int i = ifrom; i <= ito; i++)
+	{
+		for (int j = jfrom; j <= jto; j++)
+		{
+			for (auto b : _grid[i][j])
+				neighbours.push_back(b);
+		}
+	}
+
+	return neighbours;
+}
+
+/*
+vector<PhysicsBody2D*> AutoGrid::GetNeighbours(PhysicsBody2D* body, float radius)
+{
+	vector<PhysicsBody2D*> neighbours;
+	float sizex = _max.x - _min.x;
+	float sizey = _max.y - _min.y;
+
+	Vector2 pos = body->GetPosition();
+	pos = pos - _min;
+	int idx = (pos.x / sizex) * _gridx;
+	int jdx = (pos.y / sizey) * _gridy;
+	//
+	int ifrom = idx <= 0 ? 0 : idx - 1;
+	int jfrom = jdx <= 0 ? 0 : jdx - 1;
+	int ito = (idx >= (_gridx - 1)) ? (_gridx - 1) : (idx + 1);
+	int jto = (jdx >= (_gridy - 1)) ? (_gridy - 1) : (jdx + 1);
+
+	for (int i = ifrom; i <= ito; i++)
+	{
+		for (int j = jfrom; j <= jto; j++)
+		{
+			for (auto b : _grid[i][j])
+				neighbours.push_back(b);
+		}
+	}
+
+	return neighbours;
+}
+*/
+
+void AutoGrid::DebugRender()
+{
+	float sizex = _max.x - _min.x;
+	float sizey = _max.y - _min.y;
+
+	float dx = sizex / _gridx;
+	float dy = sizey / _gridy;
+	float x = _min.x;
+	float y = _min.y;
+	
+	for (int i = 0; i <= _gridx; i++, x += dx)
+		gDebugRenderer.AddLine(
+			ToVector3(Vector2(x, _min.y)),
+			ToVector3(Vector2(x, _max.y)),
+			Color::Grey);
+
+	for (int i = 0; i <= _gridy; i++, y += dy)
+		gDebugRenderer.AddLine(
+			ToVector3(Vector2(_min.x, y)),
+			ToVector3(Vector2(_max.x, y)),
+			Color::Grey);
+
+	for (int i = 0; i < _gridx; i++)
+	{
+		for (int j = 0; j < _gridy; j++)
+		{
+			Vector2 c(i * dx, j * dy);
+			c += Vector2(dx / 2, dy / 2);
+			c += _min;
+			gDebugRenderer.AddCircle(ToVector3(c), 0.3f, Color::Red, 3);
+
+			for (auto b : _grid[i][j])
+			{
+				gDebugRenderer.AddLine(
+					ToVector3(b->GetPosition()),
+					ToVector3(c),
+					Color::Red);
+
+
+				auto neighbours = GetNeighbours(b);
+
+				for (auto n : neighbours)
+				{
+					if (n < b)
+					{
+						gDebugRenderer.AddLine(
+							ToVector3(b->GetPosition()),
+							ToVector3(n->GetPosition()),
+							Color::Orange);
+					}
+				}
+			}
+		}
+	}
+}
+
 PhysicsManager2D::PhysicsManager2D(World& world)
 	: Component(world)
 {
+	_algorithm = CA_AUTO_GRID;
 }
 
 void PhysicsManager2D::UpdatePhysics(float dt)
@@ -273,21 +535,17 @@ void PhysicsManager2D::RemovePhysicsBody(PhysicsBody2D* body)
 
 vector<PhysicsBody2D*> PhysicsManager2D::GetInRadius(const Vector2& position, float radius)
 {
-	vector<PhysicsBody2D*> neighbours;
-
-	// gDebugRenderer.AddCircle(ToVector3(position), radius);
-	
-	for(auto b : _bodies)
+	switch (_algorithm)
 	{
-		auto d = b->GetPosition() - position;
-		if (d.Magnitude() < radius)
-		{
-			neighbours.push_back(b);
-			//gDebugRenderer.AddLine(ToVector3(position), ToVector3(b->GetPosition()));
-		}
+	case CA_BRUTE_FORCE:
+		return GetInRadiusBrute(position, radius);
+	case CA_AUTO_GRID:
+		return GetInRadiusAutoGrid(position, radius);
+	case CA_MULTI_GRID:
+		return GetInRadiusMultiGrid (position, radius);
+	default:
+		return vector<PhysicsBody2D*>();
 	}
-
-	return neighbours;
 }
 
 //
@@ -397,8 +655,8 @@ bool CheckCollision(PhysicsBody2D* body0, PhysicsBody2D* body1, Collision2D& col
 	float overlap = min1 < min0 ? min1 : min0;
 
 	// Uncoment to debug axis and it's normal/overlap
-	//gDebugRenderer.AddLine(ToVector3(from), ToVector3(to), Color::Yellow);
-	//gDebugRenderer.AddLine(ToVector3((from+to) * 0.5f), ToVector3((from + to) * 0.5f - normal * overlap), Color::Yellow);
+	// gDebugRenderer.AddLine(ToVector3(from), ToVector3(to), Color::Yellow);
+	// gDebugRenderer.AddLine(ToVector3((from+to) * 0.5f), ToVector3((from + to) * 0.5f - normal * overlap), Color::Yellow);
 
 	collision.FirstBody = body0;
 	collision.SecondBody = body1;
@@ -425,7 +683,40 @@ bool Overlap(const AABB left, const AABB& right)
 			(left.Max.x >= right.Min.x) && (left.Max.y >= right.Min.y);
 }
 
+#ifdef INSPECTOR	
+void PhysicsManager2D::Inspect()
+{
+	int* a = (int*)&_algorithm;
+	const char* algs[] = { "Brute Force", "Auto Grid", "Multi Grid" };
+	ImGui::Combo(
+		"Contacts Algorithm",
+		a,
+		algs,
+		3);
+
+					
+}
+#endif
+
 void PhysicsManager2D::AccumulateContacts()
+{		
+	switch (_algorithm)
+	{
+	case CA_BRUTE_FORCE:
+		AccumulateContactsBruteForce();
+		break;
+	case CA_AUTO_GRID:
+		AccumulateContactsAutoGrid();
+		break;
+	case CA_MULTI_GRID:
+		AccumulateContactsBruteForce();
+		break;
+	default:
+		break;
+	}	
+}
+
+void PhysicsManager2D::AccumulateContactsBruteForce()
 {
 	_collisions.clear();
 
@@ -456,7 +747,71 @@ void PhysicsManager2D::AccumulateContacts()
 	}
 }
 
+void PhysicsManager2D::AccumulateContactsAutoGrid()
+{
+	AutoGrid grid(_bodies);
+	//grid.DebugRender();
 
+	MultiGrid mgrid(_bodies);
+	mgrid.DebugRender();
+
+	_collisions.clear();
+	for (auto b : _bodies)
+	{
+		auto neighbours = grid.GetNeighbours(b);
+
+		for (auto n : neighbours)
+		{
+			if (n->GetOwner().GetID() < b->GetOwner().GetID())
+			{
+				const AABB& box0 = b->GetBoundingBox();
+				const AABB& box1 = n->GetBoundingBox();
+
+				if (!box0.IsValid() || !box0.IsValid())
+					break;
+
+				if (Overlap(box0, box1))
+				{
+					Collision2D collision; // Blank (invalid) collision 
+
+					if (CheckCollision(b, n, collision))
+					{
+						_collisions.push_back(collision);
+					}
+				}
+			}
+		}
+	}
+}
+
+std::vector<PhysicsBody2D*> PhysicsManager2D::GetInRadiusBrute(const Vector2& position, float radius)
+{
+	vector<PhysicsBody2D*> neighbours;
+
+	// gDebugRenderer.AddCircle(ToVector3(position), radius);
+
+	for (auto b : _bodies)
+	{
+		auto d = b->GetPosition() - position;
+		if (d.Magnitude() < radius)
+		{
+			neighbours.push_back(b);
+			//gDebugRenderer.AddLine(ToVector3(position), ToVector3(b->GetPosition()));
+		}
+	}
+
+	return neighbours;
+}
+
+vector<PhysicsBody2D*> PhysicsManager2D::GetInRadiusAutoGrid(const Vector2& position, float radius)
+{
+	return GetInRadiusBrute(position, radius);
+}
+
+vector<PhysicsBody2D*> PhysicsManager2D::GetInRadiusMultiGrid(const Vector2& position, float radius)
+{
+	return GetInRadiusBrute(position, radius);
+}
 
 void PhysicsManager2D::CallOnCollisionEvent()
 {

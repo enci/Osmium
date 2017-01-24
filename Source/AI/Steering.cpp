@@ -88,16 +88,16 @@ void Steering::CalculatePrioritized()
 		force += OffsetPursuit(Agent, Offset) * OffsetPursuitWeight;
 		if (!AccumulateForce(force)) return;
 	}	
-	if (IsOn(STEERING_COHESION))
-	{
-		force += Cohesion(neighbors) * CohesionWeight;
-		if (!AccumulateForce(force)) return;
-	}
 	if (IsOn(STEERING_SEPARATION))
 	{
 		force += Separation(neighbors) * SeparationWeight;
 		if (!AccumulateForce(force)) return;
 	}
+	if (IsOn(STEERING_COHESION))
+	{
+		force += Cohesion(neighbors) * CohesionWeight;
+		if (!AccumulateForce(force)) return;
+	}	
 	if (IsOn(STEERING_ALIGNMENT))
 	{
 		force += Alignment(neighbors) * AlignmentWeight;
@@ -120,12 +120,6 @@ Vector2 Steering::Seek(Vector2& targetPos)
 
 Vector2 Steering::Flee(Vector2& targetPos)
 {
-	/*
-	Vector2D DesiredVelocity = Vec2DNormalize(m_pVehicle->Pos() - TargetPos)
-		* m_pVehicle->MaxSpeed();
-	return (DesiredVelocity - m_pVehicle->Velocity());
-	*/
-
 	Vector2 flee = targetPos - _physicsBody->GetPosition();
 	flee.Normalize();
 	flee *= MaxAccelearation;
@@ -189,7 +183,7 @@ Vector2 Steering::OffsetPursuit(const PhysicsBody2D* agent, const Vector2& offse
 	// Now seek to the predicted future position of the evader
 	target = target + agent->GetVelocity() * LookAheadTime;
 
-	gDebugRenderer.AddCircle(ToVector3(target));
+	//gDebugRenderer.AddCircle(ToVector3(target));
 
 	return Seek(target);
 }
@@ -231,11 +225,12 @@ Vector2 Steering::Wander()
 
 	// This behavior is dependent on the update rate, so this line must
 	// be included when using time independent framerate.
-	float JitterThisTimeSlice = WanderJitter * 0.016f; // m_pVehicle->TimeElapsed();
+	float jitterThisTimeSlice = WanderJitter * 0.016f; // m_pVehicle->TimeElapsed();
 
 													   // First, add a small random vector to the target's position
-	_wanderTarget += Vector2(RandInRange(-1.0f, 1.0f) * JitterThisTimeSlice,
-		RandInRange(-1.0f, 1.0f) * JitterThisTimeSlice);
+	_wanderTarget += Vector2(
+		RandInRange(-1.0f, 1.0f) * jitterThisTimeSlice,
+		RandInRange(-1.0f, 1.0f) * jitterThisTimeSlice);
 
 	// Reproject this new vector back on to a unit circle
 	_wanderTarget.Normalize();
@@ -254,9 +249,8 @@ Vector2 Steering::Wander()
 	//Vector2 center = _physicsBody->GetToWorld(Vector2(0, WanderDistance));
 	Vector2 center = transform.TransformVector(Vector2(0, WanderDistance));
 
-	gDebugRenderer.AddCircle(ToVector3(center), WanderRadius);
-
-	gDebugRenderer.AddCircle(ToVector3(target), 0.5f, Color::Yellow);
+	// gDebugRenderer.AddCircle(ToVector3(center), WanderRadius);
+	// gDebugRenderer.AddCircle(ToVector3(target), 0.5f, Color::Yellow);
 
 	// And steer towards it
 	wander = target - _physicsBody->GetPosition();
@@ -422,7 +416,7 @@ void Steering::DebugRender()
 		auto pos = _physicsBody->GetPosition();
 		gDebugRenderer.AddCircle(
 			ToVector3(pos),
-			_physicsBody->GetRaduis(),
+			_physicsBody->GetRadius(),
 			Color::Purple);
 		gDebugRenderer.AddLine(
 			ToVector3(pos),

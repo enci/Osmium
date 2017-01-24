@@ -5,6 +5,7 @@
 #include <Core/Transform.h>
 #include <Utils.h> 
 #include <Math/Matrix33.h>
+#include <unordered_map>
 
 namespace Osm
 {
@@ -125,7 +126,7 @@ public:
 	void    SetAngularDamping(float damping) { _angularDamping = damping; }
 
 	/// Get radius, recalulated from the polygon collision shape
-	float   GetRaduis() const { return _radius; }
+	float   GetRadius() const { return _radius; }
 
 	/// Will get recalulated from the polygon collision shape
 	void    SetRadius(float r) { _radius = r; }
@@ -218,6 +219,55 @@ private:
 	std::vector<Vector2> _collisionShapeWorld;
 };
 
+///
+///
+///
+class MultiGrid
+{
+public:
+	MultiGrid(const std::vector<PhysicsBody2D*>& bodies);
+
+	std::vector<PhysicsBody2D*> GetNeighbours(PhysicsBody2D* body);
+
+	//std::vector<PhysicsBody2D*> GetNeighbours(PhysicsBody2D* body, float radius);
+
+#ifdef DEBUG
+	void DebugRender();
+#endif
+
+private:
+
+	int64_t GetIndex(const Vector2& pos);
+
+	float _cellSize = 12.0f;
+
+	std::unordered_map<int64_t, std::vector<PhysicsBody2D*>> _grid;
+};
+
+
+class AutoGrid
+{
+public:
+	AutoGrid(const std::vector<PhysicsBody2D*>& bodies);
+
+	std::vector<PhysicsBody2D*> GetNeighbours(PhysicsBody2D* body);
+
+	//std::vector<PhysicsBody2D*> GetNeighbours(PhysicsBody2D* body, float radius);
+
+#ifdef DEBUG
+	void DebugRender();
+#endif
+
+private:
+
+	int _gridx;
+	int _gridy;
+
+	Vector2 _min;
+	Vector2 _max;
+	std::vector<std::vector<std::vector<PhysicsBody2D*>>> _grid;
+};
+
 
 class PhysicsManager2D : public Component<World>
 {
@@ -236,9 +286,34 @@ public:
 	/// Get all bodies in the specified reariuis arround the given postion
 	std::vector<PhysicsBody2D*> GetInRadius(const Vector2& position, float radius);
 
+	/// A choice of algorithms for accumulating contacts
+	enum ContactsAlgorithm { CA_BRUTE_FORCE = 0, CA_AUTO_GRID = 1, CA_MULTI_GRID = 2 };
+
+	/// Set the contacts algorithm
+	void SetContactsAlgorithm(ContactsAlgorithm a) { _algorithm = a; }
+
+#ifdef INSPECTOR	
+	virtual void Inspect() override;
+#endif
+
 private:
 	/// Get all the collisions this frame
 	void AccumulateContacts();
+
+	/// Get collisions using brute force
+	void AccumulateContactsBruteForce();
+
+	/// Get collisions using brute force
+	void AccumulateContactsAutoGrid();
+
+	/// Get all bodies in the specified reariuis arround the given postion
+	std::vector<PhysicsBody2D*> GetInRadiusBrute(const Vector2& position, float radius);
+
+	/// Get all bodies in the specified reariuis arround the given postion
+	std::vector<PhysicsBody2D*> GetInRadiusAutoGrid(const Vector2& position, float radius);
+
+	/// Get all bodies in the specified reariuis arround the given postion
+	std::vector<PhysicsBody2D*> GetInRadiusMultiGrid(const Vector2& position, float radius);
 
 	/// Call events on all entities
 	void CallOnCollisionEvent();
@@ -251,8 +326,21 @@ private:
 
 	/// Current collision
 	std::vector<Collision2D>	_collisions;
+
+	ContactsAlgorithm			_algorithm = CA_BRUTE_FORCE;
+
+	//Grid						_grid;
 };
 
 std::vector<Vector2> CreateConvexHull(const std::vector<Vector2>& vertices);
 
+}
+
+// Defined in header so that it can be inlined
+inline int64_t Osm::MultiGrid::GetIndex(const Vector2 & pos)
+{
+	int64_t i = (int64_t)round(pos.x / _cellSize);
+	int64_t j = (int64_t)round(pos.y / _cellSize);
+	int64_t idx = i & 0x00000000FFFFFFFF | (j << 32);
+	return idx;
 }
