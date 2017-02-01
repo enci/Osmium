@@ -15,7 +15,7 @@ using namespace std;
 
 CEngine Osm::Engine;
 
-void EngineOptions::LoadFromFile(const std::string& file)
+void EngineSettings::LoadFromFile(const std::string& file)
 {
 
 }
@@ -37,6 +37,12 @@ void CEngine::Initialize()
 	_audio = CreateComponent<AudioManager>();
 
 	ImGui_ImplGlfwGL3_Init(_device->GetWindow(), true);
+}
+
+void CEngine::Initialize(const EngineSettings& options)
+{
+	_settings = options;
+	Initialize();
 }
 
 void CEngine::Shutdown()

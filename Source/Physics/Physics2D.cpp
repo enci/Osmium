@@ -260,6 +260,7 @@ vector<PhysicsBody2D*> MultiGrid::GetNeighbours(PhysicsBody2D* body)
 	Vector2 pos = body->GetPosition();
 	float fi = pos.x / _cellSize;
 	float fj = pos.y / _cellSize;
+
 	//float fi, fj;
 	//float fx = modf(x, &fi);
 	//float fy = modf(y, &fj);
@@ -273,9 +274,9 @@ vector<PhysicsBody2D*> MultiGrid::GetNeighbours(PhysicsBody2D* body)
 	int ifrom = ri < 0.0f ? i - 1 : i;
 	int jfrom = rj < 0.0f ? j - 1 : j;
 	int ito =  ri > 0.0f ? i + 1 : i;
-	int jto = rj > 0.0f ? ;
+	int jto = rj > 0.0f ? j + 1 : j;
 
-
+	return vector<PhysicsBody2D*>();
 }
 
 

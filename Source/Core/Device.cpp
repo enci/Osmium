@@ -20,6 +20,8 @@ GraphicsDevice::GraphicsDevice(CEngine& engine) : Component(engine)
 	if (!glfwInit())
 		exit(EXIT_FAILURE);
 
+	auto settings = engine.Settings();
+
 	glfwSetErrorCallback(error_callback);
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);		 // yes, 3 and 2!!!
@@ -30,11 +32,12 @@ GraphicsDevice::GraphicsDevice(CEngine& engine) : Component(engine)
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
 	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-
-	//_window = glfwCreateWindow(mode->width, mode->height, "Blastastic", glfwGetPrimaryMonitor(), nullptr);
-	_window = glfwCreateWindow(1920, 1080, "Blastastic", nullptr, nullptr);
-	// _window = glfwCreateWindow(640, 360, "Blastastic", nullptr, nullptr);
-	//_window = glfwCreateWindow(1280, 720, "Blastastic", nullptr, nullptr);
+	_window = glfwCreateWindow(
+		settings.ScreenWidth,
+		settings.ScreenHeight,
+		"Blastastic",
+		nullptr,
+		nullptr);
 
 	int major = glfwGetWindowAttrib(_window, GLFW_CONTEXT_VERSION_MAJOR);
 	int minor = glfwGetWindowAttrib(_window, GLFW_CONTEXT_VERSION_MINOR);

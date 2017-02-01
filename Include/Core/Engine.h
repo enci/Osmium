@@ -15,7 +15,7 @@ class World;
 class InputManager;
 class AudioManager;
 
-struct EngineOptions
+struct EngineSettings
 {
 	int ScreenWidth = 1920;
 	int ScreenHeight = 1080;
@@ -31,6 +31,8 @@ public:
 
 	void Initialize();
 
+	void Initialize(const EngineSettings& options);
+
 	void Shutdown();
 
 	void Run();
@@ -42,6 +44,8 @@ public:
 	InputManager& Input() const { return *_input; }
 
 	Profiler& GetProfiler() const { return *_profiler; }
+
+	const EngineSettings& Settings() const { return _settings; }
 
 	void SwapWorld(World* world);
 
@@ -68,6 +72,8 @@ protected:
 	Profiler* _profiler = nullptr;
 
 	AudioManager* _audio = nullptr;
+
+	EngineSettings _settings;
 
 	bool _paused = false;
 

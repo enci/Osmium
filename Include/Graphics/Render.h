@@ -24,7 +24,7 @@ class RenderManager : public Component<World>
 {
 public:
 
-	RenderManager(World& world) : Component(world) {}
+	RenderManager(World& world);
 
 	void Render();
 
@@ -49,6 +49,10 @@ protected:
 	std::vector<Renderable*>	_renderables;
 	std::vector<Light*>			_lights;
 	std::vector<Camera*>		_cameras;
+
+	GLuint _framebufferName;
+	GLuint _renderedTexture;
+	GLuint _depthrenderbuffer;
 };
 
 ///
