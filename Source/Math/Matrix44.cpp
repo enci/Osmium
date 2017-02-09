@@ -30,7 +30,8 @@ Matrix44::Matrix44()
 
 Vector3 Matrix44::operator*(const Vector3& vec) const
 {
-	return Vector3(vec.x * m[0][0] +
+	return Vector3(
+		vec.x * m[0][0] +
 		vec.y * m[1][0] +
 		vec.z * m[2][0] + m[3][0],
 
@@ -107,6 +108,11 @@ Matrix44 Matrix44::CreateTranslation(float x, float y, float z)
 	result.m[3][2] = z;
 	//
 	return result;
+}
+
+Matrix44 Matrix44::CreateTranslation(const Vector3& vec)
+{
+	return CreateTranslation(vec.x, vec.y, vec.z);
 }
 
 Matrix44 Matrix44::CreateScale(Vector3 scale)

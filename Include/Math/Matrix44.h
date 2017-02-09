@@ -110,6 +110,11 @@ struct Matrix44
 	/// @return Translation matrix
 	static Matrix44 CreateTranslation(float x, float y, float z);
 
+	/// Creates a transation matrix
+	///
+	/// @return Translation matrix
+	static Matrix44 CreateTranslation(const Vector3& vec);
+
 	static Matrix44 CreateScale(Vector3 scale);
 
 	/// Creates a rotation matrix around an arbitrary axis
