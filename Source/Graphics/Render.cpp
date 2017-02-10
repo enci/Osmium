@@ -13,6 +13,7 @@ RenderManager::RenderManager(World& world)
 	, _framebufferName(0)
 	, _renderedTexture(0)
 {
+	/*
 	// Get settings
 	auto settings = Engine.Settings();
 	auto width = settings.ScreenWidth;
@@ -54,10 +55,12 @@ RenderManager::RenderManager(World& world)
 		ASSERT(false);
 
 	// Render to our framebuffer
+
 	
 
 	// Render on the whole framebuffer, complete from the lower left corner to the upper right
 	//	glViewport(0, 0, 1024, 768); 
+	*/
 }
 
 void RenderManager::Render()
@@ -78,6 +81,7 @@ void RenderManager::Render()
 			if (renderer->GetShader() != activeShader)
 			{
 				renderer->ActivateShader(c, _lights);
+				activeShader = renderer->GetShader();
 			}
 			renderer->Draw();
 		}

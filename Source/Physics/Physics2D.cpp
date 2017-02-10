@@ -279,7 +279,7 @@ vector<PhysicsBody2D*> MultiGrid::GetNeighbours(PhysicsBody2D* body)
 	return vector<PhysicsBody2D*>();
 }
 
-
+#ifdef DEBUG
 void MultiGrid::DebugRender()
 {
 	for (auto cell : _grid)
@@ -305,6 +305,7 @@ void MultiGrid::DebugRender()
 		// cell.second->GetPosition();
 	}
 }
+#endif
 
 AutoGrid::AutoGrid(const std::vector<PhysicsBody2D*>& bodies)
 {
@@ -446,6 +447,7 @@ vector<PhysicsBody2D*> AutoGrid::GetNeighbours(PhysicsBody2D* body, float radius
 }
 */
 
+#ifdef DEBUG
 void AutoGrid::DebugRender()
 {
 	float sizex = _max.x - _min.x;
@@ -501,11 +503,12 @@ void AutoGrid::DebugRender()
 		}
 	}
 }
+#endif
 
 PhysicsManager2D::PhysicsManager2D(World& world)
 	: Component(world)
 {
-	_algorithm = CA_AUTO_GRID;
+	_algorithm = CA_BRUTE_FORCE;
 }
 
 void PhysicsManager2D::UpdatePhysics(float dt)
@@ -754,7 +757,10 @@ void PhysicsManager2D::AccumulateContactsAutoGrid()
 	//grid.DebugRender();
 
 	MultiGrid mgrid(_bodies);
+
+#ifdef  DEBUG
 	mgrid.DebugRender();
+#endif
 
 	_collisions.clear();
 	for (auto b : _bodies)

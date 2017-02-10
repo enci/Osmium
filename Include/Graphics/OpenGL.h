@@ -240,6 +240,6 @@ static void InitDebugMessages()
 #define GL_GET_ERROR()
 #endif
 
-#define DEBUG
+//#define DEBUG
 
 } // Osm
