@@ -58,15 +58,16 @@ public:
 #endif
 
 protected:
-
-	/// All the entities in this world
-	EntityInnerContainer            _entities;
-
-	/// Queue so that adding can be done form the game loop itself
-	EntityAddQueue                  _addQueue;
+	// Note: The order is important
 
 	/// Queue so that removing can be done form the game loop itself
-	EntityRemoveQueue               _removeQueue;
+	EntityRemoveQueue               _removeQueue;	// Keep this arround till last possible second
+
+	/// Queue so that adding can be done form the game loop itself
+	EntityAddQueue                  _addQueue;		// Then delete entities that are waiting to be added
+
+	/// All the entities in this world
+	EntityInnerContainer            _entities;		// First delete entities that are active
 };
 
 template<class T>

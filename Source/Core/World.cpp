@@ -27,22 +27,16 @@ void World::Update(float dt)
 	for (auto& e : _entities)
 		e->Update(dt);
 
-	// Goes over all the entities and deletes the ones for which the predicate is true.
-	auto toRemove = remove_if(_entities.begin(), _entities.end(), [this](unique_ptr<Entity>& entity)
+	while (_removeQueue.size() > 0)
 	{
-		// Check if this entity is on the remove queue. If so delete and remove from
-		// queue when there.
-		for (auto itr = _removeQueue.begin(); itr != _removeQueue.end(); ++itr)
+		Entity* r = *_removeQueue.begin();
+		_removeQueue.erase(_removeQueue.begin());
+		auto toRemove = remove_if(_entities.begin(), _entities.end(), [this, r](unique_ptr<Entity>& entity)
 		{
-			if (*itr == entity.get())
-			{
-				_removeQueue.erase(itr);
-				return true;
-			}
-		}
-		return false;
-	});
-	_entities.erase(toRemove, _entities.end());
+			return r == entity.get();
+		});
+		_entities.erase(toRemove, _entities.end());
+	}
 }
 
 void World::PostUpdate(float dt)

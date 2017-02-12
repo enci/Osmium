@@ -13,6 +13,8 @@ class Transform : public Component<Entity>
 public:
 	Transform(Entity& entity);
 
+	virtual ~Transform();
+
 	const Vector3& GetPosition() const					{ return _position; }	
 
 	void SetPosition(const Vector3& pos)				{ _position = pos; }
@@ -31,13 +33,13 @@ public:
 						const Vector3& y,
 						const Vector3& z);
 
-	Matrix44 GetWorld();
+	Matrix44 GetWorld() const;
 
-	Matrix44 GetLocal();
+	Matrix44 GetLocal() const;
 
 	void SetLocal(Matrix44 view);
 
-	void SetParent(Transform* parent)					{ _parent = parent; }
+	void SetParent(Transform* parent);
 
 	Transform* GetParent() const						{ return _parent; }
 
@@ -47,10 +49,11 @@ public:
 
 protected:
 
-	Transform*	_parent;
-	Matrix44	_orientation;
-	Vector3		_position;
-	Vector3		_scale;
+	Transform*				_parent;
+	std::vector<Transform*> _childern;
+	Matrix44				_orientation;
+	Vector3					_position;
+	Vector3					_scale;
 };
 
 inline Transform::Transform(Entity& entity)
@@ -67,7 +70,7 @@ inline void Transform::SetOrientation(const Vector3& x, const Vector3& y, const 
 	_orientation.SetOrientation(x, y, z);
 }
 
-inline Matrix44 Transform::GetWorld()
+inline Matrix44 Transform::GetWorld() const
 {
 	Matrix44 world = _orientation * Matrix44::CreateScale(_scale);
 	world.SetTranslation(_position);
@@ -78,7 +81,7 @@ inline Matrix44 Transform::GetWorld()
 	return world;
 }
 
-inline Matrix44 Transform::GetLocal()
+inline Matrix44 Transform::GetLocal() const
 {
 	Matrix44 local = _orientation * Matrix44::CreateScale(_scale);
 	local.SetTranslation(_position);
@@ -86,40 +89,3 @@ inline Matrix44 Transform::GetLocal()
 }
 
 }
-
-
-
-/*
-
-namespace Osm
-{
-
-class Transform : public Component<Entity>
-{
-public:
-	Transform(Entity& entity) : Component(entity) { }
-
-	Matrix44& GetTransform() { return _transform; }
-
-	Vector3 GetPosition() { return _transform.GetTranslation(); };
-
-	void SetPosition(const Vector3& pos) { _transform.SetTranslation(pos); }
-
-	Vector3 GetScale();
-
-	void SetScale(Vector3 scale);
-
-	void SetUniformScale(float scale) { SetScale(Vector3(scale, scale, scale)); }
-
-#ifdef INSPECTOR
-	virtual void Inspect() override;
-#endif
-
-protected:
-
-	Matrix44 _transform;
-};
-
-}
-
-*/
