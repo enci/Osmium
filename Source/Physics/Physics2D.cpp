@@ -108,6 +108,17 @@ Vector2 PhysicsBody2D::GetToWorld(const Vector2& local) const
 	return _matrix.TransformVector(local);
 }
 
+Vector2 PhysicsBody2D::GetToWorldDirection(const Vector2& local) const
+{
+	return _matrix.TransformNormal(local);
+}
+
+Vector2 PhysicsBody2D::WorldToLocal(const Vector2& world) const
+{
+	auto inv = _matrix.Inverse();
+	return inv.TransformVector(world);
+}
+
 Vector2 PhysicsBody2D::GetForward() const
 {
 	return _matrix.TransformNormal(Vector2(0.0f, 1.0f));

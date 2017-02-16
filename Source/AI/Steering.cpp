@@ -293,6 +293,109 @@ Vector2 Steering::Wander()
 	return wander;
 }
 
+Vector2 Steering::ObstacleAvoidance()
+{
+	float speed = _physicsBody->GetSpeed();
+
+	// The detection box length is proportional to the agent's velocity
+	float minDetectionBoxLength = ObstacleAvoidanceRaduis * 0.25f;
+	float boxLength = (minDetectionBoxLength)+(speed / MaxSpeed) * minDetectionBoxLength;
+
+	Vector2 v = _physicsBody->GetPosition();
+	auto obstacles = _physicsManager->GetInRadius(v, boxLength);
+	if (ObstacleTag != 0)
+	{
+		remove_if(obstacles.begin(),
+			obstacles.end(),
+			[this](PhysicsBody2D* b)
+		{
+			return b->GetOwner().GetTag() != FlockingTag;
+		});
+	}
+
+	// This will keep track of the closest intersecting obstacle (CIB)
+	PhysicsBody2D* closestIntersectingObstacle = nullptr;
+
+	// This will be used to track the distance to the CIB
+	float distToClosestIP = FLT_MAX;
+
+	// This will record the transformed local coordinates of the CIB
+	Vector2 localPosOfClosestObstacle;
+
+	for (auto ob : obstacles)
+	{
+		auto pos = ob->GetPosition();		 
+
+		// Calculate this obstacle's position in local space
+		Vector2 localPos = _physicsBody->WorldToLocal(pos);
+			
+		// If the local position has a negative x value then it must lay
+		// behind the agent. (in which case it can be ignored)
+		if (localPos.x >= 0)
+		{
+			// If the distance from the x axis to the object's position is less
+			// than its radius + half the width of the detection box then there
+			// is a potential intersection.
+			float expandedRadius = ob->GetRadius() + _physicsBody->GetRadius();
+
+			if (fabs(localPos.y) < expandedRadius)
+			{
+				// now to do a line/circle intersection test. The center of the 
+				// circle is represented by (cX, cY). The intersection points are 
+				// given by the formula x = cX +/-sqrt(r^2-cY^2) for y=0. 
+				// We only need to look at the smallest positive value of x because
+				// that will be the closest point of intersection.
+				float cX = localPos.x;
+				float cY = localPos.y;
+
+				// we only need to calculate the sqrt part of the above equation once
+				float SqrtPart = sqrt(expandedRadius * expandedRadius - cY * cY);
+
+				float ip = cX - SqrtPart;
+
+				if (ip <= 0.0f)
+				{
+					ip = cX + SqrtPart;
+				}
+
+				// test to see if this is the closest so far. If it is keep a
+				// record of the obstacle and its local coordinates
+				if (ip < distToClosestIP)
+				{
+					distToClosestIP = ip;
+					closestIntersectingObstacle = ob;
+					localPosOfClosestObstacle = localPos;
+				}
+			}
+		}
+	}
+
+	// if we have found an intersecting obstacle, calculate a steering 
+	// force away from it
+	Vector2 steeringForce;
+
+	if (closestIntersectingObstacle)
+	{
+		// the closer the agent is to an object, the stronger the 
+		// steering force should be
+		float multiplier = 1.0f + (boxLength - localPosOfClosestObstacle.x) / boxLength;
+
+		//calculate the lateral force
+		steeringForce.y = (closestIntersectingObstacle->GetRadius() -
+							localPosOfClosestObstacle.y)  * multiplier;
+
+		// apply a braking force proportional to the obstacles distance from
+		// the vehicle. 
+		const float BrakingWeight = 0.2f;
+
+		steeringForce.x = (closestIntersectingObstacle->GetRadius() -
+			localPosOfClosestObstacle.x) * BrakingWeight;
+	}
+
+	// finally, convert the steering vector from local to world space
+	return _physicsBody->GetToWorldDirection(steeringForce);
+}
+
 vector<PhysicsBody2D*> Steering::GetFlockingNeighbors()
 {
 	vector<PhysicsBody2D*> neighbors;
@@ -346,7 +449,6 @@ Vector2 Steering::Cohesion(const std::vector<PhysicsBody2D*>& agents)
 Vector2 Steering::Separation(const std::vector<PhysicsBody2D*>& agents)
 {
 	Vector2 steeringForce;
-
 	
 	// iterate through the neighbors and sum up all the position vectors
 	for (auto a : agents)

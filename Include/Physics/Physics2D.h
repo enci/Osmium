@@ -158,6 +158,12 @@ public:
 	/// Calculate world space vector
 	Vector2 GetToWorld(const Vector2& local) const;
 
+	/// Calculate world space vector
+	Vector2 GetToWorldDirection(const Vector2& local) const;
+
+	/// Calculate world space vector
+	Vector2 WorldToLocal(const Vector2& world) const;
+
 	/// Get the forward vector
 	Vector2 GetForward() const;
 

@@ -57,7 +57,11 @@ public:
 
 	float ArriveAcceleration = 3.0f;
 
+	float ObstacleAvoidanceRaduis = 70.0f;
+
 	uint FlockingTag = 0;
+
+	uint ObstacleTag = 0;
 
 	Vector2 Target;
 
@@ -118,9 +122,9 @@ protected:
 	// This behavior makes the agent wander about randomly
 	Vector2 Wander();
 
-	//this returns a steering force which will attempt to keep the agent 
-	//away from any obstacles it may encounter
-	//SteeringOutput ObstacleAvoidance(const std::vector<BaseGameEntity*>& obstacles);
+	// This returns a steering force which will attempt to keep the agent 
+	// away from any obstacles it may encounter
+	Vector2 ObstacleAvoidance();
 
 	//this returns a steering force which will keep the agent away from any
 	//walls it may encounter
