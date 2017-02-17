@@ -68,6 +68,11 @@ void Steering::CalculatePrioritized()
 
 	Vector2 force;
 
+	if(IsOn(STEERING_OBSTACLE_AVOIDANCE))
+	{
+		force += ObstacleAvoidance() * ObstacleAvoidanceWeight;
+		if (!AccumulateForce(force)) return;
+	}
 	if (IsOn(STEERING_SEEK))
 	{
 		force += Seek(Target) * SeekWeight;
@@ -303,14 +308,19 @@ Vector2 Steering::ObstacleAvoidance()
 
 	Vector2 v = _physicsBody->GetPosition();
 	auto obstacles = _physicsManager->GetInRadius(v, boxLength);
+
+	// Early out
+	if (obstacles.size() == 0)
+		return Vector2();
+
 	if (ObstacleTag != 0)
 	{
-		remove_if(obstacles.begin(),
+		obstacles.erase(remove_if(obstacles.begin(),
 			obstacles.end(),
 			[this](PhysicsBody2D* b)
 		{
-			return b->GetOwner().GetTag() != FlockingTag;
-		});
+			return (b == _physicsBody) || (b->GetOwner().GetTag() != ObstacleTag);
+		}), obstacles.end());
 	}
 
 	// This will keep track of the closest intersecting obstacle (CIB)
@@ -324,22 +334,36 @@ Vector2 Steering::ObstacleAvoidance()
 
 	for (auto ob : obstacles)
 	{
-		auto pos = ob->GetPosition();		 
+		auto pos = ob->GetPosition();	
 
 		// Calculate this obstacle's position in local space
-		Vector2 localPos = _physicsBody->WorldToLocal(pos);
+		Vector2 localPos = _physicsBody->WorldToLocal(pos);		
 			
 		// If the local position has a negative x value then it must lay
 		// behind the agent. (in which case it can be ignored)
-		if (localPos.x >= 0)
-		{
+		if (localPos.y >= 0)
+		{			
 			// If the distance from the x axis to the object's position is less
 			// than its radius + half the width of the detection box then there
 			// is a potential intersection.
 			float expandedRadius = ob->GetRadius() + _physicsBody->GetRadius();
 
-			if (fabs(localPos.y) < expandedRadius)
+			if (fabs(localPos.x) < expandedRadius)
 			{
+				//if(_inspect)
+				{
+					gDebugRenderer.AddCircle(
+						//ToVector3(localPos),
+						ToVector3(pos),
+						ob->GetRadius(),
+						Color::White);
+
+					gDebugRenderer.AddCircle(
+						ToVector3(localPos),
+						ob->GetRadius(),
+						Color::Orange);
+				}
+
 				// now to do a line/circle intersection test. The center of the 
 				// circle is represented by (cX, cY). The intersection points are 
 				// given by the formula x = cX +/-sqrt(r^2-cY^2) for y=0. 
@@ -349,13 +373,13 @@ Vector2 Steering::ObstacleAvoidance()
 				float cY = localPos.y;
 
 				// we only need to calculate the sqrt part of the above equation once
-				float SqrtPart = sqrt(expandedRadius * expandedRadius - cY * cY);
+				float sqrtPart = sqrt(expandedRadius * expandedRadius - cX * cX);
 
-				float ip = cX - SqrtPart;
+				float ip = cY - sqrtPart;
 
 				if (ip <= 0.0f)
 				{
-					ip = cX + SqrtPart;
+					ip = cY + sqrtPart;
 				}
 
 				// test to see if this is the closest so far. If it is keep a
@@ -376,20 +400,31 @@ Vector2 Steering::ObstacleAvoidance()
 
 	if (closestIntersectingObstacle)
 	{
+		auto pos = closestIntersectingObstacle->GetPosition();
+
+		//if(_inspect)
+		{
+			gDebugRenderer.AddCircle(
+				//ToVector3(localPos),
+				ToVector3(pos),
+				closestIntersectingObstacle->GetRadius() * 1.2f,
+				Color::Yellow);
+		}
+
 		// the closer the agent is to an object, the stronger the 
 		// steering force should be
-		float multiplier = 1.0f + (boxLength - localPosOfClosestObstacle.x) / boxLength;
+		float multiplier = 1.0f + (boxLength - localPosOfClosestObstacle.y) / boxLength;
 
 		//calculate the lateral force
-		steeringForce.y = (closestIntersectingObstacle->GetRadius() -
-							localPosOfClosestObstacle.y)  * multiplier;
+		steeringForce.x = (closestIntersectingObstacle->GetRadius() -
+							localPosOfClosestObstacle.x)  * multiplier;
 
-		// apply a braking force proportional to the obstacles distance from
+		// Apply a braking force proportional to the obstacles distance from
 		// the vehicle. 
 		const float BrakingWeight = 0.2f;
 
-		steeringForce.x = (closestIntersectingObstacle->GetRadius() -
-			localPosOfClosestObstacle.x) * BrakingWeight;
+		steeringForce.y = (closestIntersectingObstacle->GetRadius() -
+			localPosOfClosestObstacle.y) * BrakingWeight;
 	}
 
 	// finally, convert the steering vector from local to world space

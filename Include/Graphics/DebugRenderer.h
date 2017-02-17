@@ -36,13 +36,13 @@ public:
                     const Color& color = Osm::Color::Red);
         
 	/// Queues a circle for drawing
-	void AddCircle(const Vector3& center,
+	void AddCircle( const Vector3& center,
                     float radius         = 1.0f,
                     const Color& color   = Osm::Color::Red,
                     int divs             = 12);
         
     /// Queues a sphere for drawing
-	void AddAxisSphere(const Vector3& center,
+	void AddAxisSphere( const Vector3& center,
                         float radius         = 1.0f,
                         const Color& xzColor = Osm::Color::Green,
                         const Color& xyColor = Osm::Color::Blue,
