@@ -11,35 +11,64 @@ InputManager::InputManager(CEngine& engine)
 	, _joysticks(GLFW_JOYSTICK_LAST)
 {}
 
+void InputManager::Update()
+{
+	_joyCount = 0;
+	for (int i = GLFW_JOYSTICK_1; i < GLFW_JOYSTICK_LAST; i++)
+	{
+		int present = glfwJoystickPresent(i);
+
+		if (present)
+		{
+			//string name(glfwGetJoystickName(i));			
+			
+			int count;
+			JoystickState& state = _joysticks[_joyCount];
+			//state.Name = name;
+
+			const float* axes = glfwGetJoystickAxes(i, &count);
+			for (size_t j = 0; j < count; j++)
+			{
+				state.Axes[j] = axes[j];
+			}
+
+			const unsigned char* buttons = glfwGetJoystickButtons(i, &count);
+			for (size_t j = 0; j < count; j++)
+			{
+				state.Buttons[j] = buttons[j];
+			}
+
+			_joyCount++;
+		}
+	}
+}
+
+bool InputManager::GetJoystickButton(uint joystick, JoystickButtons button)
+{
+	if (joystick < _joysticks.size())
+		return _joysticks[joystick].Buttons[button];
+	return false;
+}
+
+float InputManager::GetJoystickAxis(uint joystick, JoystickAxes axis)
+{
+	if (joystick < _joysticks.size())
+		return _joysticks[joystick].Axes[axis];
+	return 0.0f;
+}
+
 #ifdef INSPECTOR
 void InputManager::Inspect()
 {
-	for (int joy = GLFW_JOYSTICK_1; joy < GLFW_JOYSTICK_LAST; joy++)
+	for (auto j : _joysticks)
 	{
-		int present = glfwJoystickPresent(joy);
-		if(present)
+		if (ImGui::CollapsingHeader(j.Name.c_str()))
 		{
-			string name(glfwGetJoystickName(joy));
-			name += " - " + to_string(joy);
-			if (ImGui::CollapsingHeader(name.c_str()))
-			{
-				int count;
-				JoystickState& state = _joysticks[joy];
-				
-				const float* axes = glfwGetJoystickAxes(joy, &count);
-				for (size_t i = 0; i < count; i++)
-				{
-					state.Axes[i] = axes[i];
-					ImGui::DragFloat("Axis", &state.Axes[i]);
-				}
+			for (auto a : j.Axes)		
+				ImGui::DragFloat("Axis", &a);		
 
-				const unsigned char* buttons = glfwGetJoystickButtons(joy, &count);
-				for (size_t i = 0; i < count; i++)
-				{
-					state.Buttons[i] = buttons[i];
-					ImGui::DragInt("Buttons", &state.Buttons[i]);
-				}
-			}
+			for(auto b : j.Buttons)
+				ImGui::DragInt("Buttons", &b);
 		}
 	}
 }

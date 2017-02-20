@@ -83,6 +83,7 @@ void CEngine::Run()
 		{
 			_profiler->StartFrame();
 			uint updateID = _profiler->StartSection("Update");
+			_input->Update();
 			_world->Update(deltaTime);
 			_profiler->EndSection(updateID);
 			_advanceFrame = false;
