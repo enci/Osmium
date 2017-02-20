@@ -6,70 +6,139 @@
 using namespace Osm;
 using namespace std;
 
+void joystick_callback(int joy, int event)
+{
+	if (event == GLFW_CONNECTED)
+	{
+		Engine.Input().AddJoystick(joy);
+	}
+	else if (event == GLFW_DISCONNECTED)
+	{
+		Engine.Input().RemoveJoystick(joy);
+	}
+}
+
 InputManager::InputManager(CEngine& engine)
 	: Component(engine)
-	, _joysticks(GLFW_JOYSTICK_LAST)
-{}
-
-void InputManager::Update()
+	, _joyState(0)
 {
-	_joyCount = 0;
+	Init();
+	glfwSetJoystickCallback(joystick_callback);
+}
+
+void InputManager::Init()
+{
 	for (int i = GLFW_JOYSTICK_1; i < GLFW_JOYSTICK_LAST; i++)
 	{
 		int present = glfwJoystickPresent(i);
-
-		if (present)
+		if(present)
 		{
-			//string name(glfwGetJoystickName(i));			
-			
-			int count;
-			JoystickState& state = _joysticks[_joyCount];
-			//state.Name = name;
+			_joyMapping.push_back(i);
 
-			const float* axes = glfwGetJoystickAxes(i, &count);
-			for (size_t j = 0; j < count; j++)
-			{
-				state.Axes[j] = axes[j];
-			}
+			JoystickState state;
+			string name(glfwGetJoystickName(i));            			
+			state.Name = name + " " + to_string(i);
+			_joyState.push_back(state);
+		}
+	}
+}
 
-			const unsigned char* buttons = glfwGetJoystickButtons(i, &count);
-			for (size_t j = 0; j < count; j++)
-			{
-				state.Buttons[j] = buttons[j];
-			}
+void InputManager::Update()
+{	
+	for (int i = 0; i < _joyMapping.size(); i++)
+	{		
+		int joy = _joyMapping[i];
+		JoystickState& state = _joyState[i];			
+		int count;
+				
+		const float* axes = glfwGetJoystickAxes(joy, &count);
+		for (size_t j = 0; j < count && j < JOYSTICK_AXIS_COUNT; j++)
+		{
+			state.Axes[j] = axes[j];
+		}
 
-			_joyCount++;
+		const unsigned char* buttons = glfwGetJoystickButtons(joy, &count);
+		for (size_t j = 0; j < count && JOYSTICK_BUTTON_COUNT; j++)
+		{
+			state.Buttons[j] = buttons[j];
 		}
 	}
 }
 
 bool InputManager::GetJoystickButton(uint joystick, JoystickButtons button)
 {
-	if (joystick < _joysticks.size())
-		return _joysticks[joystick].Buttons[button];
+	if (joystick < _joyState.size())
+	{
+		return _joyState[joystick].Buttons[button];
+	}
 	return false;
 }
 
 float InputManager::GetJoystickAxis(uint joystick, JoystickAxes axis)
 {
-	if (joystick < _joysticks.size())
-		return _joysticks[joystick].Axes[axis];
+	if (joystick < _joyState.size())
+	{
+		return _joyState[joystick].Axes[axis];
+	}
 	return 0.0f;
+}
+
+void InputManager::AddJoystick(int joy)
+{
+	int g = 0;
+}
+
+void InputManager::RemoveJoystick(int joy)
+{
+	int g = 0;
 }
 
 #ifdef INSPECTOR
 void InputManager::Inspect()
 {
-	for (auto j : _joysticks)
+	for (auto j : _joyState)
 	{
 		if (ImGui::CollapsingHeader(j.Name.c_str()))
 		{
-			for (auto a : j.Axes)		
-				ImGui::DragFloat("Axis", &a);		
+			int i = 0;
+			for (auto a : j.Axes)
+			{
+				ImGui::DragFloat((string("Axis ") + to_string(i)).c_str(), &a);
+				i++;
+			}
 
-			for(auto b : j.Buttons)
-				ImGui::DragInt("Buttons", &b);
+			i = 0;
+			for (auto b : j.Buttons)
+			{
+				ImGui::DragInt((string("Buttons ") + to_string(i)).c_str(), &b);
+				i++;
+			}
 		}
 	}
 }
 #endif
+
+void InputManager::InitProfiles()
+{
+	/*
+	Profile xboxOne;
+	xboxOne.Buttons		= 
+	{
+		0,		// JOYSTICK_BUTTON_A
+		1,		// JOYSTICK_BUTTON_B
+		2,		// JOYSTICK_BUTTON_X
+		3,		// JOYSTICK_BUTTON_Y
+		// JOYSTICK_BUTTON_LB
+		// JOYSTICK_BUTTON_RB
+		// JOYSTICK_BUTTON_BACK
+		// JOYSTICK_BUTTON_START
+		// JOYSTICK_BUTTON_DPAD_UP
+		// JOYSTICK_BUTTON_DPAD_DOWN
+		// JOYSTICK_BUTTON_DPAD_LEFT
+		// JOYSTICK_BUTTON_DPAD_RIGHT
+		// JOYSTICK_BUTTON_R3
+		// JOYSTICK_BUTTON_L3
+	};
+	xboxOne.Axes		= {0, 1,  5, 4};
+	*/
+}

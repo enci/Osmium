@@ -66,6 +66,9 @@ void Steering::CalculatePrioritized()
 		neighbors = GetFlockingNeighbors();
 	}
 
+	if (!_physicsManager->IsPhysicsBodyValid(Agent))
+		Agent = nullptr;
+
 	Vector2 force;
 
 	if(IsOn(STEERING_OBSTACLE_AVOIDANCE))
@@ -83,12 +86,12 @@ void Steering::CalculatePrioritized()
 		force += Arrive(Target, ArriveAcceleration)* ArriveWeight;
 		if (!AccumulateForce(force)) return;
 	}
-	if (IsOn(STEERING_EVADE))
+	if (IsOn(STEERING_EVADE) && Agent)
 	{
 		force += Evade(Agent);
 		if (!AccumulateForce(force)) return;
 	}
-	if (IsOn(STEERING_OFFSET_PURSUIT))
+	if (IsOn(STEERING_OFFSET_PURSUIT) && Agent)
 	{
 		force += OffsetPursuit(Agent, Offset) * OffsetPursuitWeight;
 		if (!AccumulateForce(force)) return;

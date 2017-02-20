@@ -548,6 +548,12 @@ void PhysicsManager2D::RemovePhysicsBody(PhysicsBody2D* body)
 	_bodies.erase(remove(_bodies.begin(), _bodies.end(), body));
 }
 
+bool PhysicsManager2D::IsPhysicsBodyValid(PhysicsBody2D* body)
+{
+	auto it = find(_bodies.begin(), _bodies.end(), body);
+	return it != _bodies.end();
+}
+
 vector<PhysicsBody2D*> PhysicsManager2D::GetInRadius(const Vector2& position, float radius)
 {
 	switch (_algorithm)

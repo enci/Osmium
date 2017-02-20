@@ -289,6 +289,9 @@ public:
 	/// Removes a body from the manager. No need to ever call this, it's automatic
 	void RemovePhysicsBody(PhysicsBody2D* body);
 
+	/// Check a body to the manager.
+	bool IsPhysicsBodyValid(PhysicsBody2D* body);
+
 	/// Get all bodies in the specified reariuis arround the given postion
 	std::vector<PhysicsBody2D*> GetInRadius(const Vector2& position, float radius);
 
