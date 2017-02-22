@@ -15,9 +15,10 @@ Steering::Steering(Entity& entity)
 
 Vector2 Steering::GetSteering()
 {
-	CalculatePrioritized();
-	DebugRender();
-	return _current;
+	return Vector2();
+//	CalculatePrioritized();
+//	DebugRender();
+//	return _current;
 }
 
 bool Steering::AccumulateForce(Vector2 add)
