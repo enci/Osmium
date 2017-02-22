@@ -771,10 +771,11 @@ void PhysicsManager2D::AccumulateContactsBruteForce()
 void PhysicsManager2D::AccumulateContactsAutoGrid()
 {
 	AutoGrid grid(_bodies);
-	//grid.DebugRender();
+#ifdef DEBUG
+	grid.DebugRender();
+#endif
 
 	MultiGrid mgrid(_bodies);
-
 #ifdef  DEBUG
 	mgrid.DebugRender();
 #endif

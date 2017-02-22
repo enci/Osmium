@@ -41,20 +41,20 @@ public:
 
 	bool IsOn(uint bt) const	{ return (_flags & bt) == bt; }
 
-	//float MaxAccelearation					= 100.0f;
-	//float MaxForce							= 100.0f;
-	//float MaxSpeed							= 10.0f;
-	//float WanderJitter						= 50.0f;
-	//float WanderRadius						= 5.0f;
+	float MaxAccelearation					= 100.0f;
+	float MaxForce							= 100.0f;
+	float MaxSpeed							= 10.0f;
+	//float WanderJitter					= 50.0f;
+	//float WanderRadius					= 5.0f;
 	//float WanderDistance					= 15.0f;
-	//float FlockingRadius					= 15.0f;
+	float FlockingRadius					= 15.0f;
 	//float ArriveAcceleration				= 3.0f;
 	//float ObstacleAvoidanceRaduis			= 70.0f;
-	//uint FlockingTag						= 0;
-	//uint ObstacleTag						= 0;
-	//Vector2 Target;
-	//PhysicsBody2D* Agent					= nullptr;
-	//Vector2 Offset;	
+	uint FlockingTag						= 0;
+	uint ObstacleTag						= 0;
+	Vector2 Target;
+	PhysicsBody2D* Agent					= nullptr;
+	Vector2 Offset;	
 	//float EvadeDistance						= 35.0f;
 
 	// Weights
