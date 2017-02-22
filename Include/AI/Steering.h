@@ -41,35 +41,21 @@ public:
 
 	bool IsOn(uint bt) const	{ return (_flags & bt) == bt; }
 
-	float MaxAccelearation = 100.0f;
-
-	float MaxForce = 100.0f;
-
-	float MaxSpeed = 10.0f;
-
-	float WanderJitter = 50.0f;
-
-	float WanderRadius = 5.0f;
-
-	float WanderDistance = 15.0f;
-
-	float FlockingRadius = 15.0f;
-
-	float ArriveAcceleration = 3.0f;
-
-	float ObstacleAvoidanceRaduis = 70.0f;
-
-	uint FlockingTag = 0;
-
-	uint ObstacleTag = 0;
-
-	Vector2 Target;
-
-	PhysicsBody2D* Agent = nullptr;
-
-	Vector2 Offset;	
-
-	float EvadeDistance = 35.0f;
+	//float MaxAccelearation					= 100.0f;
+	//float MaxForce							= 100.0f;
+	//float MaxSpeed							= 10.0f;
+	//float WanderJitter						= 50.0f;
+	//float WanderRadius						= 5.0f;
+	//float WanderDistance					= 15.0f;
+	//float FlockingRadius					= 15.0f;
+	//float ArriveAcceleration				= 3.0f;
+	//float ObstacleAvoidanceRaduis			= 70.0f;
+	//uint FlockingTag						= 0;
+	//uint ObstacleTag						= 0;
+	//Vector2 Target;
+	//PhysicsBody2D* Agent					= nullptr;
+	//Vector2 Offset;	
+	//float EvadeDistance						= 35.0f;
 
 	// Weights
 	float SeekWeight = 1.0f;
@@ -125,24 +111,6 @@ protected:
 	// This returns a steering force which will attempt to keep the agent 
 	// away from any obstacles it may encounter
 	Vector2 ObstacleAvoidance();
-
-	//this returns a steering force which will keep the agent away from any
-	//walls it may encounter
-	//SteeringOutput WallAvoidance(const std::vector<Wall2D> &walls);
-
-
-	//given a series of Vector2Ds, this method produces a force that will
-	//move the agent along the waypoints in order
-	//SteeringOutput FollowPath();
-
-	//this results in a steering force that attempts to steer the vehicle
-	//to the center of the vector connecting two moving agents.
-	// SteeringOutput Interpose(const Vehicle* VehicleA, const Vehicle* VehicleB);
-
-	//given another agent position to hide from and a list of BaseGameEntitys this
-	//method attempts to put an obstacle between itself and its opponent
-	// SteeringOutput Hide(const Vehicle* hunter, const std::vector<BaseGameEntity*>& obstacles);
-
 
 	// -- Group Behaviors -- //
 
