@@ -30,42 +30,39 @@ void InputManager::Init()
 {
 	for (int i = GLFW_JOYSTICK_1; i < GLFW_JOYSTICK_LAST; i++)
 	{
-		int present = glfwJoystickPresent(i);
-		if(present)
-		{
-			_joyMapping.push_back(i);
-
-			JoystickState state;
-			string name(glfwGetJoystickName(i));            			
-			state.Name = name + " " + to_string(i);
-			_joyState.push_back(state);
-		}
+		if(glfwJoystickPresent(i))
+			AddJoystick(i);			
 	}
 }
 
 void InputManager::Update()
 {	
-	for (int i = 0; i < _joyMapping.size(); i++)
-	{		
-		int joy = _joyMapping[i];
-		JoystickState& state = _joyState[i];			
-		int count;
-				
+	for (auto& i : _joyState)
+	{
+		int joy = i.first;
+		JoystickState& state = i.second;
+
+		int count;				
 		const float* axes = glfwGetJoystickAxes(joy, &count);
-		for (size_t j = 0; j < count && j < JOYSTICK_AXIS_COUNT; j++)
+
+		if (count != state.Axes.size())
+			state.Axes.resize(count);
+		for (int j = 0; j < count && j < JOYSTICK_AXIS_COUNT; j++)
 		{
 			state.Axes[j] = axes[j];
-		}
+		}		
 
 		const unsigned char* buttons = glfwGetJoystickButtons(joy, &count);
-		for (size_t j = 0; j < count && JOYSTICK_BUTTON_COUNT; j++)
+		if (count != state.Buttons.size())
+			state.Buttons.resize(count);
+		for (int j = 0; j < count && JOYSTICK_BUTTON_COUNT; j++)
 		{
 			state.Buttons[j] = buttons[j];
 		}
 	}
 }
 
-bool InputManager::GetJoystickButton(uint joystick, JoystickButtons button)
+bool InputManager::GetJoystickButton(Joystick joystick, JoystickButtons button)
 {
 	if (joystick < _joyState.size())
 	{
@@ -74,7 +71,7 @@ bool InputManager::GetJoystickButton(uint joystick, JoystickButtons button)
 	return false;
 }
 
-float InputManager::GetJoystickAxis(uint joystick, JoystickAxes axis)
+float InputManager::GetJoystickAxis(Joystick joystick, JoystickAxes axis)
 {
 	if (joystick < _joyState.size())
 	{
@@ -83,21 +80,34 @@ float InputManager::GetJoystickAxis(uint joystick, JoystickAxes axis)
 	return 0.0f;
 }
 
+std::vector<Joystick> InputManager::GetActiveJoysticks() const
+{
+	std::vector<Joystick> active;
+	for(auto j : _joyState)
+		active.push_back(j.first);
+	return active;
+}
+
 void InputManager::AddJoystick(int joy)
 {
-	int g = 0;
+	JoystickState state;
+
+	string name(glfwGetJoystickName(joy));
+	state.Name = name + " " + to_string(joy);
+	_joyState[joy] = state;
 }
 
 void InputManager::RemoveJoystick(int joy)
 {
-	int g = 0;
+	_joyState.erase(joy);
 }
 
 #ifdef INSPECTOR
 void InputManager::Inspect()
 {
-	for (auto j : _joyState)
+	for (auto i : _joyState)
 	{
+		auto j = i.second;
 		if (ImGui::CollapsingHeader(j.Name.c_str()))
 		{
 			int i = 0;

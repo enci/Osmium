@@ -2,19 +2,10 @@
 
 #include <Core/Component.h>
 #include <Core/Engine.h>
+#include <unordered_map>
 
 namespace Osm
 {
-
-struct JoystickState
-{
-	std::string			Name;
-	std::vector<float>	Axes;
-	std::vector<int>	Buttons;
-	//int					Profile;
-
-	JoystickState() : Axes(8), Buttons(24) {}
-};
 
 enum JoystickButtons
 {
@@ -32,7 +23,7 @@ enum JoystickButtons
 	JOYSTICK_BUTTON_DPAD_UP,		// 10
 	JOYSTICK_BUTTON_DPAD_RIGHT,		// 11
 	JOYSTICK_BUTTON_DPAD_DOWN,		// 12
-	JOYSTICK_BUTTON_DPAD_LEFT,		// 13			
+	JOYSTICK_BUTTON_DPAD_LEFT,		// 13
 	JOYSTICK_BUTTON_COUNT
 };
 
@@ -58,8 +49,40 @@ struct Profile
 		, Buttons(JOYSTICK_BUTTON_COUNT) {}
 };
 
+class InputManager;
+
+class Joystick
+{
+	friend class InputManager;
+public:
+	Joystick()				{ _joystick = -1; }
+	bool IsValid() const	{ return _joystick != -1;  }
+
+private:	
+	Joystick(int j)			{ _joystick = (int)j; }
+	operator int() const	{ return _joystick; }
+	int _joystick;
+};
+
 class InputManager : public Component<CEngine>
 {
+private:
+
+	struct JoystickState
+	{
+		//int					Joystick;		// Implementation ID of the joystick 
+		std::string			Name;			// The name of it
+		std::vector<float>	Axes;			// All the axes
+		std::vector<int>	Buttons;		// All the buttons		
+		std::vector<float>	LastAxes;		// All the axes from previous update
+		std::vector<int>	LastButtons;	// All the buttons from previous update
+		int					Profile;		// The profile (default -1 = Xbox)
+
+		JoystickState()
+			: /*Joystick(-1),*/ Axes(8), Buttons(24)
+			, LastAxes(8), LastButtons(24), Profile(-1) {}
+	};
+
 public:
 	InputManager(CEngine& engine);
 
@@ -71,11 +94,11 @@ public:
 
 	void Update();
 
-	bool GetJoystickButton(uint joystick, JoystickButtons button);
+	bool GetJoystickButton(Joystick joystick, JoystickButtons button);
 
-	float GetJoystickAxis(uint joystick, JoystickAxes axis);
+	float GetJoystickAxis(Joystick joystick, JoystickAxes axis);
 
-	uint GetJoystickCount() const { return _joyMapping.size(); }
+	std::vector<Joystick> GetActiveJoysticks() const;
 
 	void AddJoystick(int joy);
 
@@ -87,9 +110,9 @@ public:
 #endif
 
 private:
-	std::vector<Profile>		_profiles;
-	std::vector<JoystickState>	_joyState;
-	std::vector<int>			_joyMapping;
+	uint									_count;
+	std::vector<Profile>					_profiles;
+	std::unordered_map<int, JoystickState>	_joyState;	// Indexed by tokens
 };
 
 }
