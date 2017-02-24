@@ -2,15 +2,22 @@
 #include <GLFW/glfw3.h>
 #include <imgui/imgui.h>
 #include <string>
+#include <windows.h>
 
 using namespace Osm;
 using namespace std;
 
+DWORD mThread = -1;
+DWORD jThread = -1;
+
 void joystick_callback(int joy, int event)
 {
+	jThread = GetCurrentThreadId();
+	ASSERT(jThread == mThread);
+
 	if (event == GLFW_CONNECTED)
 	{
-		Engine.Input().AddJoystick(joy);
+		Engine.Input().AddJoystick(joy);		
 	}
 	else if (event == GLFW_DISCONNECTED)
 	{
@@ -22,6 +29,8 @@ InputManager::InputManager(CEngine& engine)
 	: Component(engine)
 	, _joyState(0)
 {
+	mThread = GetCurrentThreadId();
+
 	Init();
 	glfwSetJoystickCallback(joystick_callback);
 }
@@ -37,6 +46,9 @@ void InputManager::Init()
 
 void InputManager::Update()
 {	
+	if (_joyState.size() == 0)
+		return;
+
 	for (auto& i : _joyState)
 	{
 		int joy = i.first;
@@ -90,16 +102,23 @@ std::vector<Joystick> InputManager::GetActiveJoysticks() const
 
 void InputManager::AddJoystick(int joy)
 {
+	string name(glfwGetJoystickName(joy));	
 	JoystickState state;
-
-	string name(glfwGetJoystickName(joy));
 	state.Name = name + " " + to_string(joy);
+	LOG("Joystick %s connected.", name.c_str());
 	_joyState[joy] = state;
+	
 }
 
 void InputManager::RemoveJoystick(int joy)
-{
-	_joyState.erase(joy);
+{	
+	auto itr = _joyState.find(joy);
+	if(itr != _joyState.end())
+	{
+		JoystickState& state = itr->second;
+		LOG("Joystick %s disconnected.", state.Name.c_str());
+		_joyState.erase(joy);
+	}	
 }
 
 #ifdef INSPECTOR
