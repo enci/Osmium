@@ -7,14 +7,8 @@
 using namespace Osm;
 using namespace std;
 
-DWORD mThread = -1;
-DWORD jThread = -1;
-
 void joystick_callback(int joy, int event)
 {
-	jThread = GetCurrentThreadId();
-	ASSERT(jThread == mThread);
-
 	if (event == GLFW_CONNECTED)
 	{
 		Engine.Input().AddJoystick(joy);		
@@ -29,8 +23,6 @@ InputManager::InputManager(CEngine& engine)
 	: Component(engine)
 	, _joyState(0)
 {
-	mThread = GetCurrentThreadId();
-
 	Init();
 	glfwSetJoystickCallback(joystick_callback);
 }

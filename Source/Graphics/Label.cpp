@@ -36,12 +36,11 @@ Label::Label(	const string& labelText,
 	, _maxWidth(maxWidth)
 {
 	// We'll start basic by caching just the raw font blob,
-	// at some point we could also cache the FT_Face instance.
-	auto fontdata = Osm::ReadFile(fontFilename);
+	//auto fontdata = ReadFile(fontFilename);
 
 #ifdef _WIN32 // defined to 32 and 64
 	FILE* file;
-	if (fopen_s(&file, fontFilename.c_str(), "rb"))
+	if (fopen_s(&file, fontFilename.c_str(), "rb") == 0)
 		fread(ttf_buffer, 1, 1 << 20, file);
 	else
 		ASSERT(false);
@@ -53,12 +52,9 @@ Label::Label(	const string& labelText,
 
 	stbtt_InitFont(&fontinfo, ttf_buffer, stbtt_GetFontOffsetForIndex(ttf_buffer, 0));
 
-	//	stbtt_InitFont(&fontinfo, reinterpret_cast<const unsigned char*>(fontdata.c_str()), 0);
-
 	const auto& text = labelText;
 
 	Vector2 outSize, outUV;
-	//     bool multiline = false;
 
 	// Check for invalid utf-8 (for a simple yes/no check, there is also utf8::is_valid function)
 	auto end_it = utf8::find_invalid(text.begin(), text.end());
