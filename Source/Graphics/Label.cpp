@@ -63,15 +63,147 @@ Label::Label(	const string& labelText,
 
 	vector<uint> utf32text;
 	utf8::utf8to32(text.begin(), text.end(), back_inserter(utf32text));
-
+	
 	int ascent;
-	float scale = stbtt_ScaleForPixelHeight(&fontinfo, float(fontsize));	// get the scale for certain
-	stbtt_GetFontVMetrics(&fontinfo, &ascent, nullptr, nullptr);			// get the the ascent
-	int baseline = static_cast<int>(ascent*scale);							// calculate the baseline in pixels
+	int descent;
+	int lineGap;
+	float scale = stbtt_ScaleForPixelHeight(&fontinfo, fontsize); // get the scale for certain
+	stbtt_GetFontVMetrics(&fontinfo, &ascent, &descent, &lineGap);                          // get the the ascent
+
+	int bottom = (int)((ascent - descent + lineGap) * scale);                              // calculate the bottom in pixels
+	int baseline = (int)((ascent + lineGap) * scale);                                      // calculate the baseline in pixels
 
 
 	unsigned char* buffer = static_cast<unsigned char*>(calloc(maxBufferWidth * maxBufferHeight, sizeof(char)));
 
+	float xpos = 0;
+	float ymax = -FLT_MAX;
+	for (int ch = 0; ch < utf32text.size(); ++ch)
+	{
+		auto codepoint = utf32text[ch];
+		int advance, lsb, x0, y0, x1, y1;
+		float x_shift = xpos - (float)floor(xpos);
+
+		stbtt_GetCodepointHMetrics(&fontinfo,                   // font
+			(int)codepoint,              // current
+			&advance,                    // advance
+			&lsb);                       // left side bearing
+
+		stbtt_GetCodepointBitmapBoxSubpixel(&fontinfo,          // font
+			(int)codepoint,     // current character
+			scale,              // scale x (not in pixels)
+			scale,              // scale y (not in pixels)
+			x_shift,            // subpixel shift x
+			0,                  // subpixel shift y
+			&x0,                // x min (from)
+			&y0,                // y min (from)
+			&x1,                // x max (to)
+			&y1);               // y max (to)
+
+		int idx = (baseline + y0) * maxBufferWidth + (int)xpos + x0;
+
+		if (idx < 0)
+			idx = 0;
+
+		// This output can be saved into a bitmap and
+		stbtt_MakeCodepointBitmapSubpixel(
+			&fontinfo,                                // font
+			&buffer[idx],                             // pos in final image
+			x1 - x0,                                  // output_width
+			y1 - y0,                                  // output_height
+			maxBufferWidth,                           // stride
+			scale,                                    // scale x
+			scale,                                    // scale y
+			x_shift,                                  // subpixel shift x
+			0,                                        // subpixel shift y
+			(int)codepoint);                          // codepoint
+
+
+		xpos += (advance * scale);
+		if (ch < utf32text.size() - 1)
+			xpos += scale * stbtt_GetCodepointKernAdvance(
+				&fontinfo,
+				(int)codepoint,
+				(int)utf32text[ch + 1]);
+
+		if ((y1 - y0) > ymax)
+			ymax = (y1 - y0);
+	}
+
+	ymax = bottom;
+
+	float xmax = xpos;
+
+	outSize.x = xmax;
+	outSize.y = ymax;
+	_yoffset = ((ascent - descent) * 0.5f + descent) * scale * 0.25f;
+	uint sizex = NextPowerOfTwo(xmax);
+	uint sizey = NextPowerOfTwo(ymax + 1);
+
+	outUV.x = ((float)xmax) / sizex;
+	outUV.y = ((float)ymax) / sizey;
+
+	std::stringstream ss;
+	// We're encapsulating strings in single quotes, and replacing existing
+	// quotes with an escaped variant. This is OK-robust, but once iOS has
+	// proper c++11 regex support, this should be replaced.
+	ss << "label:'" << Osm::StringReplace(text, "'", "\'")
+		<< "' font:'" << Osm::StringReplace(_font, "'", "\'")
+		<< "' size:'" << fontsize << "'";
+
+	// Update the internal details:
+	_resourcePath = ss.str();
+	_resourceID = StringHash(_resourcePath);
+
+	// Set the texture internal properties:
+	_size = outSize;
+	_uvTo = outUV;
+	_width = sizex;
+	_height = sizey;
+	auto size = _width * _height * 4;
+	GLubyte*  imageData = (GLubyte*)calloc(size, 1);
+
+	if (_texture != 0)
+	{
+		glDeleteTextures(1, &_texture);
+		_texture = 0;
+	}
+
+	glGenTextures(1, &_texture);               // Gen
+	GL_GET_ERROR();
+	glBindTexture(GL_TEXTURE_2D, _texture);    // Bind
+	GL_GET_ERROR();
+	//
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);   // Minmization
+	GL_GET_ERROR();
+	//
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);   // Magnification
+	GL_GET_ERROR();
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	GL_GET_ERROR();
+
+	// Draw a solid label background:
+	for (int i = 0; i < _height; i++)
+	{
+		for (int j = 0; j < _width; j++)
+		{
+			unsigned char c = buffer[i * maxBufferWidth + j];
+			// unsigned char d = dbgBuffer[i * bufferWidth + j];
+
+
+			// Base index in buffer
+			int baseIdx = (i * _width + j) * 4;
+			imageData[baseIdx + 0] = (GLubyte)255;
+			imageData[baseIdx + 1] = (GLubyte)255;
+			imageData[baseIdx + 2] = (GLubyte)255;
+			imageData[baseIdx + 3] = (GLubyte)c;
+		}
+	}
+
+
+	/*
 	float xpos = 2;
 	float ymax = -FLT_MAX;
 	for (uint ch = 0; ch < utf32text.size(); ++ch)
@@ -162,7 +294,7 @@ Label::Label(	const string& labelText,
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	GL_GET_ERROR();
+	GL_GET_ERROR();	
 
 	// Draw a solid label background:
 	for (int i = 0; i < _height; i++)
@@ -179,6 +311,7 @@ Label::Label(	const string& labelText,
 			imageData[baseIdx + 3] = static_cast<GLubyte>(c);
 		}
 	}
+	*/
 
 	glTexImage2D(GL_TEXTURE_2D,         // What (target)
 		0,								// Mip-map level
