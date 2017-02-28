@@ -94,7 +94,11 @@ public:
 
 	void Update();
 
+	/// True if down 
 	bool GetJoystickButton(Joystick joystick, JoystickButtons button);
+
+	/// True only on first press
+	bool GetJoystickButtonPressed(Joystick joystick, JoystickButtons button);
 
 	float GetJoystickAxis(Joystick joystick, JoystickAxes axis);
 

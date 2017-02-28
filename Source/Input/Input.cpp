@@ -53,6 +53,7 @@ void InputManager::Update()
 			state.Axes.resize(count);
 		for (int j = 0; j < count && j < JOYSTICK_AXIS_COUNT; j++)
 		{
+			state.LastAxes[j] = state.Axes[j];
 			state.Axes[j] = axes[j];
 		}		
 
@@ -61,6 +62,7 @@ void InputManager::Update()
 			state.Buttons.resize(count);
 		for (int j = 0; j < count && JOYSTICK_BUTTON_COUNT; j++)
 		{
+			state.LastButtons[j] = state.Buttons[j];
 			state.Buttons[j] = buttons[j];
 		}
 	}
@@ -71,6 +73,16 @@ bool InputManager::GetJoystickButton(Joystick joystick, JoystickButtons button)
 	if (joystick < _joyState.size())
 	{
 		return _joyState[joystick].Buttons[button];
+	}
+	return false;
+}
+
+bool InputManager::GetJoystickButtonPressed(Joystick joystick, JoystickButtons button)
+{
+	if (joystick < _joyState.size())
+	{
+		return		_joyState[joystick].Buttons[button]
+				&&	!_joyState[joystick].LastButtons[button];
 	}
 	return false;
 }
