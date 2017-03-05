@@ -35,7 +35,7 @@ GraphicsDevice::GraphicsDevice(CEngine& engine) : Component(engine)
 	_window = glfwCreateWindow(
 		settings.ScreenWidth,
 		settings.ScreenHeight,
-		"Blastastic",
+		settings.WindowName.c_str(),
 		nullptr,
 		nullptr);
 

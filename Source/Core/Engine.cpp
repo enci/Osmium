@@ -26,8 +26,6 @@ void CEngine::Initialize()
 
 	_resources = CreateComponent<ResourceManager>();		
 
-	// Load a config in the future maybe?
-
 	_device = CreateComponent<GraphicsDevice>();
 
 	_input = CreateComponent<InputManager>();

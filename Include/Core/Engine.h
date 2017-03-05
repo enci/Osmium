@@ -21,6 +21,7 @@ struct EngineSettings
 	int ScreenHeight = 1080;
 	std::string ResourcePath = "";
 	std::string SavePath = "";
+	std::string WindowName = "Window";
 
 	void LoadFromFile(const std::string& file);
 };
