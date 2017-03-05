@@ -73,7 +73,7 @@ void CEngine::Run()
 			continue;		
 
 		auto currentFrame = glfwGetTime();
-		auto deltaTime = currentFrame - lastFrame;
+		float deltaTime = (float)(currentFrame - lastFrame);
 		lastFrame = currentFrame;
 		if (deltaTime > 0.033f)
 			deltaTime = 0.033f;

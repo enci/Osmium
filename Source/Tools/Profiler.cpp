@@ -34,7 +34,7 @@ uint Profiler::StartSection(const std::string& name)
 	section.StartTime = glfwGetTime() - _frameStart;
 	section.EndTime = -1.0f;
 	_sections.push_back(std::move(section));
-	return _sections.size() - 1;
+	return (uint)(_sections.size() - 1);
 }
 
 void Profiler::EndSection(uint sectionId)

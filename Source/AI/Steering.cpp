@@ -148,11 +148,11 @@ Vector2 Steering::Arrive(Vector2& targetPos, float deceleration)
 	{
 		// Because Deceleration is enumerated as an int, this value is required
 		// to provide fine tweaking of the deceleration..
-		const float DecelerationTweaker = 0.3;
+		const float DecelerationTweaker = 0.3f;
 
 		// Calculate the speed required to reach the target given the desired
 		// deceleration
-		float speed = dist / ((double)deceleration * DecelerationTweaker);
+		float speed = dist / (deceleration * DecelerationTweaker);
 
 		// Make sure the velocity does not exceed the max
 		speed = min(speed, MaxSpeed);
