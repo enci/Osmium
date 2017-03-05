@@ -51,5 +51,5 @@ void Transform::SetParent(Transform* parent)
 
 void Transform::Inspect()
 {
-	//ImGui::
+	ImGui::DragFloat3("Position", _position.f);
 }
