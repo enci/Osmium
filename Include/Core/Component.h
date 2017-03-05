@@ -11,13 +11,17 @@ template <class E>
 class Component : public IDable<Component<E>>
 {
 public:
-	explicit Component(E& entity) : _owner(entity) {}
+	explicit Component(E& entity) : _owner(entity), _enbled(true) {}
 
 	Component(Component& other) = delete;
 
-	virtual ~Component() {}
+	virtual ~Component()			{}
 
-	E& GetOwner() const { return _owner; }
+	E& GetOwner() const				{ return _owner; }
+
+	bool GetEnbled() const			{ return _enbled; }
+
+	void SetEnbled(bool enbled)		{ _enbled = enbled; }
 
 #ifdef INSPECTOR
 	virtual void Inspect() {}
@@ -25,6 +29,9 @@ public:
 
 protected:
 	E& _owner;
+
+protected:
+	bool _enbled;
 };
 
 template <class E>

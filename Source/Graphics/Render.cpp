@@ -78,6 +78,9 @@ void RenderManager::Render()
 
 		for (auto renderer : _renderables)
 		{
+			if(!renderer->GetEnbled())
+				continue;
+
 			if (renderer->GetShader() != activeShader)
 			{
 				renderer->ActivateShader(c, _lights);
