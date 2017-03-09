@@ -2,11 +2,7 @@
 
 #include <algorithm>
 
-using namespace Osm;
-using namespace std;
-
-
-Matrix44::Matrix44(	float m00, float m01, float m02, float m03,
+Osm::Matrix44::Matrix44(	float m00, float m01, float m02, float m03,
 					float m10, float m11, float m12, float m13,
 					float m20, float m21, float m22, float m23,
 					float m30, float m31, float m32, float m33)
@@ -17,7 +13,7 @@ Matrix44::Matrix44(	float m00, float m01, float m02, float m03,
 	m[3][0] = m30; m[3][1] = m31; m[3][2] = m32; m[3][3] = m33;
 }
 
-Matrix44::Matrix44()
+Osm::Matrix44::Matrix44()
 {
 	// Set zeros
 	memset(static_cast<void*>(m), 0x0, 4 * 4 * sizeof(float));
@@ -28,7 +24,7 @@ Matrix44::Matrix44()
 	m[3][3] = 1.0f;
 }
 
-Vector3 Matrix44::operator*(const Vector3& vec) const
+Osm::Vector3 Osm::Matrix44::operator*(const Vector3& vec) const
 {
 	return Vector3(
 		vec.x * m[0][0] +
@@ -44,7 +40,7 @@ Vector3 Matrix44::operator*(const Vector3& vec) const
 		vec.z * m[2][2] + m[3][2]);
 }
 
-Vector4 Matrix44::operator*(const Vector4& vec) const
+Osm::Vector4 Osm::Matrix44::operator*(const Vector4& vec) const
 {
 	Vector4 res(f[0] * vec.f[0] + f[4] * vec.f[1] + f[8] * vec.f[2] + f[12] * vec.f[3],
 		f[1] * vec.f[0] + f[5] * vec.f[1] + f[9] * vec.f[2] + f[13] * vec.f[3],
@@ -53,29 +49,29 @@ Vector4 Matrix44::operator*(const Vector4& vec) const
 	return res;
 }
 
-Vector3 Matrix44::GetTranslation() const
+Osm::Vector3 Osm::Matrix44::GetTranslation() const
 {
 	return Vector3(m[3][0], m[3][1], m[3][2]);
 }
 
-void Matrix44::SetTranslation(const Vector3& vec)
+void Osm::Matrix44::SetTranslation(const Vector3& vec)
 {
 	m[3][0] = vec.x;
 	m[3][1] = vec.y;
 	m[3][2] = vec.z;
 }
 
-Vector3 Matrix44::GetXAxis() const
+Osm::Vector3 Osm::Matrix44::GetXAxis() const
 {
 	return Vector3(m[0][0], m[0][1], m[0][2]);
 }
 
-Vector3 Matrix44::GetYAxis() const
+Osm::Vector3 Osm::Matrix44::GetYAxis() const
 {
 	return Vector3(m[1][0], m[1][1], m[1][2]);
 }
 
-Vector3 Matrix44::GetZAxis() const
+Osm::Vector3 Osm::Matrix44::GetZAxis() const
 {
 	return Vector3(m[2][0], m[2][1], m[2][2]);
 }
@@ -94,12 +90,12 @@ Vector3 Matrix44::GetScale() const
 }
 */
 
-Matrix44 Matrix44::CreateIdentity()
+Osm::Matrix44 Osm::Matrix44::CreateIdentity()
 {
 	return Matrix44();
 }
 
-Matrix44 Matrix44::CreateTranslation(float x, float y, float z)
+Osm::Matrix44 Osm::Matrix44::CreateTranslation(float x, float y, float z)
 {
 	Matrix44 result;
 	//
@@ -110,12 +106,12 @@ Matrix44 Matrix44::CreateTranslation(float x, float y, float z)
 	return result;
 }
 
-Matrix44 Matrix44::CreateTranslation(const Vector3& vec)
+Osm::Matrix44 Osm::Matrix44::CreateTranslation(const Vector3& vec)
 {
 	return CreateTranslation(vec.x, vec.y, vec.z);
 }
 
-Matrix44 Matrix44::CreateScale(Vector3 scale)
+Osm::Matrix44 Osm::Matrix44::CreateScale(Vector3 scale)
 {
 	// Set zeros
 	Matrix44 res;
@@ -129,7 +125,7 @@ Matrix44 Matrix44::CreateScale(Vector3 scale)
 	return res;
 }
 
-Matrix44 Matrix44::operator+(const Matrix44& mat) const
+Osm::Matrix44 Osm::Matrix44::operator+(const Matrix44& mat) const
 {
 	Matrix44 res;
 	//
@@ -140,7 +136,7 @@ Matrix44 Matrix44::operator+(const Matrix44& mat) const
 	return res;
 }
 
-Matrix44 Matrix44::operator-(const Matrix44& mat) const
+Osm::Matrix44 Osm::Matrix44::operator-(const Matrix44& mat) const
 {
 	Matrix44 res;
 	//
@@ -151,7 +147,7 @@ Matrix44 Matrix44::operator-(const Matrix44& mat) const
 	return res;
 }
 
-Matrix44 Matrix44::operator*(const Matrix44& mat) const
+Osm::Matrix44 Osm::Matrix44::operator*(const Matrix44& mat) const
 {
 	// Matrix multiplication, slow but reliable-ish :)
 
@@ -183,7 +179,7 @@ Matrix44 Matrix44::operator*(const Matrix44& mat) const
 	return res;
 }
 
-Matrix44 Matrix44::CreateRotate(float angle, const Vector3& axis)
+Osm::Matrix44 Osm::Matrix44::CreateRotate(float angle, const Vector3& axis)
 {
 	float c = cos(angle);
 	float cp = 1.0f - c;
@@ -209,7 +205,7 @@ Matrix44 Matrix44::CreateRotate(float angle, const Vector3& axis)
 	return m;
 }
 
-Matrix44 Matrix44::CreateRotateX(float angle)
+Osm::Matrix44 Osm::Matrix44::CreateRotateX(float angle)
 {
 	float c = cos(angle);
 	float s = sin(angle);
@@ -222,7 +218,7 @@ Matrix44 Matrix44::CreateRotateX(float angle)
 	return m;
 }
 
-Matrix44 Matrix44::CreateRotateY(float angle)
+Osm::Matrix44 Osm::Matrix44::CreateRotateY(float angle)
 {
 	float c = cos(angle);
 	float s = sin(angle);
@@ -235,7 +231,7 @@ Matrix44 Matrix44::CreateRotateY(float angle)
 	return m;
 }
 
-Matrix44 Matrix44::CreateRotateZ(float angle)
+Osm::Matrix44 Osm::Matrix44::CreateRotateZ(float angle)
 {
 	float c = cosf(angle);
 	float s = sinf(angle);
@@ -248,7 +244,7 @@ Matrix44 Matrix44::CreateRotateZ(float angle)
 	return m;
 }
 
-Matrix44 Matrix44::CreateFrustum(float left, float right, float bottom, float top, float nearZ, float farZ)
+Osm::Matrix44 Osm::Matrix44::CreateFrustum(float left, float right, float bottom, float top, float nearZ, float farZ)
 {
 	float       deltaX = right - left;
 	float       deltaY = top - bottom;
@@ -277,7 +273,7 @@ Matrix44 Matrix44::CreateFrustum(float left, float right, float bottom, float to
 	return frust;
 }
 
-Matrix44 Matrix44::CreatePerspective(float fovy, float aspect, float nearZ, float farZ)
+Osm::Matrix44 Osm::Matrix44::CreatePerspective(float fovy, float aspect, float nearZ, float farZ)
 {
 	float cotan = 1.0f / tanf(fovy / 2.0f);
 
@@ -288,7 +284,7 @@ Matrix44 Matrix44::CreatePerspective(float fovy, float aspect, float nearZ, floa
 	return m;
 }
 
-Matrix44 Matrix44::CreateOrtho(float left, float right, float bottom, float top, float nearZ, float farZ)
+Osm::Matrix44 Osm::Matrix44::CreateOrtho(float left, float right, float bottom, float top, float nearZ, float farZ)
 {
 	// Get bounds
 	float       deltaX = right - left;
@@ -311,7 +307,7 @@ Matrix44 Matrix44::CreateOrtho(float left, float right, float bottom, float top,
 	return ortho;
 }
 
-Matrix44 Matrix44::CreateLookAt(const Vector3& eye, const Vector3& center, const Vector3& up)
+Osm::Matrix44 Osm::Matrix44::CreateLookAt(const Vector3& eye, const Vector3& center, const Vector3& up)
 {
 	Vector3 n = eye - center;
 	n.Normalize();
@@ -333,7 +329,7 @@ Matrix44 Matrix44::CreateLookAt(const Vector3& eye, const Vector3& center, const
 }
 
 
-float Matrix44::Determinant() const
+float Osm::Matrix44::Determinant() const
 {
 	return  f[2] * f[5] * f[8] +
 		f[1] * f[6] * f[8] +
@@ -343,7 +339,7 @@ float Matrix44::Determinant() const
 		f[0] * f[5] * f[10];
 }
 
-bool Matrix44::Invert()
+bool Osm::Matrix44::Invert()
 {
 	Matrix44 inv;
 	
@@ -473,16 +469,16 @@ bool Matrix44::Invert()
 }
 
 
-void Matrix44::Transpose()
+void Osm::Matrix44::Transpose()
 {
 	for (int i = 0; i < 4; i++)
 		for (int j = 0; j < i; j++)
-			swap(m[i][j], m[j][i]);
+			std::swap(m[i][j], m[j][i]);
 }
 
-void Matrix44::SetOrientation(	const Vector3 &x,
-								const Vector3 &y,
-								const Vector3 &z)
+void Osm::Matrix44::SetOrientation(	const Vector3 &x,
+									const Vector3 &y,
+									const Vector3 &z)
 {
 	// TODO: Check orthogonality with an assert
 
@@ -491,7 +487,7 @@ void Matrix44::SetOrientation(	const Vector3 &x,
 	m[2][0] = z.x; m[2][1] = z.y; m[2][2] = z.z;
 }
 
-void Matrix44::SetEulerAxis(float yaw, float pitch, float roll)
+void Osm::Matrix44::SetEulerAxis(float yaw, float pitch, float roll)
 {
 	float phi = pitch;
 	float psi = yaw;
@@ -513,7 +509,7 @@ void Matrix44::SetEulerAxis(float yaw, float pitch, float roll)
 }
 
 
-Vector3 Matrix44::TransformDirectionVector(const Vector3& dir)
+Osm::Vector3 Osm::Matrix44::TransformDirectionVector(const Vector3& dir)
 {
 	Vector3 res(dir.x * m[0][0] +
 		dir.y * m[1][0] +
