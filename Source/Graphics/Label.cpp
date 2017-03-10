@@ -160,7 +160,7 @@ Label::Label(	const string& labelText,
 	_uvTo = outUV;
 	_width = sizex;
 	_height = sizey;
-	auto size = _width * _height * 4;
+	auto size = _width * _height; // *4;
 	GLubyte*  imageData = (GLubyte*)calloc(size, 1);
 
 	if (_texture != 0)
@@ -190,27 +190,21 @@ Label::Label(	const string& labelText,
 		for (int j = 0; j < _width; j++)
 		{
 			unsigned char c = buffer[i * maxBufferWidth + j];
-			// unsigned char d = dbgBuffer[i * bufferWidth + j];
-
 
 			// Base index in buffer
-			int baseIdx = (i * _width + j) * 4;
+			int baseIdx = (i * _width + j); // *4;
 
-			c = max(imageData[baseIdx + 3], c);
-			imageData[baseIdx + 0] = (GLubyte)255;
-			imageData[baseIdx + 1] = (GLubyte)255;
-			imageData[baseIdx + 2] = (GLubyte)255;
-			imageData[baseIdx + 3] = (GLubyte)c;
+			imageData[baseIdx] = c;
 		}
 	}
 
 	glTexImage2D(GL_TEXTURE_2D,         // What (target)
 		0,								// Mip-map level
-		GL_RGBA,						// Internal format
+		GL_R8,							// Internal format
 		_width,                         // Width
 		_height,                        // Height
 		0,								// Border
-		GL_RGBA,						// Format (how to use)
+		GL_RED,							// Format (how to use)
 		GL_UNSIGNED_BYTE,				// Type   (how to intepret)
 		imageData);						// Data
 
