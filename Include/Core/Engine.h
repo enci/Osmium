@@ -19,6 +19,7 @@ struct EngineSettings
 {
 	int ScreenWidth = 1920;
 	int ScreenHeight = 1080;
+	bool FullScreen = false;
 	std::string ResourcePath = "";
 	std::string SavePath = "";
 	std::string WindowName = "Window";

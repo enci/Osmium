@@ -30,14 +30,27 @@ GraphicsDevice::GraphicsDevice(CEngine& engine) : Component(engine)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+	
 
-	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-	_window = glfwCreateWindow(
-		settings.ScreenWidth,
-		settings.ScreenHeight,
-		settings.WindowName.c_str(),
-		nullptr,
-		nullptr);
+	const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+	if(settings.FullScreen)
+	{
+		_window = glfwCreateWindow(
+			mode->width,
+			mode->height,
+			settings.WindowName.c_str(),
+			glfwGetPrimaryMonitor(),
+			nullptr);
+	}
+	else
+	{
+		_window = glfwCreateWindow(
+			settings.ScreenWidth,
+			settings.ScreenHeight,
+			settings.WindowName.c_str(),
+			nullptr,
+			nullptr);
+	}
 
 	int major = glfwGetWindowAttrib(_window, GLFW_CONTEXT_VERSION_MAJOR);
 	int minor = glfwGetWindowAttrib(_window, GLFW_CONTEXT_VERSION_MINOR);
