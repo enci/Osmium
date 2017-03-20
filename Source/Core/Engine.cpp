@@ -114,6 +114,8 @@ void CEngine::SwapWorld(World* world)
 #ifdef INSPECTOR
 void CEngine::Inspect()
 {
+	ImGui::GetIO().FontGlobalScale = 1.5f;
+
 	ImGuiWindowFlags window_flags = 0;
 	//window_flags |= ImGuiWindowFlags_NoTitleBar;	
 	window_flags |= ImGuiWindowFlags_MenuBar;
@@ -140,7 +142,7 @@ void CEngine::Inspect()
 				// Just a reminder that this might be useful
 				// ImGui::MenuItem("Console", NULL, &show_app_console);
 				// ImGui::MenuItem("Log", NULL, &show_app_log);
-				ImGui::MenuItem("Input Debugger", nullptr, &_show_input_debug);
+				// ImGui::MenuItem("Input Debugger", nullptr, &_show_input_debug);
 				ImGui::MenuItem("World Inspector", nullptr, &_show_world_inspector);
 				ImGui::MenuItem("Profiler", nullptr, &_show_profiler);
 				ImGui::MenuItem("ImGui Test", nullptr, &_show_imgui_test);
