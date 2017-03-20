@@ -87,7 +87,7 @@ void ComponentContainer<E>::RemoveComponent()
 	T* found = nullptr;
 	for (; itr != _components.end(); ++itr)
 	{
-		found = dynamic_cast<T*>(itr.get());
+		found = dynamic_cast<T*>((*itr).get());
 		if (found)
 			break;
 	}
