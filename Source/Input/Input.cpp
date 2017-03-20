@@ -42,9 +42,12 @@ void InputManager::Update()
 		return;
 
 	for (auto& i : _joyState)
-	{
+	{	
 		int joy = i.first;
 		JoystickState& state = i.second;
+
+		if (joy >= 256)
+			continue;
 
 		int count;				
 		const float* axes = glfwGetJoystickAxes(joy, &count);
@@ -70,7 +73,7 @@ void InputManager::Update()
 
 bool InputManager::GetJoystickButton(Joystick joystick, JoystickButtons button)
 {
-	if (joystick < _joyState.size())
+	if (_joyState.find(joystick) != _joyState.end())
 	{
 		return _joyState[joystick].Buttons[button];
 	}
@@ -79,7 +82,7 @@ bool InputManager::GetJoystickButton(Joystick joystick, JoystickButtons button)
 
 bool InputManager::GetJoystickButtonPressed(Joystick joystick, JoystickButtons button)
 {
-	if (joystick < _joyState.size())
+	if (_joyState.find(joystick) != _joyState.end())
 	{
 		return		_joyState[joystick].Buttons[button]
 				&&	!_joyState[joystick].LastButtons[button];
@@ -89,7 +92,7 @@ bool InputManager::GetJoystickButtonPressed(Joystick joystick, JoystickButtons b
 
 float InputManager::GetJoystickAxis(Joystick joystick, JoystickAxes axis)
 {
-	if (joystick < _joyState.size())
+	if (_joyState.find(joystick) != _joyState.end())
 	{
 		return _joyState[joystick].Axes[axis];
 	}
@@ -111,7 +114,6 @@ void InputManager::AddJoystick(int joy)
 	state.Name = name + " " + to_string(joy);
 	LOG("Joystick %s connected.", name.c_str());
 	_joyState[joy] = state;
-	
 }
 
 void InputManager::RemoveJoystick(int joy)
@@ -128,26 +130,41 @@ void InputManager::RemoveJoystick(int joy)
 #ifdef INSPECTOR
 void InputManager::Inspect()
 {
-	for (auto i : _joyState)
+	for (auto& i : _joyState)
 	{
-		auto j = i.second;
+		auto& j = i.second;
 		if (ImGui::CollapsingHeader(j.Name.c_str()))
 		{
 			int i = 0;
-			for (auto a : j.Axes)
+			for (auto& a : j.Axes)
 			{
-				ImGui::DragFloat((string("Axis ") + to_string(i)).c_str(), &a);
+				ImGui::DragFloat((string("Axis ") + to_string(i)).c_str(), &a, 0.01f, -1.0f, 1.0f);
 				i++;
 			}
 
 			i = 0;
-			for (auto b : j.Buttons)
+			for (auto& b : j.Buttons)
 			{
-				ImGui::DragInt((string("Buttons ") + to_string(i)).c_str(), &b);
+				ImGui::DragInt((string("Buttons ") + to_string(i)).c_str(), &b, 1, 0, 1);
 				i++;
 			}
 		}
 	}
+
+	if(ImGui::Button("Add Virtual Joystick"))
+	{
+		AddVirtualJoystick();
+	}
+}
+
+void InputManager::AddVirtualJoystick()
+{
+	int joy = ++_nextVirtual;
+
+	JoystickState state;
+	state.Name = "Virtual Joystick " + to_string(joy);
+	LOG("Joystick %s connected.", state.Name.c_str());
+	_joyState[joy] = state;
 }
 #endif
 

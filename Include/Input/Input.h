@@ -110,13 +110,15 @@ public:
 
 #ifdef INSPECTOR
 	virtual void Inspect() override;
-	
+
+	void AddVirtualJoystick();
 #endif
 
 private:
 	uint									_count;
 	std::vector<Profile>					_profiles;
 	std::unordered_map<int, JoystickState>	_joyState;	// Indexed by tokens
+	int										_nextVirtual = 256;
 };
 
 }
