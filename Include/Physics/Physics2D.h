@@ -34,6 +34,24 @@ struct AABB
 	bool IsValid() const;
 };
 
+struct Ray2D
+{
+	Vector2 Origin;
+
+	Vector2 Direction;
+
+//	Ray2D(const Vector2& origin, )
+};
+
+struct Interection2D
+{
+	//bool			IsValid		= false;
+	Vector2			Position;
+	Vector2			Normal;	
+	PhysicsBody2D*	PhysicsBody = nullptr;
+	bool			IsValid() const { return PhysicsBody != nullptr; }
+};
+
 /// 
 /// Rotation
 ///
@@ -294,6 +312,8 @@ public:
 
 	/// Get all bodies in the specified reariuis arround the given postion
 	std::vector<PhysicsBody2D*> GetInRadius(const Vector2& position, float radius);
+
+	Interection2D RayIntersect(const Vector2& origin, const Vector2& direction);
 
 	/// A choice of algorithms for accumulating contacts
 	enum ContactsAlgorithm { CA_BRUTE_FORCE = 0, CA_AUTO_GRID = 1, CA_MULTI_GRID = 2 };

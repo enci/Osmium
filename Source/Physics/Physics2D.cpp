@@ -569,6 +569,74 @@ vector<PhysicsBody2D*> PhysicsManager2D::GetInRadius(const Vector2& position, fl
 	}
 }
 
+Interection2D PhysicsManager2D::RayIntersect(const Vector2& origin, const Vector2& direction)
+{
+	Vector2 dir = direction;
+	dir.Normalize();
+
+	Matrix33 toWorld;
+	toWorld.SetTransform(dir, Vector2(1,1), origin);
+	
+	gDebugRenderer.AddLine(
+		ToVector3(toWorld.TransformVector(Vector2())),
+		ToVector3(toWorld.TransformVector(Vector2(0.0f, 400.0f))),
+		Color::Yellow);
+
+	auto toLocal = toWorld.Inverse();
+
+	float minY = FLT_MAX;
+	Interection2D intersection;	// Invalid when created
+
+	for (size_t i = 0; i < _bodies.size(); i++)
+	{
+		auto body = _bodies[i];
+		Vector2 pos = body->GetPosition();
+		Vector2 localPos = toLocal.TransformVector(pos);
+
+		if (pos != origin && localPos.y > 0.0f && abs(localPos.x) <= body->GetRadius())
+		{
+			const auto& collision = body->GetCollisionShapeWorld();
+			for (size_t i = 0; i < collision.size(); i++)
+			{
+				Vector2 from = collision[i];
+				Vector2 to = collision[(i + 1) % collision.size()];
+				Vector2 lFrom = toLocal.TransformVector(from);
+				Vector2 lTo = toLocal.TransformVector(to);
+				Vector2 edge = from - to;
+				Vector2 norm = edge.Perpendicular();
+				norm = toLocal.TransformNormal(norm);
+
+				if (norm.y < 0 && (lFrom.x > 0.0f && lTo.x < 0.0f || lFrom.x < 0.0f && lTo.x > 0.0f))
+				{
+					float x0 = lFrom.x;
+					float x1 = lTo.x;
+					float y0 = lFrom.y;
+					float y1 = lTo.y;
+					float yc = y0 - x0 * ((y1 - y0) / (x1 - x0));
+					if (minY > yc)
+					{
+						minY = yc;
+						intersection.PhysicsBody = body;
+						intersection.Normal = norm;
+						intersection.Normal.Normalize();
+					}
+
+					gDebugRenderer.AddLine(ToVector3(from), ToVector3(to));
+				}
+			}
+		}
+	}
+
+	if (intersection.IsValid())
+	{
+		intersection.Position = Vector2(0.0f, minY);
+		intersection.Position = toWorld.TransformVector(intersection.Position);
+		gDebugRenderer.AddCircle(ToVector3(intersection.Position), 1.3f, Color::White);
+	}
+
+	return intersection;
+}
+
 //
 // Collision detection
 //
