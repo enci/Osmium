@@ -25,6 +25,7 @@ Profiler::Profiler(CEngine& engine)
 void Profiler::StartFrame()
 {
 	_frameStart = glfwGetTime();
+	_sections.clear();
 }
 
 uint Profiler::StartSection(const std::string& name)
