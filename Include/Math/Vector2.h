@@ -139,7 +139,7 @@ public:
 	}
         
     /// Cross product in 2D, look on mathworld
-    float Cross(const Vector2& rhs)
+    float Cross(const Vector2& rhs) const
     {
         return x*rhs.y - y*rhs.x;
     }
