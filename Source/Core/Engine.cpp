@@ -57,7 +57,8 @@ void CEngine::Run()
 	ASSERT(_initialized);
 
 	auto lastFrame = glfwGetTime();
-	while (!glfwWindowShouldClose(_device->GetWindow()))
+	while (!glfwWindowShouldClose(_device->GetWindow()) ||
+			glfwGetKey(_device->GetWindow(), GLFW_KEY_ESCAPE))
 	{
 		glfwPollEvents();
 
@@ -114,7 +115,7 @@ void CEngine::SwapWorld(World* world)
 #ifdef INSPECTOR
 void CEngine::Inspect()
 {
-	ImGui::GetIO().FontGlobalScale = 1.5f;
+	//ImGui::GetIO().FontGlobalScale = 1.5f;
 
 	ImGuiWindowFlags window_flags = 0;
 	//window_flags |= ImGuiWindowFlags_NoTitleBar;	
