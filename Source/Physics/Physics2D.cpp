@@ -184,7 +184,7 @@ void PhysicsBody2D::Inspect()
 #endif
 
 void PhysicsBody2D::UpdateDerived()
-{	
+{
 	if (!_initialized)
 		return;
 
@@ -194,7 +194,6 @@ void PhysicsBody2D::UpdateDerived()
 		_size,
 		_position);
 	_inverse = _matrix.Inverse();
-
 
 	if (_collisionShape.size() == 0)
 		return;
@@ -228,6 +227,7 @@ void PhysicsBody2D::UpdateTransform()
 	if (!_initialized)
 		return;
 
+	
 	_transform->SetPosition(ToVector3(_position));
 	_transform->SetOrientation(Matrix44::CreateRotateY(_orientation));
 
@@ -813,9 +813,15 @@ void PhysicsManager2D::AccumulateContactsBruteForce()
 	{
 		auto body0 = _bodies[i];
 
+		if (!body0->GetEnbled())
+			continue;
+
 		for (size_t j = i + 1; j < _bodies.size(); j++)
 		{
 			auto body1 = _bodies[j];
+
+			if (!body1->GetEnbled())
+				continue;
 
 			const AABB& box0 = body0->GetBoundingBox();
 			const AABB& box1 = body1->GetBoundingBox();
