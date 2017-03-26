@@ -5,6 +5,7 @@
 #include <Math/Vector2.h>
 #include <Math/Matrix33.h>
 #include <Math/Matrix44.h>
+#include <Graphics/Color.h>
 
 namespace Osm
 {
@@ -69,6 +70,8 @@ struct SphericalCoordinates
 };
 
 inline Vector3 ToVector3(const Vector2& vec2) { return Vector3(vec2.x, 0.0f, vec2.y); }
+
+inline Vector3 ToVector3(const Color& color) { return Vector3(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f); }
 
 inline Vector2 ToVector2(const Vector3& vec2) { return Vector2(vec2.x, vec2.z); }
 
