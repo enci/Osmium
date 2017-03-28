@@ -216,6 +216,12 @@ public:
         v.y = ref.y;
         return v;
     }
+
+	static Vector2 Reflect(const Vector2& v, const Vector2& n)
+    {
+		//return n * (-2 * v.Dot(n)) + v;
+		return v + n * n.Dot(v) * -2.0f;
+    }
         
     /// Distance to another vector
     float Distance(const Vector2& other) const

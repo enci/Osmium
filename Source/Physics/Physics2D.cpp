@@ -577,19 +577,19 @@ Interection2D PhysicsManager2D::RayIntersect(const Vector2& origin, const Vector
 	Matrix33 toWorld;
 	toWorld.SetTransform(dir, Vector2(1,1), origin);
 	
-	gDebugRenderer.AddLine(
-		ToVector3(toWorld.TransformVector(Vector2())),
-		ToVector3(toWorld.TransformVector(Vector2(0.0f, 400.0f))),
-		Color::Yellow);
+//	gDebugRenderer.AddLine(
+//		ToVector3(toWorld.TransformVector(Vector2())),
+//		ToVector3(toWorld.TransformVector(Vector2(0.0f, 400.0f))),
+//		Color::Yellow);
 
 	auto toLocal = toWorld.Inverse();
 
 	float minY = FLT_MAX;
 	Interection2D intersection;	// Invalid when created
 
-	for (size_t i = 0; i < _bodies.size(); i++)
+	for (size_t b = 0; b < _bodies.size(); b++)
 	{
-		auto body = _bodies[i];
+		auto body = _bodies[b];
 		Vector2 pos = body->GetPosition();
 		Vector2 localPos = toLocal.TransformVector(pos);
 
@@ -613,15 +613,14 @@ Interection2D PhysicsManager2D::RayIntersect(const Vector2& origin, const Vector
 					float y0 = lFrom.y;
 					float y1 = lTo.y;
 					float yc = y0 - x0 * ((y1 - y0) / (x1 - x0));
-					if (minY > yc)
+					if (minY > yc && yc > 0)
 					{
 						minY = yc;
 						intersection.PhysicsBody = body;
-						intersection.Normal = norm;
+						intersection.Normal = edge.Perpendicular();
 						intersection.Normal.Normalize();
 					}
-
-					gDebugRenderer.AddLine(ToVector3(from), ToVector3(to));
+					// gDebugRenderer.AddLine(ToVector3(from), ToVector3(to));
 				}
 			}
 		}
@@ -631,7 +630,7 @@ Interection2D PhysicsManager2D::RayIntersect(const Vector2& origin, const Vector
 	{
 		intersection.Position = Vector2(0.0f, minY);
 		intersection.Position = toWorld.TransformVector(intersection.Position);
-		gDebugRenderer.AddCircle(ToVector3(intersection.Position), 1.3f, Color::White);
+		// gDebugRenderer.AddCircle(ToVector3(intersection.Position), 1.3f, Color::White);
 	}
 
 	return intersection;
