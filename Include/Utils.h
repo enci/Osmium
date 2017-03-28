@@ -77,6 +77,12 @@ inline Vector2 ToVector2(const Vector3& vec2) { return Vector2(vec2.x, vec2.z); 
 
 void UpdateMatrix44FromMatrix33(Matrix44& output, const Matrix33& input);
 
+inline void SwitchOnBitFlag(uint& flags, uint bit) { flags |= bit; }
+
+inline void SwitchOffBitFlag(uint& flags, uint bit) { flags &= (~bit); }
+
+inline bool CheckBitFlag(uint flags, uint bit) { return (flags & bit) == bit; }
+
 /// Convert a cartesian 3D vector to spherical coordinates
 SphericalCoordinates CartesianToSpherical(const Vector3& cartesianVector);
 
