@@ -115,7 +115,7 @@ void CEngine::SwapWorld(World* world)
 #ifdef INSPECTOR
 void CEngine::Inspect()
 {
-	//ImGui::GetIO().FontGlobalScale = 1.5f;
+	//ImGui::GetIO().FontGlobalScale = 1.5f;ImGuiCol_MenuBarBg.
 
 	ImGuiWindowFlags window_flags = 0;
 	//window_flags |= ImGuiWindowFlags_NoTitleBar;	
@@ -125,21 +125,13 @@ void CEngine::Inspect()
 
 	bool p_open = true;
 
-	if (ImGui::Begin("Osmium Inspector", &p_open, window_flags))
-	{
-		// Paused button
-		if(!_paused)
-			_paused = ImGui::Button("Pause");
-		else
-			_paused = !ImGui::Button("Resume");
-		ImGui::SameLine();
-		_advanceFrame = ImGui::Button("Step");
-
-		if (ImGui::BeginMenuBar())
+	//if (ImGui::Begin("Osmium Inspector", &p_open, window_flags))
+	ImGui::BeginMainMenuBar();
+	{				
 		{
 			if (ImGui::BeginMenu("Tools"))
 			{
-				ImGui::MenuItem("Engine Components", nullptr, &_show_engine_compoents);
+				ImGui::MenuItem("Engine Inspector", nullptr, &_show_engine_compoents);
 				// Just a reminder that this might be useful
 				// ImGui::MenuItem("Console", NULL, &show_app_console);
 				// ImGui::MenuItem("Log", NULL, &show_app_log);
@@ -147,13 +139,19 @@ void CEngine::Inspect()
 				ImGui::MenuItem("World Inspector", nullptr, &_show_world_inspector);
 				ImGui::MenuItem("Profiler", nullptr, &_show_profiler);
 				ImGui::MenuItem("ImGui Test", nullptr, &_show_imgui_test);
-				ImGui::MenuItem("Pause", nullptr, &_paused);
 				ImGui::EndMenu();
-			}
-			ImGui::EndMenuBar();
-		}
-		ImGui::End();
+			}		
+		}	
+
+		// Paused button
+		if (!_paused)
+			_paused = ImGui::Button("||");
+		else
+			_paused = !ImGui::Button("[>");
+		ImGui::SameLine();
+		_advanceFrame = ImGui::Button(">|");
 	}
+	ImGui::EndMainMenuBar();
 
 	if (_show_world_inspector)
 	{
@@ -175,6 +173,7 @@ void CEngine::Inspect()
 
 	if(_show_engine_compoents)
 	{		
+		ImGui::Begin("Engine Inspector");
 		for (auto& c : _components)
 		{
 			string name = typeid(*c).name();
@@ -184,6 +183,7 @@ void CEngine::Inspect()
 				c->Inspect();
 			}
 		}
+		ImGui::End();
 	}
 
 	ImGui::Render();
