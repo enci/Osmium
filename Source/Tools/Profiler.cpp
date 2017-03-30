@@ -58,8 +58,8 @@ void Profiler::Inspect()
 		ImDrawList* draw_list = ImGui::GetWindowDrawList();
 						
 		float spacing = 8.0f;
-		float sz = 10.0f;
-		float barOffset = 200;
+		float sz = 10.0f * ImGui::GetIO().FontGlobalScale;
+		float barOffset = 200 * ImGui::GetIO().FontGlobalScale;
 		const ImVec2 basePos = ImGui::GetCursorScreenPos();
 		float lenghtF = 1000 * 30;
 		
