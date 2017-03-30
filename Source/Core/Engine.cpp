@@ -9,6 +9,8 @@
 #include <imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
 #include <Tools/Profiler.h>
+#include <cereal/archives/json.hpp>
+#include <fstream>
 
 using namespace Osm;
 using namespace std;
@@ -17,10 +19,44 @@ CEngine Osm::Engine;
 
 void EngineSettings::LoadFromFile(const std::string& file)
 {
-
+	FilePath = file;
+	ifstream fs;
+	fs.open(FilePath);
+	if (fs.is_open())
+	{
+		cereal::JSONInputArchive iarchive(fs);
+		iarchive(cereal::make_nvp("Setttings", *this));
+	}
+	fs.close();
 }
 
-void CEngine::Initialize()
+void EngineSettings::SaveToFile()
+{
+	ofstream fs;
+	fs.open(FilePath);
+
+	{
+		cereal::JSONOutputArchive oarchive(fs);
+		oarchive(cereal::make_nvp("Setttings", *this));
+	}
+	fs.close();
+}
+
+void EngineSettings::Inspect()
+{
+	ImGui::SliderInt("Screen Width", &ScreenWidth, 320, 5600);
+	ImGui::SliderInt("Screen Height", &ScreenHeight, 240, 5600);
+	ImGui::Checkbox("Full Screen", &FullScreen);
+	ImGui::Checkbox("Native Resolution", &UseNativeResolution);
+	ImGui::SliderFloat("Inspector Font Size", &InspectorFontSize, 0.5f, 2.0f);
+
+	if (ImGui::Button("Save Globals"))
+	{
+		SaveToFile();
+	}
+}
+
+void CEngine::InitializeInternal()
 {
 	_initialized = true;
 
@@ -40,7 +76,7 @@ void CEngine::Initialize()
 void CEngine::Initialize(const EngineSettings& options)
 {
 	_settings = options;
-	Initialize();
+	InitializeInternal();
 }
 
 void CEngine::Shutdown()
@@ -115,7 +151,7 @@ void CEngine::SwapWorld(World* world)
 #ifdef INSPECTOR
 void CEngine::Inspect()
 {
-	//ImGui::GetIO().FontGlobalScale = 1.5f;ImGuiCol_MenuBarBg.
+	ImGui::GetIO().FontGlobalScale = _settings.InspectorFontSize;
 
 	ImGuiWindowFlags window_flags = 0;
 	//window_flags |= ImGuiWindowFlags_NoTitleBar;	
@@ -125,7 +161,6 @@ void CEngine::Inspect()
 
 	bool p_open = true;
 
-	//if (ImGui::Begin("Osmium Inspector", &p_open, window_flags))
 	ImGui::BeginMainMenuBar();
 	{				
 		{
@@ -136,7 +171,8 @@ void CEngine::Inspect()
 				// ImGui::MenuItem("Console", NULL, &show_app_console);
 				// ImGui::MenuItem("Log", NULL, &show_app_log);
 				// ImGui::MenuItem("Input Debugger", nullptr, &_show_input_debug);
-				ImGui::MenuItem("World Inspector", nullptr, &_show_world_inspector);
+				ImGui::MenuItem("World Inspector", nullptr, &_show_world_inspector);				
+				ImGui::MenuItem("Settings Inspector", nullptr, &_show_settings);
 				ImGui::MenuItem("Profiler", nullptr, &_show_profiler);
 				ImGui::MenuItem("ImGui Test", nullptr, &_show_imgui_test);
 				ImGui::EndMenu();
@@ -183,6 +219,13 @@ void CEngine::Inspect()
 				c->Inspect();
 			}
 		}
+		ImGui::End();
+	}
+
+	if (_show_settings)
+	{
+		ImGui::Begin("Settings Inspector");
+		_settings.Inspect();
 		ImGui::End();
 	}
 

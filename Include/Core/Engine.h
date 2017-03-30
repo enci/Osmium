@@ -3,6 +3,7 @@
 #include <Defines.h>
 #include <Core/Component.h>
 #include <functional>
+#include <cereal/cereal.hpp>
 
 namespace Osm
 {
@@ -16,22 +17,49 @@ class InputManager;
 class AudioManager;
 
 struct EngineSettings
-{
+{	
+	void LoadFromFile(const std::string& file);
+
+	template<class Archive>
+	void serialize(Archive& archive);
+
+#ifdef INSPECTOR
+	void Inspect();
+#endif
+
+
 	int ScreenWidth = 1920;
 	int ScreenHeight = 1080;
 	bool FullScreen = false;
+	bool UseNativeResolution = true;
+	float InspectorFontSize = 1.0f;
 	std::string ResourcePath = "";
 	std::string SavePath = "";
 	std::string WindowName = "Window";
 
-	void LoadFromFile(const std::string& file);
+protected:
+	std::string FilePath;
+	void SaveToFile();	
 };
+
+template <class Archive>
+void EngineSettings::serialize(Archive& archive)
+{
+	archive(
+		CEREAL_NVP(ScreenWidth),
+		CEREAL_NVP(ScreenHeight),
+		CEREAL_NVP(FullScreen),
+		CEREAL_NVP(UseNativeResolution),
+		CEREAL_NVP(ResourcePath),
+		CEREAL_NVP(InspectorFontSize),
+		CEREAL_NVP(SavePath),
+		CEREAL_NVP(WindowName)
+	);
+}
 
 class CEngine : public ComponentContainer<CEngine>
 {
-public:
-
-	void Initialize();
+public:	
 
 	void Initialize(const EngineSettings& options);
 
@@ -54,6 +82,7 @@ public:
 	void QueueEvent(std::function<void(void)> e) { _event = e; }
 
 protected:
+	void InitializeInternal();
 
 //	void Update();
 
@@ -91,6 +120,7 @@ protected:
 	bool _show_world_inspector = false;
 	bool _show_profiler = false;
 	bool _show_imgui_test = false;
+	bool _show_settings = false;
 #endif
 };
 
