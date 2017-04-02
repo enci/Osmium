@@ -186,6 +186,12 @@ void CEngine::Inspect()
 			_paused = !ImGui::Button("[>");
 		ImGui::SameLine();
 		_advanceFrame = ImGui::Button(">|");
+
+		ImGui::SameLine();
+		ImGui::LabelText("Usage", "");
+		ImGui::SameLine();
+		ImGui::ProgressBar(0.95f);
+		//ImGui::ProgressBar(0.4f);
 	}
 	ImGui::EndMainMenuBar();
 
