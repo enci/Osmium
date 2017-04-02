@@ -17,15 +17,12 @@ public:
 
 	int GetScreenHeight() const;
 
-	GLFWwindow* GetWindow() { return _window; }
-
-	bool GetKeyOnce(char key);
+	GLFWwindow* GetWindow() const { return _window; }
 
 protected:
 	int			_height = 0;
 	int			_width = 0;
 	float		_ratio;
-	char		_keyOnce[GLFW_KEY_LAST + 1];
 	GLFWwindow* _window = nullptr;
 };
 

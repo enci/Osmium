@@ -1,8 +1,8 @@
 #include <Input/Input.h>
-#include <GLFW/glfw3.h>
 #include <imgui/imgui.h>
 #include <string>
 #include <windows.h>
+#include <Core/Device.h>
 
 using namespace Osm;
 using namespace std;
@@ -191,4 +191,11 @@ void InputManager::InitProfiles()
 	};
 	xboxOne.Axes		= {0, 1,  5, 4};
 	*/
+}
+
+bool InputManager::GetKeyOnce(char key)
+{
+	return (glfwGetKey(Engine.Device().GetWindow(), key) ?
+		(_keyOnce[key] ? false : (_keyOnce[key] = true)) : \
+		(_keyOnce[key] = false));
 }
