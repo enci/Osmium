@@ -1,5 +1,6 @@
 #pragma once
 #include <Core/Engine.h>
+#include <tchar.h>
 
 namespace Osm
 {
@@ -11,9 +12,15 @@ public:
 
 	void StartFrame();
 
+	void EndFrame();
+
 	uint StartSection(const std::string& name);
 
 	void EndSection(uint sectionId);
+
+	double GetTimePerFrame() const	{ return _timePerFrame;		}
+
+	double GetFPS() const;
 
 #ifdef INSPECTOR
 	virtual void Inspect() override;
@@ -28,8 +35,12 @@ private:
 		double EndTime;
 	};
 
-	std::vector<Section> _sections;
-	double _frameStart;
+	std::vector<Section>	_sections;
+	double					_frameStart;
+	double					_frameEnd;
+	double					_framePerSecond;
+	double					_timePerFrame;
+	double					_timeSinceRefresh;
 };
 
 }
