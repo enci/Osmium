@@ -44,8 +44,8 @@ void EngineSettings::SaveToFile()
 
 void EngineSettings::Inspect()
 {
-	ImGui::SliderInt("Screen Width", &ScreenWidth, 320, 5600);
-	ImGui::SliderInt("Screen Height", &ScreenHeight, 240, 5600);
+	ImGui::InputInt("Screen Width", &ScreenWidth, 320, 5600);
+	ImGui::InputInt("Screen Height", &ScreenHeight, 240, 5600);
 	ImGui::Checkbox("Full Screen", &FullScreen);
 	ImGui::Checkbox("Native Resolution", &UseNativeResolution);
 	ImGui::SliderFloat("Inspector Font Size", &InspectorFontSize, 0.5f, 2.0f);
@@ -151,6 +151,9 @@ void CEngine::SwapWorld(World* world)
 #ifdef INSPECTOR
 void CEngine::Inspect()
 {
+	if(_close_inspector)
+		return;
+
 	ImGui::GetIO().FontGlobalScale = _settings.InspectorFontSize;
 
 	ImGuiWindowFlags window_flags = 0;
@@ -186,6 +189,8 @@ void CEngine::Inspect()
 			_paused = !ImGui::Button("[>");
 		ImGui::SameLine();
 		_advanceFrame = ImGui::Button(">|");
+		ImGui::SameLine();
+		_close_inspector = ImGui::Button("X");
 	}
 	ImGui::EndMainMenuBar();
 

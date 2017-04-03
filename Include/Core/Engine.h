@@ -121,6 +121,7 @@ protected:
 	bool _show_profiler = false;
 	bool _show_imgui_test = false;
 	bool _show_settings = false;
+	bool _close_inspector = false;
 #endif
 };
 
