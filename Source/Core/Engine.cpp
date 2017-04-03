@@ -130,6 +130,8 @@ void CEngine::Run()
 		_world->Render();
 		_profiler->EndSection(renderID);
 
+		_profiler->EndFrame();
+
 #ifdef INSPECTOR
 		Inspect();
 #endif
@@ -190,8 +192,10 @@ void CEngine::Inspect()
 		ImGui::SameLine();
 		_advanceFrame = ImGui::Button(">|");
 		ImGui::SameLine();
-		_close_inspector = ImGui::Button("X");
-	}
+		_close_inspector = ImGui::Button("X");		ImGui::SameLine();
+		ImGui::LabelText("Frame Time", "");
+		ImGui::SameLine();
+		ImGui::ProgressBar(_profiler->GetTimePerFrame() / (1.0 / 60.0));	}
 	ImGui::EndMainMenuBar();
 
 	if (_show_world_inspector)

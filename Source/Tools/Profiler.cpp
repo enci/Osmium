@@ -6,6 +6,8 @@
 using namespace Osm;
 using namespace std;
 
+const double kRefreshRate = 0.0333;
+
 vector<ImU32> colors =
 {
 	ImColor(Color::Magenta.integervalue),
@@ -19,6 +21,10 @@ Profiler::Profiler(CEngine& engine)
 	: Component(engine)
 	, _sections()
 	, _frameStart(-1.0f)
+	, _frameEnd(-1.0f)
+	, _framePerSecond(0)
+	, _timePerFrame(0.0)
+	, _timeSinceRefresh(0.0)
 {
 }
 
@@ -26,6 +32,19 @@ void Profiler::StartFrame()
 {
 	_frameStart = glfwGetTime();
 	_sections.clear();
+}
+
+void Profiler::EndFrame()
+{
+	double frameTime = glfwGetTime() - _frameStart;	
+	_timeSinceRefresh += frameTime;
+	_framePerSecond += 1.0;
+	if (_timeSinceRefresh > kRefreshRate)
+	{		
+		_timePerFrame = _timeSinceRefresh / _framePerSecond;
+		_framePerSecond = 0.0;
+		_timeSinceRefresh -= kRefreshRate;
+	}
 }
 
 uint Profiler::StartSection(const std::string& name)
@@ -45,7 +64,14 @@ void Profiler::EndSection(uint sectionId)
 	section.EndTime = glfwGetTime() - _frameStart;
 }
 
+double Profiler::GetFPS() const
+{
+	return _framePerSecond / kRefreshRate;
+}
+
+
 #ifdef INSPECTOR
+
 void Profiler::Inspect()
 {
 	ImGuiWindowFlags window_flags = 0;

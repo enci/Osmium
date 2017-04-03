@@ -3,6 +3,7 @@
 #include <Core/Component.h>
 #include <Core/Engine.h>
 #include <unordered_map>
+//#include <GLFW/glfw3.h>
 
 namespace Osm
 {
@@ -102,6 +103,8 @@ public:
 
 	float GetJoystickAxis(Joystick joystick, JoystickAxes axis);
 
+	bool GetKeyOnce(char key);
+
 	std::vector<Joystick> GetActiveJoysticks() const;
 
 	void AddJoystick(int joy);
@@ -119,6 +122,7 @@ private:
 	std::vector<Profile>					_profiles;
 	std::unordered_map<int, JoystickState>	_joyState;	// Indexed by tokens
 	int										_nextVirtual = 256;
+	char									_keyOnce[256 + 1];
 };
 
 }

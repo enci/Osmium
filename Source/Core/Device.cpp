@@ -92,10 +92,3 @@ int GraphicsDevice::GetScreenHeight() const
 {
 	return _height;
 }
-
-bool GraphicsDevice::GetKeyOnce(char key)
-{
-	return (glfwGetKey(_window, key) ?
-		(_keyOnce[key] ? false : (_keyOnce[key] = true)) : \
-		(_keyOnce[key] = false));
-}

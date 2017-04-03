@@ -83,6 +83,8 @@ inline void SwitchOffBitFlag(uint& flags, uint bit) { flags &= (~bit); }
 
 inline bool CheckBitFlag(uint flags, uint bit) { return (flags & bit) == bit; }
 
+inline bool CheckBitFlagOverlap(uint flag0, uint flag1) { return (flag0 & flag1) != 0; }
+
 /// Convert a cartesian 3D vector to spherical coordinates
 SphericalCoordinates CartesianToSpherical(const Vector3& cartesianVector);
 
