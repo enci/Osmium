@@ -167,35 +167,31 @@ void CEngine::Inspect()
 	bool p_open = true;
 
 	ImGui::BeginMainMenuBar();
-	{				
-		{
-			if (ImGui::BeginMenu("Tools"))
-			{
-				ImGui::MenuItem("Engine Inspector", nullptr, &_show_engine_compoents);
-				// Just a reminder that this might be useful
-				// ImGui::MenuItem("Console", NULL, &show_app_console);
-				// ImGui::MenuItem("Log", NULL, &show_app_log);
-				// ImGui::MenuItem("Input Debugger", nullptr, &_show_input_debug);
-				ImGui::MenuItem("World Inspector", nullptr, &_show_world_inspector);				
-				ImGui::MenuItem("Settings Inspector", nullptr, &_show_settings);
-				ImGui::MenuItem("Profiler", nullptr, &_show_profiler);
-				ImGui::MenuItem("ImGui Test", nullptr, &_show_imgui_test);
-				ImGui::EndMenu();
-			}		
-		}	
-
-		// Paused button
-		if (!_paused)
-			_paused = ImGui::Button("||");
-		else
-			_paused = !ImGui::Button("[>");
-		ImGui::SameLine();
-		_advanceFrame = ImGui::Button(">|");
-		ImGui::SameLine();
-		_close_inspector = ImGui::Button("X");		ImGui::SameLine();
-		ImGui::LabelText("Frame Time", "");
-		ImGui::SameLine();
-		ImGui::ProgressBar(_profiler->GetTimePerFrame() / (1.0 / 60.0));	}
+	if (ImGui::BeginMenu("Tools"))
+	{
+		ImGui::MenuItem("Engine Inspector", nullptr, &_show_engine_compoents);
+		// Just a reminder that this might be useful
+		// ImGui::MenuItem("Log", NULL, &show_app_log);
+		ImGui::MenuItem("World Inspector", nullptr, &_show_world_inspector);
+		ImGui::MenuItem("Settings Inspector", nullptr, &_show_settings);
+		ImGui::MenuItem("Profiler", nullptr, &_show_profiler);
+		ImGui::MenuItem("ImGui Test", nullptr, &_show_imgui_test);
+		ImGui::EndMenu();
+	}
+	
+	// Paused button
+	if (!_paused)
+		_paused = ImGui::Button("||");
+	else
+		_paused = !ImGui::Button("[>");
+	ImGui::SameLine();
+	_advanceFrame = ImGui::Button(">|");
+	ImGui::SameLine();
+	_close_inspector = ImGui::Button("X");				
+	ImGui::SameLine();
+	ImGui::LabelText("Frame Time", "");
+	ImGui::SameLine();
+	ImGui::ProgressBar(_profiler->GetTimePerFrame() / (1.0 / 60.0));	
 	ImGui::EndMainMenuBar();
 
 	if (_show_world_inspector)

@@ -26,6 +26,9 @@
 //---- Don't define obsolete functions names
 //#define IMGUI_DISABLE_OBSOLETE_FUNCTIONS
 
+//---- Pack colors to BGRA instead of RGBA (remove need to post process vertex buffer in back ends)
+//#define IMGUI_USE_BGRA_PACKED_COLOR
+
 //---- Implement STB libraries in a namespace to avoid conflicts
 //#define IMGUI_STB_NAMESPACE     ImGuiStb
 
@@ -44,7 +47,6 @@
 //---- e.g. create variants of the ImGui::Value() helper for your low-level math types, or your own widgets/helpers.
 
 // Forwad declarations
-// Implementations in 
 namespace Osm
 {
 	class Color;
@@ -52,7 +54,6 @@ namespace Osm
 
 namespace ImGui
 {
-	//   void    Value(const char* prefix, const MyMatrix44& v, const char* float_format = NULL);
 	void OsmColor(const char* label, Osm::Color& color, bool showAplha = true);
+	//   void    Value(const char* prefix, const MyMatrix44& v, const char* float_format = NULL);
 }
-
