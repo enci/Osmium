@@ -50,7 +50,7 @@ void GameSettings::Inspect()
 	ImGui::Checkbox("Native Resolution", &UseNativeResolution);
 	ImGui::SliderFloat("Inspector Font Size", &InspectorFontSize, 0.5f, 2.0f);
 
-	if (ImGui::Button("Save Globals"))
+	if (ImGui::Button("Save Settings"))
 	{
 		SaveToFile();
 	}
