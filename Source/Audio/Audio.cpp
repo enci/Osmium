@@ -15,7 +15,7 @@ int ErrorCheck(FMOD_RESULT result)
 	return 0;
 }
 
-AudioManager::AudioManager(CEngine& owner) : Component(owner)
+AudioManager::AudioManager(CGame& owner) : Component(owner)
 {	
 	ErrorCheck(FMOD::Studio::System::create(&_studioSystem));
 	ErrorCheck(	_studioSystem->initialize(32,

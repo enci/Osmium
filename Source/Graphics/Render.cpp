@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <Core/Transform.h>
 #include <Graphics/Shader.h>
-#include <Core/Engine.h>
+#include <Core/Game.h>
 #include <imgui.h> 
 
 using namespace Osm;
@@ -15,7 +15,7 @@ RenderManager::RenderManager(World& world)
 {
 	/*
 	// Get settings
-	auto settings = Engine.Settings();
+	auto settings = Game.Settings();
 	auto width = settings.ScreenWidth;
 	auto height = settings.ScreenHeight;
 

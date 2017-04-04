@@ -11,15 +11,15 @@ void joystick_callback(int joy, int event)
 {
 	if (event == GLFW_CONNECTED)
 	{
-		Engine.Input().AddJoystick(joy);		
+		Game.Input().AddJoystick(joy);		
 	}
 	else if (event == GLFW_DISCONNECTED)
 	{
-		Engine.Input().RemoveJoystick(joy);
+		Game.Input().RemoveJoystick(joy);
 	}
 }
 
-InputManager::InputManager(CEngine& engine)
+InputManager::InputManager(CGame& engine)
 	: Component(engine)
 	, _joyState(0)
 {
@@ -195,7 +195,7 @@ void InputManager::InitProfiles()
 
 bool InputManager::GetKeyOnce(char key)
 {
-	return (glfwGetKey(Engine.Device().GetWindow(), key) ?
+	return (glfwGetKey(Game.Device().GetWindow(), key) ?
 		(_keyOnce[key] ? false : (_keyOnce[key] = true)) : \
 		(_keyOnce[key] = false));
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Core/Engine.h>
+#include <Core/Game.h>
 #include <Math/Vector3.h>
 #include <fmod_studio.hpp>
 #include <map>
@@ -10,10 +10,10 @@ namespace Osm
 	struct Vector3;
 
 	//	FMOD_VECTOR 
-class AudioManager : Component<CEngine>
+class AudioManager : Component<CGame>
 {
 public:
-	AudioManager(CEngine& owner);
+	AudioManager(CGame& owner);
 
 	virtual ~AudioManager();
 

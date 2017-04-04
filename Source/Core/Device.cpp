@@ -15,7 +15,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
-GraphicsDevice::GraphicsDevice(CEngine& engine) : Component(engine)
+GraphicsDevice::GraphicsDevice(CGame& engine) : Component(engine)
 {
 	if (!glfwInit())
 		exit(EXIT_FAILURE);

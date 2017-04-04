@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Core/Component.h>
-#include <Core/Engine.h>
+#include <Core/Game.h>
 #include <unordered_map>
 //#include <GLFW/glfw3.h>
 
@@ -65,7 +65,7 @@ private:
 	int _joystick;
 };
 
-class InputManager : public Component<CEngine>
+class InputManager : public Component<CGame>
 {
 private:
 
@@ -85,7 +85,7 @@ private:
 	};
 
 public:
-	InputManager(CEngine& engine);
+	InputManager(CGame& engine);
 
 	~InputManager() {}
 

@@ -2,7 +2,7 @@
 
 using namespace Osm;
 
-Inspector::Inspector(CEngine& engine)
+Inspector::Inspector(CGame& engine)
 	: Component(engine)
 {
 

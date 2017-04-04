@@ -1,14 +1,14 @@
 #pragma once
-#include <Core/Engine.h>
+#include <Core/Game.h>
 #include <tchar.h>
 
 namespace Osm
 {
 
-class Profiler : public  Component<CEngine>
+class Profiler : public  Component<CGame>
 {
 public:
-	Profiler(CEngine& engine);
+	Profiler(CGame& engine);
 
 	void StartFrame();
 

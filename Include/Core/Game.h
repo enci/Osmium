@@ -16,7 +16,7 @@ class World;
 class InputManager;
 class AudioManager;
 
-struct EngineSettings
+struct GameSettings
 {	
 	void LoadFromFile(const std::string& file);
 
@@ -43,7 +43,7 @@ protected:
 };
 
 template <class Archive>
-void EngineSettings::serialize(Archive& archive)
+void GameSettings::serialize(Archive& archive)
 {
 	archive(
 		CEREAL_NVP(ScreenWidth),
@@ -57,11 +57,11 @@ void EngineSettings::serialize(Archive& archive)
 	);
 }
 
-class CEngine : public ComponentContainer<CEngine>
+class CGame : public ComponentContainer<CGame>
 {
 public:	
 
-	void Initialize(const EngineSettings& options);
+	void Initialize(const GameSettings& options);
 
 	void Shutdown();
 
@@ -75,7 +75,7 @@ public:
 
 	Profiler& GetProfiler() const { return *_profiler; }
 
-	const EngineSettings& Settings() const { return _settings; }
+	const GameSettings& Settings() const { return _settings; }
 
 	void SwapWorld(World* world);
 
@@ -104,7 +104,7 @@ protected:
 
 	AudioManager* _audio = nullptr;
 
-	EngineSettings _settings;
+	GameSettings _settings;
 
 	bool _paused = false;
 
@@ -125,6 +125,6 @@ protected:
 #endif
 };
 
-extern CEngine Engine;
+extern CGame Game;
 
 }

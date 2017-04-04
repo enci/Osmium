@@ -1,4 +1,4 @@
-#include <Core/Engine.h>
+#include <Core/Game.h>
 #include <Core/Resources.h>
 #include <Core/World.h>
 #include <Core/Device.h>
@@ -15,9 +15,9 @@
 using namespace Osm;
 using namespace std;
 
-CEngine Osm::Engine;
+CGame Osm::Game;
 
-void EngineSettings::LoadFromFile(const std::string& file)
+void GameSettings::LoadFromFile(const std::string& file)
 {
 	FilePath = file;
 	ifstream fs;
@@ -30,7 +30,7 @@ void EngineSettings::LoadFromFile(const std::string& file)
 	fs.close();
 }
 
-void EngineSettings::SaveToFile()
+void GameSettings::SaveToFile()
 {
 	ofstream fs;
 	fs.open(FilePath);
@@ -42,7 +42,7 @@ void EngineSettings::SaveToFile()
 	fs.close();
 }
 
-void EngineSettings::Inspect()
+void GameSettings::Inspect()
 {
 	ImGui::InputInt("Screen Width", &ScreenWidth, 320, 5600);
 	ImGui::InputInt("Screen Height", &ScreenHeight, 240, 5600);
@@ -56,7 +56,7 @@ void EngineSettings::Inspect()
 	}
 }
 
-void CEngine::InitializeInternal()
+void CGame::InitializeInternal()
 {
 	_initialized = true;
 
@@ -73,13 +73,13 @@ void CEngine::InitializeInternal()
 	ImGui_ImplGlfwGL3_Init(_device->GetWindow(), true);
 }
 
-void CEngine::Initialize(const EngineSettings& options)
+void CGame::Initialize(const GameSettings& options)
 {
 	_settings = options;
 	InitializeInternal();
 }
 
-void CEngine::Shutdown()
+void CGame::Shutdown()
 {
 	ASSERT(_initialized);
 
@@ -88,7 +88,7 @@ void CEngine::Shutdown()
 		_components.erase(_components.end() - 1);
 }
 
-void CEngine::Run()
+void CGame::Run()
 {
 	ASSERT(_initialized);
 
@@ -140,7 +140,7 @@ void CEngine::Run()
 	}
 }
 
-void CEngine::SwapWorld(World* world)
+void CGame::SwapWorld(World* world)
 {
 	QueueEvent([this, world]()
 	{
@@ -151,7 +151,7 @@ void CEngine::SwapWorld(World* world)
 }
 
 #ifdef INSPECTOR
-void CEngine::Inspect()
+void CGame::Inspect()
 {
 	if(_close_inspector)
 		return;
@@ -169,7 +169,7 @@ void CEngine::Inspect()
 	ImGui::BeginMainMenuBar();
 	if (ImGui::BeginMenu("Tools"))
 	{
-		ImGui::MenuItem("Engine Inspector", nullptr, &_show_engine_compoents);
+		ImGui::MenuItem("Game Inspector", nullptr, &_show_engine_compoents);
 		// Just a reminder that this might be useful
 		// ImGui::MenuItem("Log", NULL, &show_app_log);
 		ImGui::MenuItem("World Inspector", nullptr, &_show_world_inspector);
@@ -214,7 +214,7 @@ void CEngine::Inspect()
 
 	if(_show_engine_compoents)
 	{		
-		ImGui::Begin("Engine Inspector");
+		ImGui::Begin("Game Inspector");
 		for (auto& c : _components)
 		{
 			string name = typeid(*c).name();
@@ -240,12 +240,12 @@ void CEngine::Inspect()
 
 
 /*
-void CEngine::Update()
+void CGame::Update()
 {
 	ASSERT(_initialized);
 }
 
-void CEngine::Render()
+void CGame::Render()
 {
 	ASSERT(_initialized);
 }

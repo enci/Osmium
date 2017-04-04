@@ -1,16 +1,16 @@
 #pragma once
 #include <Core/Component.h>
 #include <Core/Resource.h>
-#include <Core/Engine.h>
+#include <Core/Game.h>
 #include <unordered_map>
 
 namespace Osm
 {
 
-class ResourceManager : public Component<CEngine>
+class ResourceManager : public Component<CGame>
 {
 public:
-	ResourceManager(CEngine& engine) : Component(engine) {}
+	ResourceManager(CGame& engine) : Component(engine) {}
 
 	~ResourceManager() { /* TODO: Make sure there are no resources */ }
 

@@ -17,7 +17,7 @@ vector<ImU32> colors =
 	ImColor(Color::Orange.integervalue)
 };
 
-Profiler::Profiler(CEngine& engine)
+Profiler::Profiler(CGame& engine)
 	: Component(engine)
 	, _sections()
 	, _frameStart(-1.0f)

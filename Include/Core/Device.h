@@ -1,15 +1,15 @@
 #pragma once
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <Core/Engine.h>
+#include <Core/Game.h>
 
 namespace Osm
 {
 
-class GraphicsDevice : public  Component<CEngine>
+class GraphicsDevice : public  Component<CGame>
 {
 public:
-	GraphicsDevice(CEngine& engine);
+	GraphicsDevice(CGame& engine);
 
 	virtual ~GraphicsDevice();
 
