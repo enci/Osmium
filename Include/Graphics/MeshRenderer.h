@@ -15,7 +15,7 @@ class MeshRenderer : public Renderable
 {
 public:
 	const int kMaxDirecationalLights = 5;
-	const int kMaxPointLights = 5;
+	const int kMaxPointLights = 10;
 
 public:
 

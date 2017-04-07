@@ -155,7 +155,9 @@ void Camera::SetView(Matrix44 view)
 	_transform->SetLocal(view);
 }
 
-Light::Light(Entity& entity) : RenderManagerComponent(entity)
+Light::Light(Entity& entity)
+	: RenderManagerComponent(entity)
+	, _lightType(DIRECTIONAL_LIGHT)
 {
 	_transform = _owner.GetComponent<Transform>();
 	ASSERT(_transform);
