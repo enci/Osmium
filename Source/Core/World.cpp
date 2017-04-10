@@ -1,5 +1,6 @@
 #include <Core/World.h>
 #include <Core/Entity.h>
+#include <Core/Transform.h>
 #include <imgui.h>
 #include <algorithm>
 #include <Utils.h>
@@ -66,6 +67,41 @@ Entity* World::GetEntityByID(uint id)
 
 #ifdef INSPECTOR
 
+void InspectEntity(Entity* entity, set<Entity*>& inspected)
+{
+	//if(inspected.find(entity) != inspected.end())
+	//	return;	
+
+	static ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+	string name = entity->GetName();
+	if (name.empty())
+		name = typeid(*entity).name();
+	name = StringReplace(name, "class ", "");
+	name += " - ID:" + to_string(entity->GetID());
+
+	auto trn = entity->GetComponent<Transform>();
+	if (trn)
+	{
+		auto childern = trn->GetChildern();
+		//if (childern.size() > 0)
+		//{
+			if (ImGui::TreeNodeEx((void*)(intptr_t)entity->GetID(), node_flags, name.c_str()))
+			{
+				for (auto child : childern)
+				{
+					auto e = &child->GetOwner();
+					InspectEntity(e, inspected);
+				}
+				ImGui::TreePop();
+			}			
+		//}
+		//else
+		//{
+		//	ImGui::Selectable(name.c_str());
+		//}
+	}
+}
+
 void World::Inspect()
 {
 	for (auto& c : _components)
@@ -82,6 +118,15 @@ void World::Inspect()
 	vector<bool> selected(_entities.size(), false);
 	static uint Id = -1;
 
+	/*
+	set<Entity*> inspected;	
+	for (int i = 0; i < _entities.size(); i++)
+	{
+		InspectEntity(_entities[i].get(), inspected);
+	}
+	*/
+
+
 	for(int i = 0; i < _entities.size(); i++)
 	{
 		auto& e = _entities[i];
@@ -95,15 +140,6 @@ void World::Inspect()
 		{
 			Id = e->GetID();
 		}
-		/*
-		if (ImGui::TreeNode(name.c_str()))
-		{
-			ImGui::Begin("Entity Inspector");
-			e->Inspect();
-			ImGui::End();
-			ImGui::TreePop();
-		}
-		*/
 	}
 
 	if (Id != -1)

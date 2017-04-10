@@ -43,6 +43,8 @@ public:
 
 	Transform* GetParent() const						{ return _parent; }
 
+	const std::vector<Transform*>& GetChildern() const	{ return _childern; }
+
 #ifdef INSPECTOR
 	virtual void Inspect() override;
 #endif
