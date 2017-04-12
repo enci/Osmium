@@ -137,6 +137,14 @@ void CGame::Run()
 #endif
 
 		glfwSwapBuffers(_device->GetWindow());
+
+		// Escape hack
+		auto joysticks = _input->GetActiveJoysticks();
+		for (auto& j : joysticks)
+		{
+			if(_input->GetJoystickButtonPressed(j, JOYSTICK_BUTTON_BACK))
+				return;
+		}
 	}
 }
 
