@@ -213,6 +213,7 @@
     <ClInclude Include="Include\Physics\Physics2D.h" />
     <ClInclude Include="Include\Tools\Inspector.h" />
     <ClInclude Include="Include\Tools\Profiler.h" />
+    <ClInclude Include="Include\Tools\Serialization.h" />
     <ClInclude Include="Include\Utils.h" />
     <ClInclude Include="Include\Math\Vector2.h" />
     <ClInclude Include="Include\Math\Vector3.h" />
