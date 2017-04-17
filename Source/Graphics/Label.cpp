@@ -44,6 +44,7 @@ Label::Label(	const string& labelText,
 		fread(ttf_buffer, 1, 1 << 20, file);
 	else
 		ASSERT(false);
+	fclose(file);
 #elif 
 	fread(ttf_buffer, 1, 1 << 20, fopen(fontFilename.c_str(), "rb"));
 #endif
