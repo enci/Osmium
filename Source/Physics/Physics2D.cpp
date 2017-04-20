@@ -1020,10 +1020,9 @@ std::vector<Vector2> GrahamScanCovexHull(vector<Vector2> vertices)
 	swap(vertices[min], vertices[0]);
 
 	Vector2& pivot = vertices[0];
-	Vector2 base(1, 0);
 	
 	sort(vertices.begin() + 1, vertices.end(),
-		[pivot, base](const Vector2& v0, const Vector2& v1)
+		[pivot](const Vector2& v0, const Vector2& v1)
 		{
 			Vector2 t0 = v0 - pivot;
 			Vector2 t1 = v1 - pivot;
