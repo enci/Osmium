@@ -1008,9 +1008,12 @@ float CCW(Vector2 p1, Vector2 p2, Vector2 p3)
 // A very litteral implentation of the graham scanl algo 
 std::vector<Vector2> GrahamScanCovexHull(vector<Vector2> vertices)
 {
+	// A tringle is it's onwn covex hull. Might not be in the right order
+	// so another check is needed
 	if (vertices.size() < 3)
 		return vertices;
 
+	// Get the minimal vertex along the y-axis and put it front
 	size_t min = 0;
 	for (size_t i = 1; i < vertices.size(); i++)
 	{
@@ -1019,8 +1022,10 @@ std::vector<Vector2> GrahamScanCovexHull(vector<Vector2> vertices)
 	}
 	swap(vertices[min], vertices[0]);
 
+	// First element becomes a pivot
 	Vector2& pivot = vertices[0];
 	
+	// Sort vertices based on angle to the pivot vertex
 	sort(vertices.begin() + 1, vertices.end(),
 		[pivot](const Vector2& v0, const Vector2& v1)
 		{
@@ -1034,8 +1039,12 @@ std::vector<Vector2> GrahamScanCovexHull(vector<Vector2> vertices)
 		}
 	);
 
+	// Erase duplicates
 	vertices.erase(unique(vertices.begin(), vertices.end()), vertices.end());
+	// The first element is all over the place
+	vertices.erase(remove(vertices.begin() + 1, vertices.end(), pivot), vertices.end());
 
+	// Build hull
 	vector<Vector2> hull;
 	hull.push_back(vertices[0]);
 	hull.push_back(vertices[1]);	
