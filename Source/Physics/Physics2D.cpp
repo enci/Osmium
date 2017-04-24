@@ -1035,6 +1035,9 @@ std::vector<Vector2> GrahamScanCovexHull(vector<Vector2> vertices)
 			float d0 = atan2(t0.y, t0.x);
 			float d1 = atan2(t1.y, t1.x);
 
+			if(d0 == d1) // If collinear with pivot, use distance
+				return t0.SquareMagnitude() > t1.SquareMagnitude();
+
 			return d0 > d1;
 		}
 	);
