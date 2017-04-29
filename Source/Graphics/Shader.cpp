@@ -4,6 +4,7 @@
 #include <Graphics/Texture.h>
 #include <Utils.h>
 #include <Graphics/Color.h>
+#include <Tools/ShaderPreprocessor.h>
 
 using namespace std;
 using namespace Osm;
@@ -453,13 +454,16 @@ bool Shader::Validate()
 bool Shader::Load(	const string& vertexFilename,
 					const string& fragmentFilename,
 					const string& geometryFilename)
-{
-	
-	string vertShaderSource = ReadFile(vertexFilename);
+{	
+	ShaderPreprocessor preprocessor;
+
+	//string vertShaderSource = ReadFile(vertexFilename);
+
+	string vertShaderSource = preprocessor.Read(vertexFilename);
 	string geomShaderSource = "";
 	if (geometryFilename.length() > 0)
-		geomShaderSource = ReadFile(geometryFilename);
-	string fragShaderSource = ReadFile(fragmentFilename);
+		geomShaderSource = preprocessor.Read(geometryFilename);
+	string fragShaderSource = preprocessor.Read(fragmentFilename);
 
 	return LoadSource(vertShaderSource, geomShaderSource, fragShaderSource);
 }
@@ -537,8 +541,6 @@ bool Shader::LoadSource(const string& vertexShader,
 			_program = 0;
 		}
 
-		GL_GET_ERROR();
-
 		// We crash here, else the logs will be flooded with repeated
 		// error messages.
 		ASSERT(false);
@@ -547,11 +549,8 @@ bool Shader::LoadSource(const string& vertexShader,
 	}
 
 	glDeleteShader(vertShader);
-	GL_GET_ERROR();
 	glDeleteShader(geomShader);
-	GL_GET_ERROR();
 	glDeleteShader(fragShader);
-	GL_GET_ERROR();
 
 	LoadParameters();
 

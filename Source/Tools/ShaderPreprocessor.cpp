@@ -1,54 +1,50 @@
 #include <Tools/ShaderPreprocessor.h>
-
 #include <regex>
+#include <sstream>
+#include <Defines.h>
+#include "../../../Blast/Tools/SharedTools.h"
 
-#define ENABLE_PROFILING 1
+#define ENABLE_PROFILING 0
 #define ENABLE_CACHING 0
 
 #if ENABLE_PROFILING
 //#include "cinder/Timer.h"
 #endif
 
-/*
+using namespace Osm;
 using namespace std;
 
 namespace {
-	const regex sIncludeRegex = regex("^[ ]*#[ ]*include[ ]+[\"<](.*)[\">].*");
+	const regex sIncludeRegex = regex("^[ ]*#[ ]*pragma include[ ]+[\"<](.*)[\">].*");
 } // anonymous namespace
+
 
 ShaderPreprocessor::ShaderPreprocessor()
 {
-	init();
+	_searchPaths.push_back("");
 }
 
-void ShaderPreprocessor::init()
+string ShaderPreprocessor::Read(const string& path)
 {
-	mSearchPaths.push_back(app::getAssetPath(""));
+	set<string> includeTree;
+	return ParseRecursive(path, "", includeTree);
 }
 
-string ShaderPreprocessor::parse(const fs::path &path)
+string ShaderPreprocessor::ParseRecursive(
+	const string& path,
+	const string& parentPath,
+	set<string>& includeTree)
 {
-	set<fs::path> includeTree;
+	string fullPath = parentPath.empty() ? path : parentPath + "/" + path;
 
-#if ENABLE_PROFILING
-	Timer timer(true);
-	string result = parseRecursive(path, fs::path(), includeTree);
-	CI_LOG_I("parse " << path << " complete, ms: " << timer.getSeconds() * 1000);
-	return result;
-#else
-	return parseRecursive(path, fs::path(), includeTree);
-#endif
-}
+	if (includeTree.count(fullPath))
+	{
+		LOG("Circular include found! Path: %s", path.c_str());
+		return string();
+	}
 
-string ShaderPreprocessor::parseRecursive(const fs::path &path, const ci::fs::path &parentPath, set<fs::path> &includeTree)
-{
-	if (includeTree.count(path))
-		throw ShaderPreprocessorExc("circular include found, path: " + path.string());
-
-	includeTree.insert(path);
-
-	const fs::path fullPath = findFullPath(path, parentPath);
-
+	includeTree.insert(fullPath);	
+	
 #if ENABLE_CACHING
 	const time_t timeLastWrite = fs::last_write_time(fullPath);
 
@@ -58,34 +54,38 @@ string ShaderPreprocessor::parseRecursive(const fs::path &path, const ci::fs::pa
 			return cachedIt->second.mString;
 		}
 	}
-#endif
+#endif	
 
+	string parent = GetParentPath(path);
+	string inputString = ReadFile(fullPath);
+	if(inputString.empty())
+	{
+		LOG("Included shader file found! Path: %s", fullPath.c_str());
+		return string();
+	}
+
+	stringstream input(move(inputString));
 	stringstream output;
 
-	ifstream input(fullPath.c_str());
-	if (!input.is_open())
-		throw ShaderPreprocessorExc("Failed to open file at path: " + fullPath.string());
-
 	// go through each line and process includes
-
 	string line;
 	smatch matches;
-
 	size_t lineNumber = 1;
-
-	while (getline(input, line)) {
-		if (regex_search(line, matches, sIncludeRegex)) {
-			output << parseRecursive(matches[1].str(), fullPath.parent_path(), includeTree);
-			output << "#line " << lineNumber << endl;
+	while (getline(input, line))
+	{
+		if (regex_search(line, matches, sIncludeRegex))
+		{
+			output << ParseRecursive(matches[1].str(), parentPath + parent, includeTree);
+			//output << "#line " << lineNumber << endl;
 		}
 		else
-			output << line;
-
+		{
+			if(!line.empty() && line[0] != '\0') // Don't null terminate
+				output << line;
+		}
 		output << endl;
 		lineNumber++;
 	}
-
-	input.close();
 
 #if ENABLE_CACHING
 	Source &source = mCachedSources[path];
@@ -98,19 +98,17 @@ string ShaderPreprocessor::parseRecursive(const fs::path &path, const ci::fs::pa
 #endif
 }
 
-fs::path ShaderPreprocessor::findFullPath(const fs::path &path, const ci::fs::path &parentPath)
+string ShaderPreprocessor::GetParentPath(const string& path)
 {
-	auto fullPath = parentPath / path;
-	if (fs::exists(fullPath))
-		return fullPath;
+	// Implementation base on:
+	// http://stackoverflow.com/questions/28980386/how-to-get-file-name-from-a-whole-path-by-c
 
-	for (const auto &searchPath : mSearchPaths) {
-		fullPath = searchPath / path;
-		if (fs::exists(fullPath))
-			return fullPath;
-	}
+	string parent = "";
+	string::size_type found = path.find_last_of("/");
 
-	throw ShaderPreprocessorExc("could not find shader with include path: " + path.string());
+	// if we found one of this symbols
+	if (found != string::npos)
+		parent = path.substr(0, found);
+	
+	return parent;
 }
-
-*/
