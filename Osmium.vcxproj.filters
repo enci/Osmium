@@ -141,7 +141,7 @@
     <ClInclude Include="Include\Tools\Serialization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Tools\ShaderPreprocessor.h">
+    <ClInclude Include="Include\Tools\ShaderPreprocessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -246,6 +246,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Tools\ImGuiTools.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Tools\ShaderPreprocessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
