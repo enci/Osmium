@@ -218,6 +218,7 @@
     <ClInclude Include="Include\Math\Vector2.h" />
     <ClInclude Include="Include\Math\Vector3.h" />
     <ClInclude Include="Include\Math\Vector4.h" />
+    <ClInclude Include="Source\Tools\ShaderPreprocessor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\glad\src\glad.c" />
