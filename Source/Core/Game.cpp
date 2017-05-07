@@ -17,6 +17,8 @@ using namespace std;
 
 CGame Osm::Game;
 
+#define SHOW_IMGUI 0
+
 void GameSettings::LoadFromFile(const std::string& file)
 {
 	FilePath = file;
@@ -183,7 +185,17 @@ void CGame::Inspect()
 		ImGui::MenuItem("World Inspector", nullptr, &_show_world_inspector);
 		ImGui::MenuItem("Settings Inspector", nullptr, &_show_settings);
 		ImGui::MenuItem("Profiler", nullptr, &_show_profiler);
+#if SHOW_IMGUI
 		ImGui::MenuItem("ImGui Test", nullptr, &_show_imgui_test);
+#endif
+		ImGui::EndMenu();
+	}
+
+	if (ImGui::BeginMenu("About"))
+	{
+		string timestamp = __TIMESTAMP__;
+		ImGui::MenuItem(("Built on: " + timestamp).c_str());
+		ImGui::MenuItem("Copyright (C) Bojan Endrovski 2017");		
 		ImGui::EndMenu();
 	}
 	
