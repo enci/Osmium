@@ -1,0 +1,12 @@
+{
+    "Setttings": {
+        "ScreenWidth": 900,
+        "ScreenHeight": 1000,
+        "FullScreen": false,
+        "UseNativeResolution": true,
+        "ResourcePath": "",
+        "InspectorFontSize": 1.0,
+        "SavePath": "",
+        "WindowName": "Shader Tool"
+    }
+}
