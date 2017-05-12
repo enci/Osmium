@@ -19,6 +19,12 @@ public:
 
 	void ReleaseResource(Resource* res);
 
+	void Update(float deltaTime);
+
+#ifdef INSPECTOR
+	void Inspect() override;
+#endif
+
 protected:
 
 	template<typename T>

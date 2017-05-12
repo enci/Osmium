@@ -30,3 +30,4 @@ Intermediate/
 *.opendb
 *.db
 MeshTool/Executable/
+*.tlog

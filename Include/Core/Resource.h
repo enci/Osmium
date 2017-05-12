@@ -11,15 +11,15 @@ namespace Osm
 /// All supported resource types
 enum ResourceType
 {
-	RESOURCE_TYPE_TEXTURE = 1 << 0,
-	RESOURCE_TYPE_SOUND = 1 << 1,
-	RESOURCE_TYPE_XML = 1 << 2,
-	RESOURCE_TYPE_LABEL = 1 << 3,
-	RESOURCE_TYPE_SHADER = 1 << 4,
-	RESOURCE_TYPE_FONT = 1 << 5,
-	RESOURCE_TYPE_RESOURCEPACK = 1 << 6,
-	RESOURCE_TYPE_SVG = 1 << 7,
-	RESOURCE_TYPE_MESH = 1 << 8,
+	RESOURCE_TYPE_TEXTURE		= 1 << 0,
+	RESOURCE_TYPE_SOUND			= 1 << 1,
+	RESOURCE_TYPE_XML			= 1 << 2,
+	RESOURCE_TYPE_LABEL			= 1 << 3,
+	RESOURCE_TYPE_SHADER		= 1 << 4,
+	RESOURCE_TYPE_FONT			= 1 << 5,
+	RESOURCE_TYPE_RESOURCEPACK	= 1 << 6,
+	RESOURCE_TYPE_SVG			= 1 << 7,
+	RESOURCE_TYPE_MESH			= 1 << 8,
 };
 
 class ResourceManager;
@@ -66,6 +66,9 @@ protected:
 	/// Protected dtor, as resources are handled by the ResourceManager.
 	virtual ~Resource() {}
 
+	/// Reload, not madatory to handle this by all resources at current.
+	virtual void Reload() {}
+
 protected:
 
 	/// This is how the manager tracks the resources
@@ -79,6 +82,15 @@ protected:
 
 	/// The type of this resource, as set by the constructor.
 	ResourceType                _type;
+
+#ifdef INSPECTOR
+public:
+	bool	Reloaded			= false;
+protected:
+	bool	QueueReload			= false;
+	bool	AutoReload			= false;
+	float	ReloadTimer			= 0.0f;
+#endif
 };
 
 }

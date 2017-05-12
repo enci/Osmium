@@ -39,7 +39,7 @@ public:
 
 	/// Generic rendering method (if the rendered is moved completely
 	/// into the engine, this can go)
-	virtual void Render() {}
+	virtual void Render();
 
 	// TODO: Remove maybe
 	virtual bool IsDone() { return false; }

@@ -104,6 +104,11 @@ void MeshRenderer::ActivateShader(	Camera* camera,
 
 void MeshRenderer::Draw()
 {
+#ifdef INSPECTOR
+	if (_shader->Reloaded)
+		CreateVAO();
+#endif
+
 	const Matrix44& model = GetOwner().GetComponent<Transform>()->GetWorld();
 	Matrix44 modelView = _viewMatrix * model;
 	Matrix44 modelViewProjection = _projectionMatrix * modelView;
@@ -118,14 +123,11 @@ void MeshRenderer::Draw()
 	_textureParam->SetValue(*_texture);
 
 	glBindVertexArray(_vao);
-	GL_GET_ERROR();
 
 	const void* firstIndex = reinterpret_cast<const void*>(0);
 	glDrawElements(GL_TRIANGLES, _mesh->GetIndexCount(), GL_UNSIGNED_SHORT, firstIndex);
-	GL_GET_ERROR();
 
 	glBindVertexArray(0);
-	GL_GET_ERROR();
 }
 
 bool MeshRenderer::CreateVAO()
@@ -138,17 +140,13 @@ bool MeshRenderer::CreateVAO()
 	}
 
 	glGenVertexArrays(1, &_vao);
-	GL_GET_ERROR();
 	glBindVertexArray(_vao);
-	GL_GET_ERROR();
 
 	const GLuint* vbo = _mesh->GetVertexBuffers();
 
 	// Bind the buffers to the global state
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	GL_GET_ERROR();
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
-	GL_GET_ERROR();
 
 	
 #ifdef DEBUG

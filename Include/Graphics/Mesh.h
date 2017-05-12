@@ -86,6 +86,8 @@ protected:
 	/// Clear 
 	void ClearGL();
 
+	//virtual void Reload() override;
+
 	/// Mesh vertices, stored temporary when loading or creating a mesh
 	std::vector<VertexFormat>    _vertices;
 

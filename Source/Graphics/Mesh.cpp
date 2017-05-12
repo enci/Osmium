@@ -263,3 +263,9 @@ void Mesh::ClearGL()
 		GL_GET_ERROR();
 	}
 }
+/*
+void Mesh::Reload()
+{
+
+}
+*/

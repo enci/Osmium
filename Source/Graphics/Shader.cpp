@@ -226,17 +226,15 @@ void ShaderAttribute::SetAttributePointer(GLint size,
 		return;
 
 	glEnableVertexAttribArray(_location);
-	GL_GET_ERROR();
 
 	glVertexAttribPointer(
-		_location,           // attribute
+		_location,          // attribute
 		size,               // number of elements per vertex element
 		type,               // the type of each element
 		normalized,         // take our values as-is or normalize
 		stride,             // no extra data between each position
 		pointer             // offset of first element
 		);
-	GL_GET_ERROR();
 }
 
 void ShaderAttribute::DisableAttributePointer()
@@ -245,7 +243,6 @@ void ShaderAttribute::DisableAttributePointer()
 		return;
 
 	glDisableVertexAttribArray(_location);
-	GL_GET_ERROR();
 }
 
 
@@ -255,7 +252,8 @@ void ShaderAttribute::DisableAttributePointer()
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-Shader::Shader(const std::string& vertexFilename, const std::string& fragmentFilename)
+Shader::Shader(	const std::string& vertexFilename,
+				const std::string& fragmentFilename)
 	: Shader(vertexFilename, "", fragmentFilename)
 {}
 
@@ -263,18 +261,17 @@ Shader::Shader(	const std::string& vertexFilename,
 				const std::string& geometryFilename,
 				const std::string& fragmentFilename)
 	: Resource(RESOURCE_TYPE_SHADER)
-	,_program(0)
+	, _vertexFilename(vertexFilename)
+	, _fragmentFilename(fragmentFilename)
+	, _geometryFilename(geometryFilename)
+	, _program(0)
 {
-	bool success = Load(vertexFilename, fragmentFilename, geometryFilename);
-	_resourcePath = vertexFilename + "\n" + geometryFilename + "\n" + fragmentFilename;
-	if (!success)
-	{
-		LOG("Unable to load shader.");
-	}
-	else
-	{
-		LoadParameters();
-	}
+	_resourcePath =
+		geometryFilename.empty() ?
+		vertexFilename + "\n" + fragmentFilename :
+		vertexFilename + "\n" + geometryFilename + "\n" + fragmentFilename;
+
+	Shader::Reload();
 }
 
 Shader::~Shader()
@@ -283,7 +280,6 @@ Shader::~Shader()
 	{
 		glDeleteProgram(_program);
 		_program = 0;
-		GL_GET_ERROR();
 	}
 }
 
@@ -307,6 +303,33 @@ ullong Shader::CalculateResourceID(const std::string& vertexFilename, const std:
 {
 	string path = vertexFilename + "\n" + geometryFilename + "\n" + fragmentFilename;
 	return StringHash(path);
+}
+
+void Shader::Reload()
+{
+	if (_program > 0)
+	{
+		glDeleteProgram(_program);
+		_program = 0;
+	}
+
+	bool success = Load();
+
+	if (!success)
+	{
+		success = LoadMagentaShader();
+		ASSERT(success);
+		LoadParameters();
+	}
+
+	if (!success)
+	{
+		LOG("Unable to load shader %s", _resourcePath.c_str());
+	}
+	else
+	{
+		LoadParameters();
+	}
 }
 
 void Shader::LoadParameters()
@@ -451,21 +474,40 @@ bool Shader::Validate()
 	return true;
 }
 
-bool Shader::Load(	const string& vertexFilename,
-					const string& fragmentFilename,
-					const string& geometryFilename)
+bool Shader::Load()
 {	
 	ShaderPreprocessor preprocessor;
 
-	//string vertShaderSource = ReadFile(vertexFilename);
-
-	string vertShaderSource = preprocessor.Read(vertexFilename);
+	string vertShaderSource = preprocessor.Read(_vertexFilename);
 	string geomShaderSource = "";
-	if (geometryFilename.length() > 0)
-		geomShaderSource = preprocessor.Read(geometryFilename);
-	string fragShaderSource = preprocessor.Read(fragmentFilename);
+	if (_geometryFilename.length() > 0)
+		geomShaderSource = preprocessor.Read(_geometryFilename);
+	string fragShaderSource = preprocessor.Read(_fragmentFilename);
 
 	return LoadSource(vertShaderSource, geomShaderSource, fragShaderSource);
+}
+
+bool Shader::LoadMagentaShader()
+{
+	string vertShaderSource =
+		"#version 430 core\n \
+		uniform mat4 u_projection; \
+		uniform mat4 u_view; \
+		uniform mat4 u_model; \
+		in vec3 a_position; \
+		void main() \
+		{ \
+			gl_Position = u_projection * u_view * u_model * vec4(a_position, 1.0); \
+		}";
+	string fragShaderSource =
+		"#version 430 core\n \
+		out vec4 fragColor; \
+		void main() \
+		{ \
+			fragColor = vec4(1.0, 0.0, 1.0, 1.0); \
+		}";
+		
+	return LoadSource(vertShaderSource, "", fragShaderSource);
 }
 
 bool Shader::LoadSource(const string& vertexShader,

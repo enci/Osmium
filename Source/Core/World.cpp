@@ -47,6 +47,10 @@ void World::PostUpdate(float dt)
 		e->PostUpdate(dt);
 }
 
+void World::Render()
+{
+}
+
 void Osm::World::Clear()
 {
 	_entities.clear();

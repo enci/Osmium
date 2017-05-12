@@ -126,6 +126,8 @@ void CGame::Run()
 			_advanceFrame = false;
 		}
 
+		_resources->Update(deltaTime);
+
 
 		uint renderID = _profiler->StartSection("Render");
 		glViewport(0, 0, _device->GetScreenWidth(), _device->GetScreenHeight());				

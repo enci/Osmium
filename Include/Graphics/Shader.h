@@ -248,6 +248,9 @@ public:
 										const std::string& geometryFilename,
 										const std::string& fragmentFilename);
 
+protected:
+	virtual void Reload() override;
+
 private:
 
 	void LoadParameters();	
@@ -255,9 +258,10 @@ private:
 	bool Validate();
 
 	/// Just a helper for the constructors
-	bool Load(	const std::string& vertexFilename,
-				const std::string& fragmentFilename,
-				const std::string& geometryFilename = "");
+	bool Load();
+
+	/// When loading fails, load magenta shader
+	bool LoadMagentaShader();
 
 private:
 
@@ -266,6 +270,15 @@ private:
 
 	/// Store all the attributes
 	std::map<std::string, std::unique_ptr<ShaderAttribute>> _attributes;
+
+	/// Relative path to the vertex shader
+	std::string _vertexFilename;
+
+	/// Relative path to the fragment shader 
+	std::string _fragmentFilename;
+
+	/// Relative path to the geometry shader
+	std::string _geometryFilename;
 
 	/// GL id (name) of the compiled program
 	GLuint _program = 0;
