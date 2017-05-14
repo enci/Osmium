@@ -14,6 +14,8 @@ public:
 	void  Update(float dt)  override;
 
 protected:
-	Osm::Transform*	_transform = nullptr;
-	Osm::Camera*	_camera = nullptr;
+	Osm::Transform*	_transform	= nullptr;
+	Osm::Camera*	_camera		= nullptr;
+	double			_mouseX;
+	double			_mouseY;
 };

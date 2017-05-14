@@ -13,7 +13,12 @@ public:
 
 	virtual void Render() override;
 
+#ifdef INSPECTOR
+	void Inspect() override;
+#endif
+
 protected:
 	Osm::RenderManager*			_renderManager	= nullptr;
 	ToolCamera*					_camera			= nullptr;
+	bool						_wireframe		= false;
 };

@@ -190,10 +190,12 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="ToolCamera.h" />
+    <ClInclude Include="ToolModel.h" />
     <ClInclude Include="ToolWorld.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ShaderTool.cpp" />
+    <ClCompile Include="ToolModel.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="ToolCamera.cpp" />
     <ClCompile Include="ToolWorld.cpp" />

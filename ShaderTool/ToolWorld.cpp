@@ -6,6 +6,8 @@
 #include <Graphics/Render.h>
 #include <Graphics/MeshRenderer.h>
 #include <Graphics/Texture.h>
+#include <imgui/imgui.h>
+#include "ToolModel.h"
 
 using namespace Osm;
 
@@ -15,21 +17,7 @@ ToolWorld::ToolWorld()
 	_camera = CreateEntity<ToolCamera>();
 	gDebugRenderer.Initialize();
 
-
-	auto mesh = Game.Resources().LoadResource<Mesh>("./Assets/Models/SmoothSphere.obj");
-	auto shader = Game.Resources().LoadResource<Shader>(
-		"./Assets/Shaders/Planet.vsh",
-		"./Assets/Shaders/Planet.fsh");
-	auto texture = Game.Resources().LoadResource<Texture>("./Assets/Textures/white.png");
-	auto sphereEnt = CreateEntity<Entity>();
-	sphereEnt->SetName("Smooth Sphere");
-	auto trn = sphereEnt->CreateComponent<Transform>();
-	auto renderer = sphereEnt->CreateComponent<MeshRenderer>();
-	renderer->SetMesh(mesh);
-	renderer->SetTexture(texture);
-	//renderer->SetDiffuse(Color("95B9C900"));
-	//renderer->SetAmbient(Color("07242A00"));
-	renderer->SetShader(shader);
+	auto sphereEnt = CreateEntity<ToolModel>();
 
 	// White light
 	auto whiteLight = CreateEntity<Entity>();
@@ -44,15 +32,17 @@ void ToolWorld::Render()
 	Color bg = _camera->GetComponent<Camera>()->GetClearColor();
 	glClearColor(bg.r / 255.0f, bg.g / 255.0f, bg.b / 255.0f, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-	// Turn on wireframe mode
-	// glPolygonMode(GL_FRONT, GL_LINE);
-	// glPolygonMode(GL_BACK, GL_LINE);
+
+	if(_wireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 
 	_renderManager->Render();
+
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	/*
 	if (_debugRender)
@@ -62,4 +52,10 @@ void ToolWorld::Render()
 		gDebugRenderer.Draw(vp);
 	}
 	*/
+}
+
+void ToolWorld::Inspect()
+{
+	ImGui::Checkbox("Wireframe", &_wireframe);
+	World::Inspect();
 }
