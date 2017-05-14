@@ -144,6 +144,9 @@
     <ClInclude Include="Include\Tools\ShaderPreprocessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Tools\MeshGenerators.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Utils.cpp">
@@ -249,6 +252,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Tools\ShaderPreprocessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Tools\MeshGenerators.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
