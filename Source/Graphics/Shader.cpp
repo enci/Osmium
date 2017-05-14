@@ -583,10 +583,7 @@ bool Shader::LoadSource(const string& vertexShader,
 			_program = 0;
 		}
 
-		// We crash here, else the logs will be flooded with repeated
-		// error messages.
-		ASSERT(false);
-
+		LOG("Shader::Load() Failed to link shader program.");
 		return false;
 	}
 
