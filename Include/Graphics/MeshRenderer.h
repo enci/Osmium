@@ -77,6 +77,7 @@ protected:
 	ShaderParameter* _fogExpParam = nullptr;
 	ShaderParameter* _fogNearColorParam = nullptr;
 	ShaderParameter* _fogFarColorParam = nullptr;
+	ShaderParameter* _timeParam = nullptr;
 	ShaderAttribute* _positionAttrib = nullptr;
 	ShaderAttribute* _normalAttrib = nullptr;
 	ShaderAttribute* _textureAttrib = nullptr;

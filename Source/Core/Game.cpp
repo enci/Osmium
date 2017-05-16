@@ -112,8 +112,11 @@ void CGame::Run()
 		auto currentFrame = glfwGetTime();
 		float deltaTime = (float)(currentFrame - lastFrame);
 		lastFrame = currentFrame;
+		_time.WallTime += deltaTime;
 		if (deltaTime > 0.033f)
 			deltaTime = 0.033f;
+		_time.DeltaTime = deltaTime;
+		_time.ElapsedTime += deltaTime;
 
 		// Update
 		if (!_paused || _advanceFrame)

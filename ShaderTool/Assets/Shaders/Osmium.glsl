@@ -25,6 +25,7 @@ uniform vec3 u_eyePos;
 uniform float u_fogFar;
 uniform float u_fogNear;
 uniform float u_fogExp;
+uniform float u_time;
 uniform vec4 u_fogColorNear;
 uniform vec4 u_fogColorFar;
 

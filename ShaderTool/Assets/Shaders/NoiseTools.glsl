@@ -3,10 +3,13 @@
 
 const float W = 400.0;
 const float PI = 3.14;
+const float Speed = 0.1;
 
 // Sample noise with frequncy. Hide algorithm
 float noise(vec3 p, float f)
 {
+  //vec4 pos = vec4(p.x, p.y, p.z, u_time * Speed);
+  //return cnoise(pos * f);
   return cnoise(p * f);
 }
 
@@ -27,8 +30,9 @@ float stripes(float x, float f)
 // This is the one the game is using
 float sample_noise(vec3 pos)
 {
+  return (noise(pos, 8.0) + 1.0) * 0.5;
   //return 0.01 * stripes(pos.x + 2 * turbulence(pos, 1.0), 1.6);  //MARBLED
-  return noise(pos, 8.0) * 0.04;
+  //return noise(pos, 8.0) * 0.04;
   //return -0.10 * turbulence(pos, 1);                       //CRINKLED
   //return 0.0;
 }

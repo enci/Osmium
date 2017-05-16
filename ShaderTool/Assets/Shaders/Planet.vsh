@@ -21,7 +21,7 @@ void main()
 	vec3 normal = normalize((u_model * vec4(a_normal, 0.0)).xyz);
 	vec3 worldPosition = a_position;
 	float offset = sample_noise(worldPosition) * 2.0;
-	worldPosition += normal * offset;
+	//worldPosition += normal * offset;
 	worldPosition = (u_model * vec4(worldPosition, 1.0)).xyz;
 
 	gl_Position = u_projection * u_view * vec4(worldPosition, 1.0);

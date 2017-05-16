@@ -57,6 +57,13 @@ void GameSettings::serialize(Archive& archive)
 	);
 }
 
+struct CTime
+{
+	float DeltaTime			= 0.0f;
+	float ElapsedTime		= 0.0f;
+	float WallTime			= 0.0f;
+};
+
 class CGame : public ComponentContainer<CGame>
 {
 public:	
@@ -80,6 +87,8 @@ public:
 	void SwapWorld(World* world);
 
 	void QueueEvent(std::function<void(void)> e) { _event = e; }
+
+	const CTime& Time() const { return _time;  }
 
 protected:
 	void InitializeInternal();
@@ -111,6 +120,8 @@ protected:
 	bool _advanceFrame = false;
 
 	std::function<void(void)> _event;
+
+	CTime _time;
 
 #ifdef INSPECTOR
 	void Inspect();

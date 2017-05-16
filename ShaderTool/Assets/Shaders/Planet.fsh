@@ -34,11 +34,12 @@ void main()
 
   vec3 normal = normalize(v_normal);
   vec3 dn = vec3(fx - f, fy - f, fz - f) * 1 / eps;
-  normal = normalize(normal - dn);
+  //normal = normalize(normal - dn);
 
   color += CalculateDirectionalLightsSpecular(normal, v_position, 40.0);
+  color = vec3(f);
   //color = u_directionalLights[0].direction;
-  //color = v_normal;
+  // color = v_normal;
 
   // vec3 color = v_color;
   // vec3 color =  vec3((noise + 1.0) * 0.5);

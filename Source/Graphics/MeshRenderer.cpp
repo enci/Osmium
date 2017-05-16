@@ -1,6 +1,7 @@
 #include <Graphics/MeshRenderer.h>
 #include <Core/Transform.h>
 #include <imgui/imgui.h>
+#include "Core/Game.h"
 
 using namespace Osm;
 
@@ -48,6 +49,7 @@ void MeshRenderer::SetShader(Shader* shader)
 	_fogExpParam = shader->GetParameter("u_fogExp");
 	_fogNearColorParam = shader->GetParameter("u_fogColorNear");
 	_fogFarColorParam = shader->GetParameter("u_fogColorFar");
+	_timeParam = shader->GetParameter("u_time");
 
 	for (size_t i = 0; i < kMaxDirecationalLights; i++)
 	{
@@ -81,6 +83,7 @@ void MeshRenderer::ActivateShader(	Camera* camera,
 	_fogExpParam->SetValue(camera->GetFogGamma());
 	_fogNearColorParam->SetValue(camera->GetFogNearColor());
 	_fogFarColorParam->SetValue(camera->GetFogFarColor());
+	_timeParam->SetValue(Game.Time().ElapsedTime);
 
 	int pointLightsCount = 0;
 	int dirLightsCount = 0;
