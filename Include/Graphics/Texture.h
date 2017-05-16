@@ -31,6 +31,8 @@ public:
 
 protected:	
 
+	void Reload() override;
+
 	/// Only for the Label
 	Texture() : Resource(RESOURCE_TYPE_TEXTURE) {}
 

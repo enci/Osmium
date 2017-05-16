@@ -24,7 +24,7 @@ ToolWorld::ToolWorld()
 	auto transform = whiteLight->CreateComponent<Transform>();
 	auto light = whiteLight->CreateComponent<Light>();
 	light->SetColor(Color::White);
-	transform->SetOrientation(Matrix44::CreateRotateX(DegToRad(-20.0)) * Matrix44::CreateRotateY(DegToRad(-20.0)));
+	transform->SetOrientation(Matrix44::CreateRotateX(DegToRad(-60.0)) * Matrix44::CreateRotateY(DegToRad(-20.0)));
 }
 
 void ToolWorld::Render()

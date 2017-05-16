@@ -18,4 +18,7 @@ protected:
 	Osm::Camera*	_camera		= nullptr;
 	double			_mouseX;
 	double			_mouseY;
+	float			_fi = 0.0;
+	float			_theta		= Osm::Pi * 0.25f;
+	bool			_wasMouseDown = false;
 };

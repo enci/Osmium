@@ -10,7 +10,7 @@ class ToolModel : public Osm::Entity
 	{
 		Sphere		= 0,
 		Plane		= 1,
-		Teappot		= 2
+		Monkey		= 2
 	};
 
 public:
@@ -27,7 +27,7 @@ private:
 
 	Model _model				= Model::Sphere;
 	bool _dirty					= false;
-	int _sphereTesselation		= 2;
+	int _sphereTesselation		= 4;
 	int _planeResolution		= 10;
 	float _size					= 1.0f;
 

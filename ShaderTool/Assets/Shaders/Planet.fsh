@@ -36,8 +36,18 @@ void main()
   vec3 dn = vec3(fx - f, fy - f, fz - f) * 1 / eps;
   //normal = normalize(normal - dn);
 
+  // Caluate color based on light / normal
   color += CalculateDirectionalLightsSpecular(normal, v_position, 40.0);
+  // color += CalculateDirectionalLights(normal);
+
+  // Just output raw noise value
   color = vec3(f);
+
+  // Wood
+  f *= 10.0;
+  f = f - floor(f);
+  //color *= texture(u_texture, vec2(f, 0.5)).rgb;
+
   //color = u_directionalLights[0].direction;
   // color = v_normal;
 

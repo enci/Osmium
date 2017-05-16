@@ -13,13 +13,11 @@ ToolModel::ToolModel(Osm::World& world) : Entity(world)
 {
 	SetName("Model");
 
-	//auto mesh = Game.Resources().LoadResource<Mesh>("./Assets/Models/SmoothSphere.obj");
-
 	auto shader = Game.Resources().LoadResource<Shader>(
 		"./Assets/Shaders/Planet.vsh",
 		"./Assets/Shaders/Planet.gsh",
 		"./Assets/Shaders/Planet.fsh");
-	auto texture = Game.Resources().LoadResource<Texture>("./Assets/Textures/white.png");
+	auto texture = Game.Resources().LoadResource<Texture>("./Assets/Textures/Texture.png");
 
 	_transform = CreateComponent<Transform>();
 	_renderer = CreateComponent<MeshRenderer>();
@@ -40,7 +38,7 @@ void ToolModel::Update(float dt)
 void ToolModel::Inspect()
 {
 	int* m = (int*)&_model;
-	const char* model[] = { "Sphere", "Plane", "Teapot" };
+	const char* model[] = { "Sphere", "Plane", "Monkey" };
 	if(ImGui::Combo("Model", m, model, 3))
 	{
 		_dirty = true;
@@ -55,7 +53,7 @@ void ToolModel::Inspect()
 		if(ImGui::InputInt("Plane Resolution", &_planeResolution))
 			_dirty = true;
 		break;
-	case Teappot:
+	case Monkey:
 		break;
 	default:;
 	}
@@ -70,27 +68,31 @@ void ToolModel::Setup()
 		Game.Resources().ReleaseResource(_mesh);
 	else
 		delete _mesh;
-
-	_mesh = new Mesh();
-
+	
 	vector<VertexFormat> vertices;
 	vector<ushort> indices;
 
 	switch (_model)
 	{
 	case Sphere:
-		GenerateIcosphere(_size, _sphereTesselation, vertices, indices);;
+		_mesh = new Mesh();
+		GenerateIcosphere(_size, _sphereTesselation, vertices, indices);
 		break;
 	case Plane:
-		GeneratePlane(10.0f * _size, _planeResolution, vertices, indices);;
+		_mesh = new Mesh();
+		GeneratePlane(10.0f * _size, _planeResolution, vertices, indices);
 		break;
-	case Teappot:
+	case Monkey:
+		_mesh = Game.Resources().LoadResource<Mesh>("./Assets/Models/Monkey.obj");
 		break;
 	default:;
-	}
+	}	
 
-	_mesh->SetVertices(move(vertices));
-	_mesh->SetIndices(move(indices));
-	_mesh->Apply();
+	if (_model == Sphere || _model == Plane)
+	{
+		_mesh->SetVertices(move(vertices));
+		_mesh->SetIndices(move(indices));
+		_mesh->Apply();
+	}
 	_renderer->SetMesh(_mesh);
 }

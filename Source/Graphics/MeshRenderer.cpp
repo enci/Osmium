@@ -74,10 +74,15 @@ void MeshRenderer::ActivateShader(	Camera* camera,
 {
 	_viewMatrix = camera->GetView();
 	_projectionMatrix = camera->Projection();
+	//Vector3 eyePos = -1.0f * _viewMatrix.GetTranslation();
+	auto viewInv = _viewMatrix;
+	viewInv.Invert();
+	Vector3 eyePos = viewInv * Vector3(0, 0, 0);
 
 	_shader->Activate();
 	_projParam->SetValue(_projectionMatrix);
 	_viewParam->SetValue(_viewMatrix);
+	_eyePosParam->SetValue(eyePos);
 	_fogNearParam->SetValue(camera->GetFogNear());
 	_fogFarParam->SetValue(camera->GetFogFar());
 	_fogExpParam->SetValue(camera->GetFogGamma());
@@ -114,13 +119,11 @@ void MeshRenderer::Draw()
 
 	const Matrix44& model = GetOwner().GetComponent<Transform>()->GetWorld();
 	Matrix44 modelView = _viewMatrix * model;
-	Matrix44 modelViewProjection = _projectionMatrix * modelView;
-	Vector3 eyePos = -1.0f * _viewMatrix.GetTranslation();
+	Matrix44 modelViewProjection = _projectionMatrix * modelView;	
 
 	_modelParam->SetValue(model);
 	_modelViewParam->SetValue(modelView);
 	_modelViewProjParam->SetValue(modelViewProjection);
-	_eyePosParam->SetValue(eyePos);
 	_diffuseParam->SetValue(_diffuse);
 	_ambientParam->SetValue(_ambient);
 	_textureParam->SetValue(*_texture);

@@ -1,16 +1,25 @@
-//#pragma include "Osmium.glsl"
 #pragma include "Noise.glsl"
 
 const float W = 400.0;
 const float PI = 3.14;
 const float Speed = 0.1;
+const float Frequency = 10.5;
 
 // Sample noise with frequncy. Hide algorithm
 float noise(vec3 p, float f)
 {
-  //vec4 pos = vec4(p.x, p.y, p.z, u_time * Speed);
-  //return cnoise(pos * f);
-  return cnoise(p * f);
+  // Animate noise
+  // vec4 pos = vec4(p.x, p.y, p.z, u_time * Speed);
+  // return cnoise(pos * f);
+
+  // Classic noise
+  // return cnoise(p * f);
+
+  // Simplex noise
+  //return snoise(p * f);
+
+  // Value noise
+  return vnoise(p * f);
 }
 
 float turbulence(vec3 pos, float f)
@@ -30,9 +39,14 @@ float stripes(float x, float f)
 // This is the one the game is using
 float sample_noise(vec3 pos)
 {
-  return (noise(pos, 8.0) + 1.0) * 0.5;
-  //return 0.01 * stripes(pos.x + 2 * turbulence(pos, 1.0), 1.6);  //MARBLED
-  //return noise(pos, 8.0) * 0.04;
-  //return -0.10 * turbulence(pos, 1);                       //CRINKLED
+  // Put to [0,1] range
+  //return (noise(pos, Frequency) + 1.0) * 0.5;
+
+  // Return plain
+  return noise(pos, Frequency);
+
+  //return 0.01 * stripes(pos.x + 2 * turbulence(pos, 1.0), 1.6);  // Marbled
+  //return noise(pos, 8.0) * 0.04;                                // Simple
+  //return -0.10 * turbulence(pos, 1);                       // Riges
   //return 0.0;
 }

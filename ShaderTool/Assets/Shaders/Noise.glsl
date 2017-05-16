@@ -1,454 +1,51 @@
 ////////////////////////////////////////////////////////////////////////////////
 //	Value Noise 3D
-//	Return value range of 0.0->1.0
-//	http://briansharpe.files.wordpress.com/2011/11/valuesample1.jpg
 ////////////////////////////////////////////////////////////////////////////////
-//
-//	FAST32_hash
-//	A very fast hashing function.  Requires 32bit support.
-//	http://briansharpe.wordpress.com/2011/11/15/a-fast-and-simple-32bit-floating-point-hash-function/
-//
-//	The 2D hash formula takes the form....
-//	hash = mod( coord.x * coord.x * coord.y * coord.y, SOMELARGEFLOAT ) / SOMELARGEFLOAT
-//	We truncate and offset the domain to the most interesting part of the noise.
-//	SOMELARGEFLOAT should be in the range of 400.0->1000.0 and needs to be hand picked.  Only some give good results.
-//	A 3D hash is achieved by offsetting the SOMELARGEFLOAT value by the Z coordinate
-//
-vec4 FAST32_hash_2D( vec2 gridcell )	//	generates a random number for each of the 4 cell corners
-{
-    //	gridcell is assumed to be an integer coordinate
-    const vec2 OFFSET = vec2( 26.0, 161.0 );
-    const float DOMAIN = 71.0;
-    const float SOMELARGEFLOAT = 951.135664;
-    vec4 P = vec4( gridcell.xy, gridcell.xy + 1.0 );
-    P = P - floor(P * ( 1.0 / DOMAIN )) * DOMAIN;	//	truncate the domain
-    P += OFFSET.xyxy;								//	offset to interesting part of the noise
-    P *= P;											//	calculate and return the hash
-    return fract( P.xzxz * P.yyww * ( 1.0 / SOMELARGEFLOAT ) );
+
+
+
+float rand2D(in vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
 }
-void FAST32_hash_2D( vec2 gridcell, out vec4 hash_0, out vec4 hash_1 )	//	generates 2 random numbers for each of the 4 cell corners
-{
-    //    gridcell is assumed to be an integer coordinate
-    const vec2 OFFSET = vec2( 26.0, 161.0 );
-    const float DOMAIN = 71.0;
-    const vec2 SOMELARGEFLOATS = vec2( 951.135664, 642.949883 );
-    vec4 P = vec4( gridcell.xy, gridcell.xy + 1.0 );
-    P = P - floor(P * ( 1.0 / DOMAIN )) * DOMAIN;
-    P += OFFSET.xyxy;
-    P *= P;
-    P = P.xzxz * P.yyww;
-    hash_0 = fract( P * ( 1.0 / SOMELARGEFLOATS.x ) );
-    hash_1 = fract( P * ( 1.0 / SOMELARGEFLOATS.y ) );
-}
-void FAST32_hash_2D( 	vec2 gridcell,
-                        out vec4 hash_0,
-                        out vec4 hash_1,
-                        out vec4 hash_2	)	//	generates 3 random numbers for each of the 4 cell corners
-{
-    //    gridcell is assumed to be an integer coordinate
-    const vec2 OFFSET = vec2( 26.0, 161.0 );
-    const float DOMAIN = 71.0;
-    const vec3 SOMELARGEFLOATS = vec3( 951.135664, 642.949883, 803.202459 );
-    vec4 P = vec4( gridcell.xy, gridcell.xy + 1.0 );
-    P = P - floor(P * ( 1.0 / DOMAIN )) * DOMAIN;
-    P += OFFSET.xyxy;
-    P *= P;
-    P = P.xzxz * P.yyww;
-    hash_0 = fract( P * ( 1.0 / SOMELARGEFLOATS.x ) );
-    hash_1 = fract( P * ( 1.0 / SOMELARGEFLOATS.y ) );
-    hash_2 = fract( P * ( 1.0 / SOMELARGEFLOATS.z ) );
-}
-vec4 FAST32_hash_2D_Cell( vec2 gridcell )	//	generates 4 different random numbers for the single given cell point
-{
-    //	gridcell is assumed to be an integer coordinate
-    const vec2 OFFSET = vec2( 26.0, 161.0 );
-    const float DOMAIN = 71.0;
-    const vec4 SOMELARGEFLOATS = vec4( 951.135664, 642.949883, 803.202459, 986.973274 );
-    vec2 P = gridcell - floor(gridcell * ( 1.0 / DOMAIN )) * DOMAIN;
-    P += OFFSET.xy;
-    P *= P;
-    return fract( (P.x * P.y) * ( 1.0 / SOMELARGEFLOATS.xyzw ) );
-}
-vec4 FAST32_hash_3D_Cell( vec3 gridcell )	//	generates 4 different random numbers for the single given cell point
-{
-    //    gridcell is assumed to be an integer coordinate
-
-    //	TODO: 	these constants need tweaked to find the best possible noise.
-    //			probably requires some kind of brute force computational searching or something....
-    const vec2 OFFSET = vec2( 50.0, 161.0 );
-    const float DOMAIN = 69.0;
-    const vec4 SOMELARGEFLOATS = vec4( 635.298681, 682.357502, 668.926525, 588.255119 );
-    const vec4 ZINC = vec4( 48.500388, 65.294118, 63.934599, 63.279683 );
-
-    //	truncate the domain
-    gridcell.xyz = gridcell - floor(gridcell * ( 1.0 / DOMAIN )) * DOMAIN;
-    gridcell.xy += OFFSET.xy;
-    gridcell.xy *= gridcell.xy;
-    return fract( ( gridcell.x * gridcell.y ) * ( 1.0 / ( SOMELARGEFLOATS + gridcell.zzzz * ZINC ) ) );
-}
-void FAST32_hash_3D( vec3 gridcell, out vec4 lowz_hash, out vec4 highz_hash )	//	generates a random number for each of the 8 cell corners
-{
-    //    gridcell is assumed to be an integer coordinate
-
-    //	TODO: 	these constants need tweaked to find the best possible noise.
-    //			probably requires some kind of brute force computational searching or something....
-    const vec2 OFFSET = vec2( 50.0, 161.0 );
-    const float DOMAIN = 69.0;
-    const float SOMELARGEFLOAT = 635.298681;
-    const float ZINC = 48.500388;
-
-    //	truncate the domain
-    gridcell.xyz = gridcell.xyz - floor(gridcell.xyz * ( 1.0 / DOMAIN )) * DOMAIN;
-    vec3 gridcell_inc1 = step( gridcell, vec3( DOMAIN - 1.5 ) ) * ( gridcell + 1.0 );
-
-    //	calculate the noise
-    vec4 P = vec4( gridcell.xy, gridcell_inc1.xy ) + OFFSET.xyxy;
-    P *= P;
-    P = P.xzxz * P.yyww;
-    highz_hash.xy = vec2( 1.0 / ( SOMELARGEFLOAT + vec2( gridcell.z, gridcell_inc1.z ) * ZINC ) );
-    lowz_hash = fract( P * highz_hash.xxxx );
-    highz_hash = fract( P * highz_hash.yyyy );
-}
-void FAST32_hash_3D( 	vec3 gridcell,
-                        vec3 v1_mask,		//	user definable v1 and v2.  ( 0's and 1's )
-                        vec3 v2_mask,
-                        out vec4 hash_0,
-                        out vec4 hash_1,
-                        out vec4 hash_2	)		//	generates 3 random numbers for each of the 4 3D cell corners.  cell corners:  v0=0,0,0  v3=1,1,1  the other two are user definable
-{
-    //    gridcell is assumed to be an integer coordinate
-
-    //	TODO: 	these constants need tweaked to find the best possible noise.
-    //			probably requires some kind of brute force computational searching or something....
-    const vec2 OFFSET = vec2( 50.0, 161.0 );
-    const float DOMAIN = 69.0;
-    const vec3 SOMELARGEFLOATS = vec3( 635.298681, 682.357502, 668.926525 );
-    const vec3 ZINC = vec3( 48.500388, 65.294118, 63.934599 );
-
-    //	truncate the domain
-    gridcell.xyz = gridcell.xyz - floor(gridcell.xyz * ( 1.0 / DOMAIN )) * DOMAIN;
-    vec3 gridcell_inc1 = step( gridcell, vec3( DOMAIN - 1.5 ) ) * ( gridcell + 1.0 );
-
-    //	compute x*x*y*y for the 4 corners
-    vec4 P = vec4( gridcell.xy, gridcell_inc1.xy ) + OFFSET.xyxy;
-    P *= P;
-    vec4 V1xy_V2xy = mix( P.xyxy, P.zwzw, vec4( v1_mask.xy, v2_mask.xy ) );		//	apply mask for v1 and v2
-    P = vec4( P.x, V1xy_V2xy.xz, P.z ) * vec4( P.y, V1xy_V2xy.yw, P.w );
-
-    //	get the lowz and highz mods
-    vec3 lowz_mods = vec3( 1.0 / ( SOMELARGEFLOATS.xyz + gridcell.zzz * ZINC.xyz ) );
-    vec3 highz_mods = vec3( 1.0 / ( SOMELARGEFLOATS.xyz + gridcell_inc1.zzz * ZINC.xyz ) );
-
-    //	apply mask for v1 and v2 mod values
-    v1_mask = ( v1_mask.z < 0.5 ) ? lowz_mods : highz_mods;
-    v2_mask = ( v2_mask.z < 0.5 ) ? lowz_mods : highz_mods;
-
-    //	compute the final hash
-    hash_0 = fract( P * vec4( lowz_mods.x, v1_mask.x, v2_mask.x, highz_mods.x ) );
-    hash_1 = fract( P * vec4( lowz_mods.y, v1_mask.y, v2_mask.y, highz_mods.y ) );
-    hash_2 = fract( P * vec4( lowz_mods.z, v1_mask.z, v2_mask.z, highz_mods.z ) );
-}
-vec4 FAST32_hash_3D( 	vec3 gridcell,
-                        vec3 v1_mask,		//	user definable v1 and v2.  ( 0's and 1's )
-                        vec3 v2_mask )		//	generates 1 random number for each of the 4 3D cell corners.  cell corners:  v0=0,0,0  v3=1,1,1  the other two are user definable
-{
-    //    gridcell is assumed to be an integer coordinate
-
-    //	TODO: 	these constants need tweaked to find the best possible noise.
-    //			probably requires some kind of brute force computational searching or something....
-    const vec2 OFFSET = vec2( 50.0, 161.0 );
-    const float DOMAIN = 69.0;
-    const float SOMELARGEFLOAT = 635.298681;
-    const float ZINC = 48.500388;
-
-    //	truncate the domain
-    gridcell.xyz = gridcell.xyz - floor(gridcell.xyz * ( 1.0 / DOMAIN )) * DOMAIN;
-    vec3 gridcell_inc1 = step( gridcell, vec3( DOMAIN - 1.5 ) ) * ( gridcell + 1.0 );
-
-    //	compute x*x*y*y for the 4 corners
-    vec4 P = vec4( gridcell.xy, gridcell_inc1.xy ) + OFFSET.xyxy;
-    P *= P;
-    vec4 V1xy_V2xy = mix( P.xyxy, P.zwzw, vec4( v1_mask.xy, v2_mask.xy ) );		//	apply mask for v1 and v2
-    P = vec4( P.x, V1xy_V2xy.xz, P.z ) * vec4( P.y, V1xy_V2xy.yw, P.w );
-
-    //	get the z mod vals
-    vec2 V1z_V2z = vec2( v1_mask.z < 0.5 ? gridcell.z : gridcell_inc1.z, v2_mask.z < 0.5 ? gridcell.z : gridcell_inc1.z );
-    vec4 mod_vals = vec4( 1.0 / ( SOMELARGEFLOAT + vec4( gridcell.z, V1z_V2z, gridcell_inc1.z ) * ZINC ) );
-
-    //	compute the final hash
-    return fract( P * mod_vals );
-}
-void FAST32_hash_3D( 	vec3 gridcell,
-                        out vec4 lowz_hash_0,
-                        out vec4 lowz_hash_1,
-                        out vec4 lowz_hash_2,
-                        out vec4 highz_hash_0,
-                        out vec4 highz_hash_1,
-                        out vec4 highz_hash_2	)		//	generates 3 random numbers for each of the 8 cell corners
-{
-    //    gridcell is assumed to be an integer coordinate
-
-    //	TODO: 	these constants need tweaked to find the best possible noise.
-    //			probably requires some kind of brute force computational searching or something....
-    const vec2 OFFSET = vec2( 50.0, 161.0 );
-    const float DOMAIN = 69.0;
-    const vec3 SOMELARGEFLOATS = vec3( 635.298681, 682.357502, 668.926525 );
-    const vec3 ZINC = vec3( 48.500388, 65.294118, 63.934599 );
-
-    //	truncate the domain
-    gridcell.xyz = gridcell.xyz - floor(gridcell.xyz * ( 1.0 / DOMAIN )) * DOMAIN;
-    vec3 gridcell_inc1 = step( gridcell, vec3( DOMAIN - 1.5 ) ) * ( gridcell + 1.0 );
-
-    //	calculate the noise
-    vec4 P = vec4( gridcell.xy, gridcell_inc1.xy ) + OFFSET.xyxy;
-    P *= P;
-    P = P.xzxz * P.yyww;
-    vec3 lowz_mod = vec3( 1.0 / ( SOMELARGEFLOATS.xyz + gridcell.zzz * ZINC.xyz ) );
-    vec3 highz_mod = vec3( 1.0 / ( SOMELARGEFLOATS.xyz + gridcell_inc1.zzz * ZINC.xyz ) );
-    lowz_hash_0 = fract( P * lowz_mod.xxxx );
-    highz_hash_0 = fract( P * highz_mod.xxxx );
-    lowz_hash_1 = fract( P * lowz_mod.yyyy );
-    highz_hash_1 = fract( P * highz_mod.yyyy );
-    lowz_hash_2 = fract( P * lowz_mod.zzzz );
-    highz_hash_2 = fract( P * highz_mod.zzzz );
-}
-void FAST32_hash_3D( 	vec3 gridcell,
-                        out vec4 lowz_hash_0,
-                        out vec4 lowz_hash_1,
-                        out vec4 lowz_hash_2,
-                        out vec4 lowz_hash_3,
-                        out vec4 highz_hash_0,
-                        out vec4 highz_hash_1,
-                        out vec4 highz_hash_2,
-                        out vec4 highz_hash_3	)		//	generates 4 random numbers for each of the 8 cell corners
-{
-    //    gridcell is assumed to be an integer coordinate
-
-    //	TODO: 	these constants need tweaked to find the best possible noise.
-    //			probably requires some kind of brute force computational searching or something....
-    const vec2 OFFSET = vec2( 50.0, 161.0 );
-    const float DOMAIN = 69.0;
-    const vec4 SOMELARGEFLOATS = vec4( 635.298681, 682.357502, 668.926525, 588.255119 );
-    const vec4 ZINC = vec4( 48.500388, 65.294118, 63.934599, 63.279683 );
-
-    //	truncate the domain
-    gridcell.xyz = gridcell.xyz - floor(gridcell.xyz * ( 1.0 / DOMAIN )) * DOMAIN;
-    vec3 gridcell_inc1 = step( gridcell, vec3( DOMAIN - 1.5 ) ) * ( gridcell + 1.0 );
-
-    //	calculate the noise
-    vec4 P = vec4( gridcell.xy, gridcell_inc1.xy ) + OFFSET.xyxy;
-    P *= P;
-    P = P.xzxz * P.yyww;
-    lowz_hash_3.xyzw = vec4( 1.0 / ( SOMELARGEFLOATS.xyzw + gridcell.zzzz * ZINC.xyzw ) );
-    highz_hash_3.xyzw = vec4( 1.0 / ( SOMELARGEFLOATS.xyzw + gridcell_inc1.zzzz * ZINC.xyzw ) );
-    lowz_hash_0 = fract( P * lowz_hash_3.xxxx );
-    highz_hash_0 = fract( P * highz_hash_3.xxxx );
-    lowz_hash_1 = fract( P * lowz_hash_3.yyyy );
-    highz_hash_1 = fract( P * highz_hash_3.yyyy );
-    lowz_hash_2 = fract( P * lowz_hash_3.zzzz );
-    highz_hash_2 = fract( P * highz_hash_3.zzzz );
-    lowz_hash_3 = fract( P * lowz_hash_3.wwww );
-    highz_hash_3 = fract( P * highz_hash_3.wwww );
+float rand3D(in vec3 co){
+    return fract(sin(dot(co.xyz ,vec3(12.9898,78.233,144.7272))) * 43758.5453);
 }
 
-
-//
-//	FastHash32_2
-//
-//	An alternative to FastHash32
-//	- slightly slower
-//	- can have a larger domain
-//	- allows for a 4D implementation
-//
-//	(eg)4D is computed like so....
-//	coord = mod( coord, DOMAIN );
-//	coord = ( coord * SCALE ) + OFFSET;
-//	coord *= coord;
-//	hash = mod( coord.x * coord.y * coord.z * coord.w, SOMELARGEFLOAT ) / SOMELARGEFLOAT;
-//
-vec4 FAST32_2_hash_2D( vec2 gridcell )	//	generates a random number for each of the 4 cell corners
+float simple_interpolate(in float a, in float b, in float x)
 {
-    //	gridcell is assumed to be an integer coordinate
-    const vec2 OFFSET = vec2( 403.839172, 377.242706 );
-    const float DOMAIN = 69.0;		//	NOTE:  this can most likely be extended with some tweaking of the other parameters
-    const float SOMELARGEFLOAT = 32745.708984;
-    const vec2 SCALE = vec2( 2.009842, 1.372549 );
-
-    vec4 P = vec4( gridcell.xy, gridcell.xy + 1.0 );
-    P = P - floor(P * ( 1.0 / DOMAIN )) * DOMAIN;
-    P = ( P * SCALE.xyxy ) + OFFSET.xyxy;
-    P *= P;
-    return fract( P.xzxz * P.yyww * ( 1.0 / SOMELARGEFLOAT ) );
+   return a + smoothstep(0.0,1.0,x) * (b-a);
 }
-void FAST32_2_hash_3D( 	vec3 gridcell,
-                        out vec4 z0_hash,			//  vec4 == ( x0y0, x1y0, x0y1, x1y1 )
-                        out vec4 z1_hash	)		//	generates a random number for each of the 8 cell corners
+float vnoise(in vec3 p)
 {
-    //	gridcell is assumed to be an integer coordinate
-    const vec3 OFFSET = vec3( 55.882355, 63.167774, 52.941177 );
-    const float DOMAIN = 69.0;		//	NOTE:  this can most likely be extended with some tweaking of the other parameters
-    const float SOMELARGEFLOAT = 69412.070313;
-    const vec3 SCALE = vec3( 0.235142, 0.205890, 0.216449 );
+    float integer_x = p.x - fract(p.x);
+    float fractional_x = p.x - integer_x;
 
-    //	truncate the domain
-    gridcell = gridcell - floor(gridcell * ( 1.0 / DOMAIN )) * DOMAIN;
-    vec3 gridcell_inc1 = step( gridcell, vec3( DOMAIN - 1.5 ) ) * ( gridcell + 1.0 );
+    float integer_y = p.y - fract(p.y);
+    float fractional_y = p.y - integer_y;
 
-    //	calculate the noise
-    gridcell = ( gridcell * SCALE ) + OFFSET;
-    gridcell_inc1 = ( gridcell_inc1 * SCALE ) + OFFSET;
-    gridcell *= gridcell;
-    gridcell_inc1 *= gridcell_inc1;
+    float integer_z = p.z - fract(p.z);
+    float fractional_z = p.z - integer_z;
 
-    vec4 x0y0_x1y0_x0y1_x1y1 = vec4( gridcell.x, gridcell_inc1.x, gridcell.x, gridcell_inc1.x ) * vec4( gridcell.yy, gridcell_inc1.yy );
+    float v1 = rand3D(vec3(integer_x, integer_y, integer_z));
+    float v2 = rand3D(vec3(integer_x+1.0, integer_y, integer_z));
+    float v3 = rand3D(vec3(integer_x, integer_y+1.0, integer_z));
+    float v4 = rand3D(vec3(integer_x+1.0, integer_y +1.0, integer_z));
 
-    z0_hash = fract( x0y0_x1y0_x0y1_x1y1 * gridcell.zzzz * ( 1.0 / SOMELARGEFLOAT ) );
-    z1_hash = fract( x0y0_x1y0_x0y1_x1y1 * gridcell_inc1.zzzz * ( 1.0 / SOMELARGEFLOAT ) );
+    float v5 = rand3D(vec3(integer_x, integer_y, integer_z+1.0));
+    float v6 = rand3D(vec3(integer_x+1.0, integer_y, integer_z+1.0));
+    float v7 = rand3D(vec3(integer_x, integer_y+1.0, integer_z+1.0));
+    float v8 = rand3D(vec3(integer_x+1.0, integer_y +1.0, integer_z+1.0));
+
+    float i1 = simple_interpolate(v1,v5, fractional_z);
+    float i2 = simple_interpolate(v2,v6, fractional_z);
+    float i3 = simple_interpolate(v3,v7, fractional_z);
+    float i4 = simple_interpolate(v4,v8, fractional_z);
+
+    float ii1 = simple_interpolate(i1,i2,fractional_x);
+    float ii2 = simple_interpolate(i3,i4,fractional_x);
+
+    return simple_interpolate(ii1 , ii2 , fractional_y);
 }
-void FAST32_2_hash_4D( 	vec4 gridcell,
-                        out vec4 z0w0_hash,		//  vec4 == ( x0y0, x1y0, x0y1, x1y1 )
-                        out vec4 z1w0_hash,
-                        out vec4 z0w1_hash,
-                        out vec4 z1w1_hash	)
-{
-    //    gridcell is assumed to be an integer coordinate
-
-    //	TODO: 	these constants need tweaked to find the best possible noise.
-    //			probably requires some kind of brute force computational searching or something....
-    const vec4 OFFSET = vec4( 16.841230, 18.774548, 16.873274, 13.664607 );
-    const float DOMAIN = 69.0;
-    const float SOMELARGEFLOAT = 47165.636719;
-    const vec4 SCALE = vec4( 0.102007, 0.114473, 0.139651, 0.084550 );
-
-    //	truncate the domain
-    gridcell = gridcell - floor(gridcell * ( 1.0 / DOMAIN )) * DOMAIN;
-    vec4 gridcell_inc1 = step( gridcell, vec4( DOMAIN - 1.5 ) ) * ( gridcell + 1.0 );
-
-    //	calculate the noise
-    gridcell = ( gridcell * SCALE ) + OFFSET;
-    gridcell_inc1 = ( gridcell_inc1 * SCALE ) + OFFSET;
-    gridcell *= gridcell;
-    gridcell_inc1 *= gridcell_inc1;
-
-    vec4 x0y0_x1y0_x0y1_x1y1 = vec4( gridcell.x, gridcell_inc1.x, gridcell.x, gridcell_inc1.x ) * vec4( gridcell.yy, gridcell_inc1.yy );
-    vec4 z0w0_z1w0_z0w1_z1w1 = vec4( gridcell.z, gridcell_inc1.z, gridcell.z, gridcell_inc1.z ) * vec4( gridcell.ww, gridcell_inc1.ww ) * ( 1.0 / SOMELARGEFLOAT );
-
-    z0w0_hash = fract( x0y0_x1y0_x0y1_x1y1 * z0w0_z1w0_z0w1_z1w1.xxxx );
-    z1w0_hash = fract( x0y0_x1y0_x0y1_x1y1 * z0w0_z1w0_z0w1_z1w1.yyyy );
-    z0w1_hash = fract( x0y0_x1y0_x0y1_x1y1 * z0w0_z1w0_z0w1_z1w1.zzzz );
-    z1w1_hash = fract( x0y0_x1y0_x0y1_x1y1 * z0w0_z1w0_z0w1_z1w1.wwww );
-}
-void FAST32_2_hash_4D( 	vec4 gridcell,
-                        out vec4 z0w0_hash_0,		//  vec4 == ( x0y0, x1y0, x0y1, x1y1 )
-                        out vec4 z0w0_hash_1,
-                        out vec4 z0w0_hash_2,
-                        out vec4 z0w0_hash_3,
-                        out vec4 z1w0_hash_0,
-                        out vec4 z1w0_hash_1,
-                        out vec4 z1w0_hash_2,
-                        out vec4 z1w0_hash_3,
-                        out vec4 z0w1_hash_0,
-                        out vec4 z0w1_hash_1,
-                        out vec4 z0w1_hash_2,
-                        out vec4 z0w1_hash_3,
-                        out vec4 z1w1_hash_0,
-                        out vec4 z1w1_hash_1,
-                        out vec4 z1w1_hash_2,
-                        out vec4 z1w1_hash_3	)
-{
-    //    gridcell is assumed to be an integer coordinate
-
-    //	TODO: 	these constants need tweaked to find the best possible noise.
-    //			probably requires some kind of brute force computational searching or something....
-    const vec4 OFFSET = vec4( 16.841230, 18.774548, 16.873274, 13.664607 );
-    const float DOMAIN = 69.0;
-    const vec4 SOMELARGEFLOATS = vec4( 56974.746094, 47165.636719, 55049.667969, 49901.273438 );
-    const vec4 SCALE = vec4( 0.102007, 0.114473, 0.139651, 0.084550 );
-
-    //	truncate the domain
-    gridcell = gridcell - floor(gridcell * ( 1.0 / DOMAIN )) * DOMAIN;
-    vec4 gridcell_inc1 = step( gridcell, vec4( DOMAIN - 1.5 ) ) * ( gridcell + 1.0 );
-
-    //	calculate the noise
-    gridcell = ( gridcell * SCALE ) + OFFSET;
-    gridcell_inc1 = ( gridcell_inc1 * SCALE ) + OFFSET;
-    gridcell *= gridcell;
-    gridcell_inc1 *= gridcell_inc1;
-
-    vec4 x0y0_x1y0_x0y1_x1y1 = vec4( gridcell.x, gridcell_inc1.x, gridcell.x, gridcell_inc1.x ) * vec4( gridcell.yy, gridcell_inc1.yy );
-    vec4 z0w0_z1w0_z0w1_z1w1 = vec4( gridcell.z, gridcell_inc1.z, gridcell.z, gridcell_inc1.z ) * vec4( gridcell.ww, gridcell_inc1.ww );
-
-    vec4 hashval = x0y0_x1y0_x0y1_x1y1 * z0w0_z1w0_z0w1_z1w1.xxxx;
-    z0w0_hash_0 = fract( hashval * ( 1.0 / SOMELARGEFLOATS.x ) );
-    z0w0_hash_1 = fract( hashval * ( 1.0 / SOMELARGEFLOATS.y ) );
-    z0w0_hash_2 = fract( hashval * ( 1.0 / SOMELARGEFLOATS.z ) );
-    z0w0_hash_3 = fract( hashval * ( 1.0 / SOMELARGEFLOATS.w ) );
-    hashval = x0y0_x1y0_x0y1_x1y1 * z0w0_z1w0_z0w1_z1w1.yyyy;
-    z1w0_hash_0 = fract( hashval * ( 1.0 / SOMELARGEFLOATS.x ) );
-    z1w0_hash_1 = fract( hashval * ( 1.0 / SOMELARGEFLOATS.y ) );
-    z1w0_hash_2 = fract( hashval * ( 1.0 / SOMELARGEFLOATS.z ) );
-    z1w0_hash_3 = fract( hashval * ( 1.0 / SOMELARGEFLOATS.w ) );
-    hashval = x0y0_x1y0_x0y1_x1y1 * z0w0_z1w0_z0w1_z1w1.zzzz;
-    z0w1_hash_0 = fract( hashval * ( 1.0 / SOMELARGEFLOATS.x ) );
-    z0w1_hash_1 = fract( hashval * ( 1.0 / SOMELARGEFLOATS.y ) );
-    z0w1_hash_2 = fract( hashval * ( 1.0 / SOMELARGEFLOATS.z ) );
-    z0w1_hash_3 = fract( hashval * ( 1.0 / SOMELARGEFLOATS.w ) );
-    hashval = x0y0_x1y0_x0y1_x1y1 * z0w0_z1w0_z0w1_z1w1.wwww;
-    z1w1_hash_0 = fract( hashval * ( 1.0 / SOMELARGEFLOATS.x ) );
-    z1w1_hash_1 = fract( hashval * ( 1.0 / SOMELARGEFLOATS.y ) );
-    z1w1_hash_2 = fract( hashval * ( 1.0 / SOMELARGEFLOATS.z ) );
-    z1w1_hash_3 = fract( hashval * ( 1.0 / SOMELARGEFLOATS.w ) );
-}
-
-
-//
-//	Interpolation functions
-//	( smoothly increase from 0.0 to 1.0 as x increases linearly from 0.0 to 1.0 )
-//	http://briansharpe.wordpress.com/2011/11/14/two-useful-interpolation-functions-for-noise-development/
-//
-float Interpolation_C1( float x ) { return x * x * (3.0 - 2.0 * x); }   //  3x^2-2x^3  ( Hermine Curve.  Same as SmoothStep().  As used by Perlin in Original Noise. )
-vec2 Interpolation_C1( vec2 x ) { return x * x * (3.0 - 2.0 * x); }
-vec3 Interpolation_C1( vec3 x ) { return x * x * (3.0 - 2.0 * x); }
-vec4 Interpolation_C1( vec4 x ) { return x * x * (3.0 - 2.0 * x); }
-
-float Interpolation_C2( float x ) { return x * x * x * (x * (x * 6.0 - 15.0) + 10.0); }   //  6x^5-15x^4+10x^3	( Quintic Curve.  As used by Perlin in Improved Noise.  http://mrl.nyu.edu/~perlin/paper445.pdf )
-vec2 Interpolation_C2( vec2 x ) { return x * x * x * (x * (x * 6.0 - 15.0) + 10.0); }
-vec3 Interpolation_C2( vec3 x ) { return x * x * x * (x * (x * 6.0 - 15.0) + 10.0); }
-vec4 Interpolation_C2( vec4 x ) { return x * x * x * (x * (x * 6.0 - 15.0) + 10.0); }
-vec4 Interpolation_C2_InterpAndDeriv( vec2 x ) { return x.xyxy * x.xyxy * ( x.xyxy * ( x.xyxy * ( x.xyxy * vec2( 6.0, 0.0 ).xxyy + vec2( -15.0, 30.0 ).xxyy ) + vec2( 10.0, -60.0 ).xxyy ) + vec2( 0.0, 30.0 ).xxyy ); }
-vec3 Interpolation_C2_Deriv( vec3 x ) { return x * x * (x * (x * 30.0 - 60.0) + 30.0); }
-
-float Interpolation_C2_Fast( float x ) { float x3 = x*x*x; return ( 7.0 + ( x3 - 7.0 ) * x ) * x3; }   //  7x^3-7x^4+x^7   ( Faster than Perlin Quintic.  Not quite as good shape. )
-vec2 Interpolation_C2_Fast( vec2 x ) { vec2 x3 = x*x*x; return ( 7.0 + ( x3 - 7.0 ) * x ) * x3; }
-vec3 Interpolation_C2_Fast( vec3 x ) { vec3 x3 = x*x*x; return ( 7.0 + ( x3 - 7.0 ) * x ) * x3; }
-vec4 Interpolation_C2_Fast( vec4 x ) { vec4 x3 = x*x*x; return ( 7.0 + ( x3 - 7.0 ) * x ) * x3; }
-
-float Interpolation_C3( float x ) { float xsq = x*x; float xsqsq = xsq*xsq; return xsqsq * ( 25.0 - 48.0 * x + xsq * ( 25.0 - xsqsq ) ); }   //  25x^4-48x^5+25x^6-x^10		( C3 Interpolation function.  If anyone ever needs it... :) )
-vec2 Interpolation_C3( vec2 x ) { vec2 xsq = x*x; vec2 xsqsq = xsq*xsq; return xsqsq * ( 25.0 - 48.0 * x + xsq * ( 25.0 - xsqsq ) ); }
-vec3 Interpolation_C3( vec3 x ) { vec3 xsq = x*x; vec3 xsqsq = xsq*xsq; return xsqsq * ( 25.0 - 48.0 * x + xsq * ( 25.0 - xsqsq ) ); }
-vec4 Interpolation_C3( vec4 x ) { vec4 xsq = x*x; vec4 xsqsq = xsq*xsq; return xsqsq * ( 25.0 - 48.0 * x + xsq * ( 25.0 - xsqsq ) ); }
-
-float vnoise(vec3 P)
-{
-    //	establish our grid cell and unit position
-    vec3 Pi = floor(P);
-    vec3 Pf = P - Pi;
-
-    //	calculate the hash.
-    //	( various hashing methods listed in order of speed )
-    vec4 hash_lowz, hash_highz;
-    FAST32_hash_3D( Pi, hash_lowz, hash_highz );
-    //FAST32_2_hash_3D( Pi, hash_lowz, hash_highz );
-    //BBS_hash_3D( Pi, hash_lowz, hash_highz );
-    //SGPP_hash_3D( Pi, hash_lowz, hash_highz );
-
-    //	blend the results and return
-    vec3 blend = Interpolation_C2( Pf );
-    vec4 res0 = mix( hash_lowz, hash_highz, blend.z );
-    vec4 blend2 = vec4( blend.xy, vec2( 1.0 - blend.xy ) );
-    return dot( res0, blend2.zxzx * blend2.wwyy );
-}
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -660,4 +257,171 @@ float cnoise(vec4 P){
   vec2 n_yzw = mix(n_zw.xy, n_zw.zw, fade_xyzw.y);
   float n_xyzw = mix(n_yzw.x, n_yzw.y, fade_xyzw.x);
   return 2.2 * n_xyzw;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Simplex Noise
+////////////////////////////////////////////////////////////////////////////////
+
+//	Simplex 3D Noise
+//	by Ian McEwan, Ashima Arts
+//
+float snoise(vec3 v){
+  const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
+  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
+
+// First corner
+  vec3 i  = floor(v + dot(v, C.yyy) );
+  vec3 x0 =   v - i + dot(i, C.xxx) ;
+
+// Other corners
+  vec3 g = step(x0.yzx, x0.xyz);
+  vec3 l = 1.0 - g;
+  vec3 i1 = min( g.xyz, l.zxy );
+  vec3 i2 = max( g.xyz, l.zxy );
+
+  //  x0 = x0 - 0. + 0.0 * C
+  vec3 x1 = x0 - i1 + 1.0 * C.xxx;
+  vec3 x2 = x0 - i2 + 2.0 * C.xxx;
+  vec3 x3 = x0 - 1. + 3.0 * C.xxx;
+
+// Permutations
+  i = mod(i, 289.0 );
+  vec4 p = permute( permute( permute(
+             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
+           + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
+           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
+
+// Gradients
+// ( N*N points uniformly over a square, mapped onto an octahedron.)
+  float n_ = 1.0/7.0; // N=7
+  vec3  ns = n_ * D.wyz - D.xzx;
+
+  vec4 j = p - 49.0 * floor(p * ns.z *ns.z);  //  mod(p,N*N)
+
+  vec4 x_ = floor(j * ns.z);
+  vec4 y_ = floor(j - 7.0 * x_ );    // mod(j,N)
+
+  vec4 x = x_ *ns.x + ns.yyyy;
+  vec4 y = y_ *ns.x + ns.yyyy;
+  vec4 h = 1.0 - abs(x) - abs(y);
+
+  vec4 b0 = vec4( x.xy, y.xy );
+  vec4 b1 = vec4( x.zw, y.zw );
+
+  vec4 s0 = floor(b0)*2.0 + 1.0;
+  vec4 s1 = floor(b1)*2.0 + 1.0;
+  vec4 sh = -step(h, vec4(0.0));
+
+  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;
+  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;
+
+  vec3 p0 = vec3(a0.xy,h.x);
+  vec3 p1 = vec3(a0.zw,h.y);
+  vec3 p2 = vec3(a1.xy,h.z);
+  vec3 p3 = vec3(a1.zw,h.w);
+
+//Normalise gradients
+  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+  p0 *= norm.x;
+  p1 *= norm.y;
+  p2 *= norm.z;
+  p3 *= norm.w;
+
+// Mix final noise value
+  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+  m = m * m;
+  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),
+                                dot(p2,x2), dot(p3,x3) ) );
+}
+//	Simplex 4D Noise
+//	by Ian McEwan, Ashima Arts
+//
+float permute(float x){return floor(mod(((x*34.0)+1.0)*x, 289.0));}
+float taylorInvSqrt(float r){return 1.79284291400159 - 0.85373472095314 * r;}
+
+vec4 grad4(float j, vec4 ip){
+  const vec4 ones = vec4(1.0, 1.0, 1.0, -1.0);
+  vec4 p,s;
+
+  p.xyz = floor( fract (vec3(j) * ip.xyz) * 7.0) * ip.z - 1.0;
+  p.w = 1.5 - dot(abs(p.xyz), ones.xyz);
+  s = vec4(lessThan(p, vec4(0.0)));
+  p.xyz = p.xyz + (s.xyz*2.0 - 1.0) * s.www;
+
+  return p;
+}
+
+float snoise(vec4 v){
+  const vec2  C = vec2( 0.138196601125010504,  // (5 - sqrt(5))/20  G4
+                        0.309016994374947451); // (sqrt(5) - 1)/4   F4
+// First corner
+  vec4 i  = floor(v + dot(v, C.yyyy) );
+  vec4 x0 = v -   i + dot(i, C.xxxx);
+
+// Other corners
+
+// Rank sorting originally contributed by Bill Licea-Kane, AMD (formerly ATI)
+  vec4 i0;
+
+  vec3 isX = step( x0.yzw, x0.xxx );
+  vec3 isYZ = step( x0.zww, x0.yyz );
+//  i0.x = dot( isX, vec3( 1.0 ) );
+  i0.x = isX.x + isX.y + isX.z;
+  i0.yzw = 1.0 - isX;
+
+//  i0.y += dot( isYZ.xy, vec2( 1.0 ) );
+  i0.y += isYZ.x + isYZ.y;
+  i0.zw += 1.0 - isYZ.xy;
+
+  i0.z += isYZ.z;
+  i0.w += 1.0 - isYZ.z;
+
+  // i0 now contains the unique values 0,1,2,3 in each channel
+  vec4 i3 = clamp( i0, 0.0, 1.0 );
+  vec4 i2 = clamp( i0-1.0, 0.0, 1.0 );
+  vec4 i1 = clamp( i0-2.0, 0.0, 1.0 );
+
+  //  x0 = x0 - 0.0 + 0.0 * C
+  vec4 x1 = x0 - i1 + 1.0 * C.xxxx;
+  vec4 x2 = x0 - i2 + 2.0 * C.xxxx;
+  vec4 x3 = x0 - i3 + 3.0 * C.xxxx;
+  vec4 x4 = x0 - 1.0 + 4.0 * C.xxxx;
+
+// Permutations
+  i = mod(i, 289.0);
+  float j0 = permute( permute( permute( permute(i.w) + i.z) + i.y) + i.x);
+  vec4 j1 = permute( permute( permute( permute (
+             i.w + vec4(i1.w, i2.w, i3.w, 1.0 ))
+           + i.z + vec4(i1.z, i2.z, i3.z, 1.0 ))
+           + i.y + vec4(i1.y, i2.y, i3.y, 1.0 ))
+           + i.x + vec4(i1.x, i2.x, i3.x, 1.0 ));
+// Gradients
+// ( 7*7*6 points uniformly over a cube, mapped onto a 4-octahedron.)
+// 7*7*6 = 294, which is close to the ring size 17*17 = 289.
+
+  vec4 ip = vec4(1.0/294.0, 1.0/49.0, 1.0/7.0, 0.0) ;
+
+  vec4 p0 = grad4(j0,   ip);
+  vec4 p1 = grad4(j1.x, ip);
+  vec4 p2 = grad4(j1.y, ip);
+  vec4 p3 = grad4(j1.z, ip);
+  vec4 p4 = grad4(j1.w, ip);
+
+// Normalise gradients
+  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+  p0 *= norm.x;
+  p1 *= norm.y;
+  p2 *= norm.z;
+  p3 *= norm.w;
+  p4 *= taylorInvSqrt(dot(p4,p4));
+
+// Mix contributions from the five corners
+  vec3 m0 = max(0.6 - vec3(dot(x0,x0), dot(x1,x1), dot(x2,x2)), 0.0);
+  vec2 m1 = max(0.6 - vec2(dot(x3,x3), dot(x4,x4)            ), 0.0);
+  m0 = m0 * m0;
+  m1 = m1 * m1;
+  return 49.0 * ( dot(m0*m0, vec3( dot( p0, x0 ), dot( p1, x1 ), dot( p2, x2 )))
+               + dot(m1*m1, vec2( dot( p3, x3 ), dot( p4, x4 ) ) ) ) ;
+
 }
