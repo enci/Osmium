@@ -17,7 +17,30 @@ float simple_interpolate(in float a, in float b, in float x)
 }
 float vnoise(in vec3 p)
 {
-  return 0.0;
+  vec3 b = floor(p);
+  vec3 fr = p - b;
+
+  float v0 = rand3D(vec3(b.x, b.y, b.z));
+  float v1 = rand3D(vec3(b.x + 1.0, b.y, b.z));
+  float v2 = rand3D(vec3(b.x, b.y + 1.0, b.z));
+  float v3 = rand3D(vec3(b.x + 1.0, b.y + 1.0, b.z));
+  //
+  float v4 = rand3D(vec3(b.x, b.y, b.z + 1.0));
+  float v5 = rand3D(vec3(b.x + 1.0, b.y, b.z + 1.0));
+  float v6 = rand3D(vec3(b.x, b.y + 1.0, b.z + 1.0));
+  float v7 = rand3D(vec3(b.x + 1.0, b.y + 1.0, b.z + 1.0));
+
+  float i0 = simple_interpolate(v0, v4, fr.z);
+  float i1 = simple_interpolate(v1, v5, fr.z);
+  float i2 = simple_interpolate(v2, v6, fr.z);
+  float i3 = simple_interpolate(v3, v7, fr.z);
+
+  float f0 = simple_interpolate(i0, i1, fr.x);
+  float f1 = simple_interpolate(i2, i3, fr.x);
+
+  float val = simple_interpolate(f0, f1, fr.y);
+
+  return val;
 }
 
 

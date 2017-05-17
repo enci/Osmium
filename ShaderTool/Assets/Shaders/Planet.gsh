@@ -13,9 +13,9 @@ out vec3 v_position;
 void main()
 {
   // Calculate normal from triangle (set to face)
-  // vec3 d0 = vg_position[1] - vg_position[0];
-  // vec3 d1 = vg_position[2] - vg_position[0];
-  // vec3 normal = normalize(cross(d0, d1));
+  vec3 d0 = vg_position[1] - vg_position[0];
+  vec3 d1 = vg_position[2] - vg_position[0];
+  vec3 normal = normalize(cross(d0, d1));
 
   for(int i = 0; i < 3; i++)
   {

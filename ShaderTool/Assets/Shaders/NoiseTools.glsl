@@ -1,6 +1,6 @@
 #pragma include "Noise.glsl"
 
-const float W = 400.0;
+const float W = 700.0;
 const float PI = 3.14;
 const float Speed = 0.1;
 const float Frequency = 10.5;
@@ -9,17 +9,17 @@ const float Frequency = 10.5;
 float noise(vec3 p, float f)
 {
   // Animate noise
-  // vec4 pos = vec4(p.x, p.y, p.z, u_time * Speed);
-  // return cnoise(pos * f);
+  vec4 pos = vec4(p.x, p.y, p.z, u_time * Speed);
+  return snoise(pos * f);
 
   // Classic noise
-  // return cnoise(p * f);
+  //return cnoise(p * f);
 
   // Simplex noise
   //return snoise(p * f);
 
   // Value noise
-  return vnoise(p * f);
+  //return vnoise(p * f);
 }
 
 float turbulence(vec3 pos, float f)
@@ -43,9 +43,22 @@ float sample_noise(vec3 pos)
   //return (noise(pos, Frequency) + 1.0) * 0.5;
 
   // Return plain
-  return noise(pos, Frequency);
+  //return noise(pos, Frequency);
 
-  //return 0.01 * stripes(pos.x + 2 * turbulence(pos, 1.0), 1.6);  // Marbled
+/*
+  float val = 0.0;
+  float amp = 1.0;
+  float fre = Frequency;
+  for(int i = 0; i < 4; i++)
+  {
+    val += noise(pos, fre) * amp;
+    amp = amp / 2.0;
+    fre = fre * 2.0;
+  }
+  return val;
+  */
+
+  return 0.013 * stripes(pos.x + 2 * turbulence(pos, 1.0), 1.6);  // Marbled
   //return noise(pos, 8.0) * 0.04;                                // Simple
   //return -0.10 * turbulence(pos, 1);                       // Riges
   //return 0.0;

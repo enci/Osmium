@@ -33,15 +33,15 @@ void main()
   float fz = sample_noise(spos + vec3(0.0, 0.0, eps));
 
   vec3 normal = normalize(v_normal);
-  vec3 dn = vec3(fx - f, fy - f, fz - f) * 1 / eps;
-  //normal = normalize(normal - dn);
+  vec3 dn = vec3(fx - f, fy - f, fz - f) * 1 / eps * 0.7;
+  normal = normalize(normal - dn);
 
   // Caluate color based on light / normal
   color += CalculateDirectionalLightsSpecular(normal, v_position, 40.0);
-  // color += CalculateDirectionalLights(normal);
+  //color += CalculateDirectionalLights(normal);
 
   // Just output raw noise value
-  //color = vec3(f);
+  // color = vec3(f);
 
   // Wood
   f *= 10.0;

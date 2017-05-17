@@ -31,3 +31,4 @@ Intermediate/
 *.db
 MeshTool/Executable/
 *.tlog
+ShaderTool/Executable/
