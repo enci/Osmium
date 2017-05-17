@@ -41,7 +41,7 @@ void main()
   // color += CalculateDirectionalLights(normal);
 
   // Just output raw noise value
-  color = vec3(f);
+  //color = vec3(f);
 
   // Wood
   f *= 10.0;
