@@ -76,7 +76,7 @@ public:
     ///  the up and right vectors must be perpedicular and normalized.
     ///
     /// @up             New up vector
-    /// @sioze          New size vector
+    /// @size			New size vector
     /// @translation    New position vector
     inline void SetTransform(const Vector2& up,
                              const Vector2& size,

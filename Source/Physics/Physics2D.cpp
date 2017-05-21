@@ -14,6 +14,10 @@ const float skin = 0.1f;
 
 #define PACK_TO_64(i,j) (((i) & 0x00000000FFFFFFFF) | ((j) << 32));
 
+#define RESTITUTION_AVERGE 1
+#define RESTITUTION_MIN 2
+#define RESTITUTION_ALG RESTITUTION_MIN
+
 void AABB::Clear()
 {
 	Min.x = FLT_MAX;
@@ -124,10 +128,40 @@ Vector2 PhysicsBody2D::GetForward() const
 	return _matrix.TransformNormal(Vector2(0.0f, 1.0f));
 }
 
-void PhysicsBody2D::UpdateBody(float dt)
+void PhysicsBody2D::UpdateKinematc(float dt)
+{
+	_parent = _transform->GetParent()->GetOwner().GetComponent<PhysicsBody2D>();
+
+	if(_parent)
+	{
+		_parent->UpdateTransform();
+		_position = ToVector2(_transform->GetWorld() * Vector3(0, 0, 0));
+		_velocity = _parent->GetVelocity();
+		_angularVelocity = _parent->GetAngularVelocity();
+		_mass = _parent->GetMass();
+		_parent->SetMass(_mass * 10.0f);
+	}
+	else
+	{
+		Vector2 newPos = ToVector2(_transform->GetWorld() * Vector3(0, 0, 0));
+		if (!_initialized)
+		{
+			_position = newPos;
+		}
+		else
+		{
+			_velocity = (newPos - _position) / dt;
+			_position = newPos;
+			UpdateDerived();
+		}
+	}
+}
+
+void PhysicsBody2D::UpdateDynamic(float dt)
 {
 	_position = ToVector2(_transform->GetPosition());
 	_size = ToVector2(_transform->GetScale());
+
 	if (!_initialized)
 	{
 		_initialized = true;
@@ -149,6 +183,17 @@ void PhysicsBody2D::UpdateBody(float dt)
 	_torque = 0.0f;
 
 	UpdateDerived();
+}
+
+void PhysicsBody2D::UpdateBody(float dt)
+{
+	// This is used during resolution. Keep it here!
+	_parent = nullptr;
+
+	if (_transform->GetParent())
+		UpdateKinematc(dt);		
+	else 
+		UpdateDynamic(dt);
 }
 
 void PhysicsBody2D::SetCollisionShape(std::vector<Vector2>&& shape)
@@ -189,6 +234,9 @@ void PhysicsBody2D::UpdateDerived()
 		return;
 
 	Vector2 direction = Vector2(sin(_orientation), cos(_orientation));
+	if (_transform->GetParent()) // Kinematic
+		direction = ToVector2(_transform->GetWorld().TransformDirectionVector(Vector3(0.0f, 0.0f, 1.0f)));
+
 	_matrix.SetTransform(
 		direction,
 		_size,
@@ -224,14 +272,13 @@ void PhysicsBody2D::UpdateDerived()
 
 void PhysicsBody2D::UpdateTransform()
 {
-	if (!_initialized)
+	DebugRenderShape();
+
+	if (!_initialized || _transform->GetParent())
 		return;
 
-	
 	_transform->SetPosition(ToVector3(_position));
 	_transform->SetOrientation(Matrix44::CreateRotateY(_orientation));
-
-	DebugRenderShape();
 }
 
 void PhysicsBody2D::DebugRenderShape()
@@ -776,13 +823,7 @@ void PhysicsManager2D::Inspect()
 {
 	int* a = (int*)&_algorithm;
 	const char* algs[] = { "Brute Force", "Auto Grid", "Multi Grid" };
-	ImGui::Combo(
-		"Contacts Algorithm",
-		a,
-		algs,
-		3);
-
-					
+	ImGui::Combo("Contacts Algorithm", a, algs, 3);
 }
 #endif
 
@@ -930,9 +971,11 @@ void PhysicsManager2D::ResloveCollisions()
 
 		if (!collision.Resolved)
 		{
-			PhysicsBody2D& first = *collision.FirstBody;
-			PhysicsBody2D& second = *collision.SecondBody;
-
+			//
+			// Either a nasty hack or fantastic solution to having parented physics bodies
+			//
+			PhysicsBody2D& first = collision.FirstBody->_parent ? *collision.FirstBody->_parent : *collision.FirstBody ;
+			PhysicsBody2D& second = collision.SecondBody->_parent ? *collision.SecondBody->_parent : *collision.SecondBody;
 
 			//
 			// Resolve overlap
@@ -974,7 +1017,11 @@ void PhysicsManager2D::ResloveCollisions()
 				continue;
 			}
 
+#if RESTITUTION_ALG == RESTITUTION_AVERGE
 			float restitution = (collision.FirstBody->GetRestitutuion() + collision.SecondBody->GetRestitutuion()) * 0.5f;
+#elif RESTITUTION_ALG == RESTITUTION_MIN
+			float restitution = min(collision.FirstBody->GetRestitutuion(), collision.SecondBody->GetRestitutuion());
+#endif
 			float inverseMass = 1 / first._mass + 1 / second._mass;
 			float denominator = Sqr(rAP.Dot(collision.Normal)) / first._momentOfInertia +
 								Sqr(rBP.Dot(collision.Normal)) / second._momentOfInertia +

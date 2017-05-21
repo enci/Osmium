@@ -184,6 +184,8 @@ public:
 
 	/// Get the forward vector
 	Vector2 GetForward() const;
+	void UpdateKinematc(float dt);
+	void UpdateDynamic(float dt);
 
 	/// Update body - integrate forces
 	void UpdateBody(float dt);
@@ -216,27 +218,28 @@ private:
 	/// Render the shape and the bounding volumes
 	void DebugRenderShape();
 
-	float		_radius = 1.0f;
-	float		_mass = 1.0f;
-	float		_momentOfInertia = 1.0f;
-	float		_linearDamping = 0.02f;
-	float		_angularDamping = 1.2f;
-	float		_restitution = 0.8f;
-	Vector2		_size;
+	float			_radius = 1.0f;
+	float			_mass = 1.0f;
+	float			_momentOfInertia = 1.0f;
+	float			_linearDamping = 0.02f;
+	float			_angularDamping = 1.2f;
+	float			_restitution = 0.8f;
+	Vector2			_size;
 
-	Vector2		_position;
-	Vector2		_velocity;
-	Vector2		_force;
+	Vector2			_position;
+	Vector2			_velocity;
+	Vector2			_force;
 
-	float		_orientation;
-	float		_angularVelocity;
-	float		_torque;
+	float			_orientation;
+	float			_angularVelocity;
+	float			_torque;
 	
-	Transform*	_transform = nullptr;
-	AABB		_boundingBox;
-	Matrix33	_matrix;
-	Matrix33	_inverse;
-	bool		_initialized = false;
+	Transform*		_transform		= nullptr;	
+	AABB			_boundingBox;
+	Matrix33		_matrix;
+	Matrix33		_inverse;
+	bool			_initialized	= false;
+	PhysicsBody2D*	_parent			= nullptr;
 
 	// Must be a convex shape
 	std::vector<Vector2> _collisionShape;
