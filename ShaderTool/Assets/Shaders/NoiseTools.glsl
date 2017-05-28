@@ -43,7 +43,7 @@ float sample_noise(vec3 pos)
   //return (noise(pos, Frequency) + 1.0) * 0.5;
 
   // Return plain
-  //return noise(pos, Frequency);
+  //return noise(pos, Frequency) * 0.05;
 
 /*
   float val = 0.0;

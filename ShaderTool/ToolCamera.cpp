@@ -12,7 +12,7 @@ ToolCamera::ToolCamera(World& world) : Entity(world)
 
 void ToolCamera::Update(float dt)
 {		
-	const float r = 3.0f;
+	const float r = 2.5f;
 	float dx = 0.0f;
 	float dy = 0.0f;
 	float speed = 0.01f;
@@ -41,7 +41,7 @@ void ToolCamera::Update(float dt)
 	_theta -= dx;
 
 	float x = r * sin(_theta);
-	float y = 2.0f;
+	float y = 1.4f;
 	float z = r * cos(_theta);
 
 	float fov = 60.0f;

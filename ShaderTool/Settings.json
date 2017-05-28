@@ -1,7 +1,7 @@
 {
     "Setttings": {
-        "ScreenWidth": 900,
-        "ScreenHeight": 1000,
+        "ScreenWidth": 1024,
+        "ScreenHeight": 1024,
         "FullScreen": false,
         "UseNativeResolution": true,
         "ResourcePath": "",
