@@ -801,6 +801,13 @@ bool CheckCollision(PhysicsBody2D* body0, PhysicsBody2D* body1, Collision2D& col
 	collision.Position0 = collision.Position1 + normal * overlap;
 	collision.Position = (collision.Position0 + collision.Position0) * 0.5f;
 
+#if RESTITUTION_ALG == RESTITUTION_AVERGE
+	collision.Restitution = (collision.FirstBody->GetRestitutuion() + collision.SecondBody->GetRestitutuion()) * 0.5f;
+#elif RESTITUTION_ALG == RESTITUTION_MIN
+	collision.Restitution = min(collision.FirstBody->GetRestitutuion(), collision.SecondBody->GetRestitutuion());
+#endif
+	 
+
 	Vector2 vel0 = collision.FirstBody->GetVelocityAtPoint(collision.Position0);
 	gDebugRenderer.AddLine(ToVector3(collision.Position0), ToVector3(collision.Position0 + vel0), Color::Purple);
 
@@ -1017,18 +1024,12 @@ void PhysicsManager2D::ResloveCollisions()
 				continue;
 			}
 
-#if RESTITUTION_ALG == RESTITUTION_AVERGE
-			float restitution = (collision.FirstBody->GetRestitutuion() + collision.SecondBody->GetRestitutuion()) * 0.5f;
-#elif RESTITUTION_ALG == RESTITUTION_MIN
-			float restitution = min(collision.FirstBody->GetRestitutuion(), collision.SecondBody->GetRestitutuion());
-#endif
 			float inverseMass = 1 / first._mass + 1 / second._mass;
 			float denominator = Sqr(rAP.Dot(collision.Normal)) / first._momentOfInertia +
 								Sqr(rBP.Dot(collision.Normal)) / second._momentOfInertia +
 								inverseMass;
-			float impulse = (-(1 + restitution) * separatingVelocity) / denominator;
+			float impulse = (-(1 + collision.Restitution) * separatingVelocity) / denominator;
 			
-
 			first._velocity += (impulse / first._mass) * collision.Normal;
 			second._velocity -= (impulse / second._mass) * collision.Normal;
 

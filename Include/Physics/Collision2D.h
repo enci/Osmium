@@ -37,6 +37,10 @@ struct Collision2D
 	/// not reslove in the physics engine
 	bool Resolved;
 
+	/// The restitution is stored, so that it can be changed
+	/// in the collision event. It's between a hack and feature
+	float Restitution;
+
 	/// Default init ctor
 	Collision2D()
 		: FirstBody(nullptr)
@@ -45,6 +49,7 @@ struct Collision2D
 		, Overlap(0.0f)
 		, Position(Vector2())
 		, Resolved(false)
+		, Restitution(1.0f)
 	{}
 
 	/// Creates a new contact among two dynamic bodies
