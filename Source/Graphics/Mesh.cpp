@@ -206,27 +206,27 @@ void Mesh::Apply()
 
 	// Allocate two buffers
 	glGenBuffers(2, _vbo);
-	GL_GET_ERROR();
+	
 
 	// Array buffer contains the attribute data
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo[0]);
-	GL_GET_ERROR();
+	
 
 	// Copy into VBO
 	glBufferData(GL_ARRAY_BUFFER, sizeof(_vertices[0]) * _vertices.size(), &_vertices[0], GL_DYNAMIC_DRAW);
-	GL_GET_ERROR();
+	
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Unbind buffer
-	GL_GET_ERROR();
+	
 
 	// Element array buffer contains the indices.
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _vbo[1]);
-	GL_GET_ERROR();
+	
 
 	// Copy into VBO
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(_indices[0]) * _indices.size(), &_indices[0], GL_DYNAMIC_DRAW);
-	GL_GET_ERROR();
+	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // Unbind buffer
-	GL_GET_ERROR();
+	
 
 	_indexCount =  static_cast<uint>(_indices.size());
 	_vertices.clear();
@@ -260,7 +260,7 @@ void Mesh::ClearGL()
 	if (HasVertexBuffers())
 	{
 		glDeleteBuffers(2, _vbo);
-		GL_GET_ERROR();
+		
 	}
 }
 /*

@@ -63,10 +63,10 @@ void DebugRenderer::Initialize()
 	_paramCamera = _shader->GetParameter("u_worldviewproj");
 
 	glGenVertexArrays(1, &_vao);
-	GL_GET_ERROR();
+	
 
 	glBindVertexArray(_vao);
-	GL_GET_ERROR();
+	
 
 	// Allocate two buffers
 	glGenBuffers(1, &_linesVBO);

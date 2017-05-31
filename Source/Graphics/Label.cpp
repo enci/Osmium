@@ -171,19 +171,19 @@ Label::Label(	const string& labelText,
 	}
 
 	glGenTextures(1, &_texture);               // Gen
-	GL_GET_ERROR();
+	
 	glBindTexture(GL_TEXTURE_2D, _texture);    // Bind
-	GL_GET_ERROR();
+	
 	//
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);   // Minmization
-	GL_GET_ERROR();
+	
 	//
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);   // Magnification
-	GL_GET_ERROR();
+	
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	GL_GET_ERROR();
+	
 
 	// Draw a solid label background:
 	for (int i = 0; i < _height; i++)
@@ -209,7 +209,7 @@ Label::Label(	const string& labelText,
 		GL_UNSIGNED_BYTE,				// Type   (how to intepret)
 		imageData);						// Data
 
-	GL_GET_ERROR();
+	
 
 	free(buffer);
 	free(imageData);

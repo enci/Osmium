@@ -24,7 +24,7 @@ bool CompileShader(GLuint* shader, GLenum type, const GLchar* source)
 
 	*shader = glCreateShader(type);
 	glShaderSource(*shader, 1, &source, nullptr);
-	GL_GET_ERROR();
+	
 	glCompileShader(*shader);
 
 #if defined(DEBUG)
@@ -46,7 +46,7 @@ bool CompileShader(GLuint* shader, GLenum type, const GLchar* source)
 		return false;
 	}
 
-	GL_GET_ERROR();
+	
 
 	return true;
 }
@@ -118,7 +118,7 @@ void ShaderParameter::SetValue(float val)
 
 	ASSERT(_type == GL_FLOAT);
 	glUniform1f(_location, val);
-	GL_GET_ERROR();
+	
 }
 
 
@@ -129,7 +129,7 @@ void ShaderParameter::SetValue(int val)
 
 	ASSERT(_type == GL_INT);
 	glUniform1i(_location, val);
-	GL_GET_ERROR();
+	
 }
 
 void ShaderParameter::SetValue(bool val)
@@ -139,7 +139,7 @@ void ShaderParameter::SetValue(bool val)
 
 	ASSERT(_type == GL_BOOL);
 	glUniform1i(_location, val);
-	GL_GET_ERROR();
+	
 }
 
 void ShaderParameter::SetValue(const Vector2& vec)
@@ -149,7 +149,7 @@ void ShaderParameter::SetValue(const Vector2& vec)
 
 	ASSERT(_type == GL_FLOAT_VEC2);
 	glUniform2fv(_location, 1, &vec.x);
-	GL_GET_ERROR();
+	
 }
 
 void ShaderParameter::SetValue(const Vector3& vec)
@@ -159,7 +159,7 @@ void ShaderParameter::SetValue(const Vector3& vec)
 
 	ASSERT(_type == GL_FLOAT_VEC3);
 	glUniform3fv(_location, 1, vec.f);
-	GL_GET_ERROR();
+	
 }
 
 void ShaderParameter::SetValue(const Vector4& vec)
@@ -169,7 +169,7 @@ void ShaderParameter::SetValue(const Vector4& vec)
 
 	ASSERT(_type == GL_FLOAT_VEC4);
 	glUniform4fv(_location, 1, &vec.x);
-	GL_GET_ERROR();
+	
 }
 
 void ShaderParameter::SetValue(const Color& color)
@@ -179,7 +179,7 @@ void ShaderParameter::SetValue(const Color& color)
 		glUniform4fv(_location, 1, &c.x);
 	else if (_type == GL_FLOAT_VEC3)
 		glUniform3fv(_location, 1, &c.x);
-	GL_GET_ERROR();
+	
 }
 
 void ShaderParameter::SetValue(const Matrix44& mtx, bool transpose)
@@ -189,7 +189,7 @@ void ShaderParameter::SetValue(const Matrix44& mtx, bool transpose)
 
 	ASSERT(_type == GL_FLOAT_MAT4);
 	glUniformMatrix4fv(_location, 1, transpose, mtx.f);
-	GL_GET_ERROR();
+	
 }
 
 
@@ -201,13 +201,13 @@ void ShaderParameter::SetValue(const Texture &texture)
 	ASSERT(_type == GL_SAMPLER_2D);
 	// Use texture with index sampler. GL_TEXTURE1 = GL_TEXTURE1+1 is always true
 	glActiveTexture(GL_TEXTURE0 + _sampler);
-	GL_GET_ERROR();
+	
 	// Work with this texture
 	glBindTexture(GL_TEXTURE_2D, texture.GetTexture());
-	GL_GET_ERROR();
+	
 	// Set the sampler
 	glUniform1i(_location, _sampler);
-	GL_GET_ERROR();
+	
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -458,7 +458,7 @@ ShaderAttribute* Shader::GetAttribute(const string& name)
 void Shader::Activate()
 {
 	glUseProgram(GetProgram());
-	GL_GET_ERROR();
+	
 }
 
 bool Shader::Validate()
@@ -467,7 +467,7 @@ bool Shader::Validate()
 	if (!ValidateProgram(_program))
 	{
 		LOG("Failed to validate program: %d", _program);
-		GL_GET_ERROR();
+		
 		return false;
 	}
 #endif
