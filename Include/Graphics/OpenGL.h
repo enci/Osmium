@@ -5,56 +5,9 @@
 #include <iostream>
 #include <sstream>
 
-#define OPENGL_ES 0
-
 namespace Osm
 {
 #ifdef DEBUG
-
-#if OPENGL_ES
-
-// Convert a GLenum to a readable c-string
-inline const char* GLErrorString(GLenum error)
-{
-	switch (error)
-	{
-	case GL_INVALID_ENUM:
-		return "GL_INVALID_ENUM";
-
-	case GL_INVALID_VALUE:
-		return "GL_INVALID_VALUE";
-
-	case GL_INVALID_OPERATION:
-		return "GL_INVALID_OPERATION";
-
-	case GL_OUT_OF_MEMORY:
-		return "GL_OUT_OF_MEMORY";
-
-	default:
-		return "UNKNOWN";
-	}
-}
-
-#define GL_GET_ERROR()                                              \
-{                                                                   \
-    GLenum error;                                                   \
-    bool err = false;                                               \
-    while ( (error = glGetError()) != GL_NO_ERROR)                  \
-    {                                                               \
-        LOG( "OpenGL ERROR: %s\nCHECK POINT: %s (line %d)\n",       \
-        Osm::GLErrorString(error), __FILE__, __LINE__ );			\
-        err = true;                                                 \
-    }                                                               \
-    ASSERT(!err);                                                   \
-}
-
-#define GL_CLEAR_ERROR()                                            \
-{                                                                   \
-    GLenum error;                                                   \
-    while ( (error = glGetError()) != GL_NO_ERROR);                 \
-}
-
-#else
 
 static std::string FormatDebugOutput(GLenum source,
 	GLenum type,
@@ -229,15 +182,6 @@ static void InitDebugMessages()
 		GL_FALSE);
 }
 
-// No need for this when not running ES
-#define GL_CLEAR_ERROR()
-#define GL_GET_ERROR()
-#endif
-
-#else
-#define InitDebugMessages()
-#define GL_CLEAR_ERROR()
-#define GL_GET_ERROR()
 #endif
 
 //#define DEBUG

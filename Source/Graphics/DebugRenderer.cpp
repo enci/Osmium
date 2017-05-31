@@ -70,19 +70,13 @@ void DebugRenderer::Initialize()
 
 	// Allocate two buffers
 	glGenBuffers(1, &_linesVBO);
-	GL_GET_ERROR();
 
 	// Array buffer contains the attribute data
 	glBindBuffer(GL_ARRAY_BUFFER, _linesVBO);
-	GL_GET_ERROR();
 
 	// Alocate into VBO
 	auto size = sizeof(_vertexArray);
 	glBufferData(GL_ARRAY_BUFFER, size, &_vertexArray[0], GL_STREAM_DRAW);
-	GL_GET_ERROR();
-
-	//glBindBuffer(GL_ARRAY_BUFFER, 0); // Unbind buffer
-	//GL_GET_ERROR();
 
 	_attribVertex->SetAttributePointer(3,
 		GL_FLOAT,
@@ -113,23 +107,18 @@ void DebugRenderer::Draw(Matrix44& vp)
 	_paramCamera->SetValue(vp);
 
 	glBindVertexArray(_vao);
-	GL_GET_ERROR();
 
 	if (_linesCount > 0)
 	{
 		// Array buffer contains the attribute data
 		glBindBuffer(GL_ARRAY_BUFFER, _linesVBO);
-		//GL_GET_ERROR();
 
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(VertexPosition3DColor) * (_linesCount * 2), &_vertexArray[0].Position);
 		//glBufferData(GL_ARRAY_BUFFER, sizeof(_vertexArray), &_vertexArray[0], GL_DYNAMIC_DRAW);
-		GL_GET_ERROR();
 
 		glDrawArrays(GL_LINES, 0, _linesCount * 2);
-		//GL_GET_ERROR();
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0); // Unbind buffer
-		//GL_GET_ERROR();
 	}
 
 	glBindVertexArray(0);
