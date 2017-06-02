@@ -64,9 +64,7 @@ void DebugRenderer::Initialize()
 
 	glGenVertexArrays(1, &_vao);
 	
-
 	glBindVertexArray(_vao);
-	
 
 	// Allocate two buffers
 	glGenBuffers(1, &_linesVBO);
