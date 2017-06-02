@@ -77,7 +77,6 @@ inline float DiskRadius(float A)
 	return sqrt(A / Pi);
 }
 
-
 #ifdef DEBUG
 
 #define LOG(macro_format, ...)										\
