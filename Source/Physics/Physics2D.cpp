@@ -544,7 +544,6 @@ void AutoGrid::DebugRender()
 					ToVector3(c),
 					Color::Red);
 
-
 				auto neighbours = GetNeighbours(b);
 
 				for (auto n : neighbours)
@@ -779,8 +778,8 @@ bool CheckCollision(PhysicsBody2D* body0, PhysicsBody2D* body1, Collision2D& col
 	auto& shape0 = body0->GetCollisionShapeWorld();
 	auto& shape1 = body1->GetCollisionShapeWorld();
 
-	size_t axisFrom;
-	size_t axisTo;
+	size_t axisFrom = 0;
+	size_t axisTo = 0;
 	Vector2 normal;
 	float min0 = CheckProjection(shape0, shape1, FLT_MAX, normal, axisFrom, axisTo);
 	if(min0 < 0.0f)
@@ -795,12 +794,13 @@ bool CheckCollision(PhysicsBody2D* body0, PhysicsBody2D* body1, Collision2D& col
 	}
 
 	auto& shape = body0->GetCollisionShapeWorld();
-
-	Vector2 from = shape[axisFrom];
-	Vector2 to = shape[axisTo];
 	
 	float overlap = min1 < min0 ? min1 : min0;
 
+	//ASSERT(axisFrom < shape.size());
+	//ASSERT(axisTo < shape.size());
+	//Vector2 from = shape[axisFrom];
+	//Vector2 to = shape[axisTo];
 	// Uncoment to debug axis and it's normal/overlap
 	// gDebugRenderer.AddLine(ToVector3(from), ToVector3(to), Color::Yellow);
 	// gDebugRenderer.AddLine(ToVector3((from+to) * 0.5f), ToVector3((from + to) * 0.5f - normal * overlap), Color::Yellow);
@@ -1129,6 +1129,9 @@ std::vector<Vector2> GrahamScanCovexHull(vector<Vector2> vertices)
 		while (true);
 		hull.push_back(n);
 	}
+
+	if (hull[0] == hull[hull.size() - 1])
+		hull.resize(hull.size() - 1);
 
 	return hull;
 }
