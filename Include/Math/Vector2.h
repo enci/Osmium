@@ -175,7 +175,7 @@ public:
 		{
 			(*this) *= ((float)1)/l;
 		}
-	}
+	}	
 		
 	/// Returns the normalised version of a vector
 	Vector2 Unit() const
@@ -233,7 +233,7 @@ public:
     float SquareDistance(const Vector2& other) const
     {
         return (x - other.x) * (x - other.x) + (y - other.y) * (y - other.y);
-    }            
+    }           
         
     static Vector2 Zero;
 };

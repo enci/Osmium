@@ -572,7 +572,12 @@ PhysicsManager2D::PhysicsManager2D(World& world)
 void PhysicsManager2D::UpdatePhysics(float dt)
 {
 	for (auto b : _bodies)
-		b->UpdateBody(dt);
+	{
+		if (b->GetEnbled())
+		{
+			b->UpdateBody(dt);
+		}
+	}
 
 	AccumulateContacts();
 	CallOnCollisionEvent();
@@ -580,8 +585,11 @@ void PhysicsManager2D::UpdatePhysics(float dt)
 
 	for (auto b : _bodies)
 	{
-		b->UpdateDerived();
-		b->UpdateTransform();
+		if (b->GetEnbled())
+		{
+			b->UpdateDerived();
+			b->UpdateTransform();
+		}
 	}
 }
 
@@ -637,6 +645,10 @@ Interection2D PhysicsManager2D::RayIntersect(const Vector2& origin, const Vector
 	for (size_t b = 0; b < _bodies.size(); b++)
 	{
 		auto body = _bodies[b];
+
+		if(!body->_enbled)
+			continue;
+
 		Vector2 pos = body->GetPosition();
 		Vector2 localPos = toLocal.TransformVector(pos);
 

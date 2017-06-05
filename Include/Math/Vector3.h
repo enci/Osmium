@@ -78,6 +78,8 @@ struct Vector3
 	/// Turns a non-zero vector into a vector of unit length
 	void Normalize();
 
+	/// Returns the normalised version of a vector
+	Vector3 Unit() const;
 
 	/// Checks if the two vectors have identical components
 	bool operator==(const Vector3& other) const;
@@ -204,6 +206,13 @@ inline void Osm::Vector3::Normalize()
 	{
 		(*this) *= 1.0f / l;
 	}
+}
+
+inline Osm::Vector3 Osm::Vector3::Unit() const
+{
+	Vector3 result = *this;	// Copy ctor
+	result.Normalize();
+	return result;
 }
 
 

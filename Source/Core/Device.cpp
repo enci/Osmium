@@ -1,6 +1,7 @@
 #include <Core/Device.h>
 #include <iostream>
 #include <Graphics/DebugRenderer.h>
+#include <Graphics/OpenGL.h>
 
 using namespace Osm;
 
@@ -71,7 +72,10 @@ GraphicsDevice::GraphicsDevice(CGame& engine) : Component(engine)
 		cout << "Failed to initialize OpenGL context" << endl;
 		ASSERT(false);
 	}
+
+#ifdef DEBUG 
 	InitDebugMessages();
+#endif
 
 	glfwGetFramebufferSize(_window, &_width, &_height);
 	_ratio = _width / float(_height);

@@ -73,47 +73,47 @@ void Steering::CalculatePrioritized()
 
 	if(IsOn(STEERING_OBSTACLE_AVOIDANCE))
 	{
-		force += ObstacleAvoidance() * ObstacleAvoidanceWeight;
+		force = ObstacleAvoidance() * ObstacleAvoidanceWeight;
 		if (!AccumulateForce(force)) return;
 	}
 	if (IsOn(STEERING_SEEK))
 	{
-		force += Seek(Target) * SeekWeight;
+		force = Seek(Target) * SeekWeight;
 		if (!AccumulateForce(force)) return;
 	}
 	if (IsOn(STEERING_ARRIVE))
 	{
-		force += Arrive(Target, ArriveAcceleration)* ArriveWeight;
+		force = Arrive(Target, ArriveAcceleration)* ArriveWeight;
 		if (!AccumulateForce(force)) return;
 	}
 	if (IsOn(STEERING_EVADE) && Agent)
 	{
-		force += Evade(Agent);
+		force = Evade(Agent);
 		if (!AccumulateForce(force)) return;
 	}
 	if (IsOn(STEERING_OFFSET_PURSUIT) && Agent)
 	{
-		force += OffsetPursuit(Agent, Offset) * OffsetPursuitWeight;
+		force = OffsetPursuit(Agent, Offset) * OffsetPursuitWeight;
 		if (!AccumulateForce(force)) return;
 	}	
 	if (IsOn(STEERING_SEPARATION))
 	{
-		force += Separation(neighbors) * SeparationWeight;
+		force = Separation(neighbors) * SeparationWeight;
 		if (!AccumulateForce(force)) return;
 	}
 	if (IsOn(STEERING_COHESION))
 	{
-		force += Cohesion(neighbors) * CohesionWeight;
+		force = Cohesion(neighbors) * CohesionWeight;
 		if (!AccumulateForce(force)) return;
 	}	
 	if (IsOn(STEERING_ALIGNMENT))
 	{
-		force += Alignment(neighbors) * AlignmentWeight;
+		force = Alignment(neighbors) * AlignmentWeight;
 		if (!AccumulateForce(force)) return;
 	}
 	if (IsOn(STEERING_WANDER))
 	{
-		force += Wander() * WanderWeight;
+		force = Wander() * WanderWeight;
 		if (!AccumulateForce(force)) return;
 	}
 }
