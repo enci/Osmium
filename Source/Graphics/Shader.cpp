@@ -526,7 +526,7 @@ bool Shader::LoadSource(const string& vertexShader,
 	res = CompileShader(&vertShader, GL_VERTEX_SHADER, vertexShader.c_str());
 	if (!res)
 	{
-		LOG("Shader::Load() Failed to compile vertex shader");
+		LOG("Shader::Load() Failed to compile vertex shader. File: %s", _vertexFilename.c_str());
 		return false;
 	}
 
@@ -536,7 +536,7 @@ bool Shader::LoadSource(const string& vertexShader,
 		res = CompileShader(&geomShader, GL_GEOMETRY_SHADER_ARB, geometryShader.c_str());
 		if (!res)
 		{
-			LOG("Shader::Load() Failed to compile geometry shader");
+			LOG("Shader::Load() Failed to compile geometry shader. File: %s", _geometryFilename.c_str());
 			return false;
 		}
 	}
@@ -545,7 +545,7 @@ bool Shader::LoadSource(const string& vertexShader,
 	res = CompileShader(&fragShader, GL_FRAGMENT_SHADER, fragmentShader.c_str());
 	if (!res)
 	{
-		LOG("Shader::Load() Failed to compile fragment shader");
+		LOG("Shader::Load() Failed to compile fragment shader. File: %s", _fragmentFilename.c_str());
 		return false;
 	}
 
