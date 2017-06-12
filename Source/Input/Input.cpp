@@ -199,3 +199,10 @@ bool InputManager::GetKeyOnce(char key)
 		(_keyOnce[key] ? false : (_keyOnce[key] = true)) : \
 		(_keyOnce[key] = false));
 }
+
+// ReSharper disable once CppMemberFunctionMayBeStatic
+// ReSharper disable once CppMemberFunctionMayBeConst
+bool InputManager::GetKey(int key)
+{
+	return glfwGetKey(Game.Device().GetWindow(), key) == GLFW_PRESS;
+}

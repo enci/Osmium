@@ -126,13 +126,14 @@ protected:
 #ifdef INSPECTOR
 	void Inspect();
 
+	bool _show_inspector = false;
 	bool _show_engine_compoents = false;
 	bool _show_input_debug = false;
 	bool _show_world_inspector = false;
 	bool _show_profiler = false;
 	bool _show_imgui_test = false;
 	bool _show_settings = false;
-	bool _close_inspector = false;
+	//bool _close_inspector = false;	
 #endif
 };
 

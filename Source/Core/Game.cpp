@@ -167,8 +167,11 @@ void CGame::SwapWorld(World* world)
 
 #ifdef INSPECTOR
 void CGame::Inspect()
-{
-	if(_close_inspector)
+{	
+	if (_input->GetKey(GLFW_KEY_RIGHT_SHIFT) && _input->GetKeyOnce(GLFW_KEY_I))
+		_show_inspector = !_show_inspector;
+
+	if (!_show_inspector)
 		return;
 
 	ImGui::GetIO().FontGlobalScale = _settings.InspectorFontSize;
@@ -212,7 +215,7 @@ void CGame::Inspect()
 	ImGui::SameLine();
 	_advanceFrame = ImGui::Button(">|");
 	ImGui::SameLine();
-	_close_inspector = ImGui::Button("X");				
+	_show_inspector = !ImGui::Button("X");				
 	ImGui::SameLine();
 	ImGui::LabelText("Frame Time", "");
 	ImGui::SameLine();

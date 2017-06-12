@@ -105,6 +105,8 @@ public:
 
 	bool GetKeyOnce(char key);
 
+	bool GetKey(int key);
+
 	std::vector<Joystick> GetActiveJoysticks() const;
 
 	void AddJoystick(int joy);
