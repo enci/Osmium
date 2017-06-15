@@ -142,7 +142,7 @@ Vector2 Steering::Arrive(Vector2& targetPos, float deceleration)
 	Vector2 arrive;
 
 	// Calculate the distance to the target
-	double dist = toTarget.Magnitude();
+	float dist = toTarget.Magnitude();
 
 	if (dist > 0)
 	{

@@ -323,8 +323,11 @@ vector<PhysicsBody2D*> MultiGrid::GetNeighbours(PhysicsBody2D* body)
 	//float fx = modf(x, &fi);
 	//float fy = modf(y, &fj);
 
-	int64_t i = (int64_t)round(fi);
-	int64_t j = (int64_t)round(fj);
+	// int64_t i = (int64_t)round(fi);
+	// int64_t j = (int64_t)round(fj);
+
+	int i = (int)round(fi);
+	int j = (int)round(fj);
 
 	float ri = fi - i;
 	float rj = fj - j;
@@ -439,8 +442,8 @@ AutoGrid::AutoGrid(const std::vector<PhysicsBody2D*>& bodies)
 		// Build the grid size
 		Vector2 pos = b->GetPosition();
 		pos = pos - _min;
-		int i = (pos.x / sizex) * _gridx;
-		int j = (pos.y / sizey) * _gridy;
+		int i = (int)((pos.x / sizex) * _gridx);
+		int j = (int)((pos.y / sizey) * _gridy);
 
 		// Add to 
 		_grid[i][j].push_back(b);
@@ -455,8 +458,8 @@ vector<PhysicsBody2D*> AutoGrid::GetNeighbours(PhysicsBody2D* body)
 
 	Vector2 pos = body->GetPosition();
 	pos = pos - _min;
-	int idx = (pos.x / sizex) * _gridx;
-	int jdx = (pos.y / sizey) * _gridy;
+	int idx = (int)((pos.x / sizex) * _gridx);
+	int jdx = (int)((pos.y / sizey) * _gridy);
 	//
 	int ifrom = idx <= 0 ? 0 : idx - 1;
 	int jfrom = jdx <= 0 ? 0 : jdx - 1;

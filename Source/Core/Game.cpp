@@ -219,7 +219,7 @@ void CGame::Inspect()
 	ImGui::SameLine();
 	ImGui::LabelText("Frame Time", "");
 	ImGui::SameLine();
-	ImGui::ProgressBar(_profiler->GetTimePerFrame() / (1.0 / 60.0));	
+	ImGui::ProgressBar((float)(_profiler->GetTimePerFrame() / (1.0 / 60.0)));	
 	ImGui::EndMainMenuBar();
 
 	if (_show_world_inspector)

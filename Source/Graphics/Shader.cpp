@@ -397,15 +397,15 @@ void Shader::LoadParameters()
 	glGetProgramiv(_program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxAttribNameLength);
 	vector<GLchar> attribNameData(maxAttribNameLength);
 
-
-	for (int attrib = 0; attrib < numActiveAttribs; ++attrib)
+	GLuint numAttribs = (GLuint)numActiveAttribs;
+	for (GLuint attrib = 0; attrib < numAttribs; ++attrib)
 	{
 		GLint arraySize = 0;
 		GLenum type = 0;
 		GLsizei actualLength = 0;
 		glGetActiveAttrib(_program,
 			attrib,
-			attribNameData.size(),
+			(GLsizei)attribNameData.size(),
 			&actualLength,
 			&arraySize,
 			&type,

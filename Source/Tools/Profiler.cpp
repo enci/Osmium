@@ -76,7 +76,6 @@ void Profiler::Inspect()
 {
 	ImGuiWindowFlags window_flags = 0;
 	window_flags |= ImGuiWindowFlags_NoResize;
-	bool open;
 	
 	if (ImGui::Begin("Profiler"))
 	{

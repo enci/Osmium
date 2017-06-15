@@ -948,6 +948,8 @@ public:
     bool IsDouble() const { return (data_.f.flags & kDoubleFlag) != 0; }
     bool IsString() const { return (data_.f.flags & kStringFlag) != 0; }
 
+#pragma warning(push, 0)       
+
     // Checks whether a number can be losslessly converted to a double.
     bool IsLosslessDouble() const {
         if (!IsNumber()) return false;
@@ -985,6 +987,8 @@ public:
         double b = static_cast<double>(static_cast<float>(a));
         return a >= b && a <= b;    // Prevent -Wfloat-equal
     }
+
+#pragma warning(pop)
 
     //@}
 

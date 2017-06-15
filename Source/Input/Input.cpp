@@ -75,7 +75,7 @@ bool InputManager::GetJoystickButton(Joystick joystick, JoystickButtons button)
 {
 	if (_joyState.find(joystick) != _joyState.end())
 	{
-		return _joyState[joystick].Buttons[button];
+		return _joyState[joystick].Buttons[button] == 1;
 	}
 	return false;
 }

@@ -24,6 +24,13 @@ uint NextPowerOfTwo(uint val)
 	while (t < val) t *= 2;
 	return t;
 }	
+
+uint NextPowerOfTwo(float val)
+{
+	uint t = 2;
+	while (t < val) t *= 2;
+	return t;
+}
 }
 
 unsigned char ttf_buffer[1 << 20];
@@ -68,7 +75,7 @@ Label::Label(	const string& labelText,
 	int ascent;
 	int descent;
 	int lineGap;
-	float scale = stbtt_ScaleForPixelHeight(&fontinfo, fontsize); // get the scale for certain
+	float scale = stbtt_ScaleForPixelHeight(&fontinfo, (float)fontsize);					// get the scale for certain
 	stbtt_GetFontVMetrics(&fontinfo, &ascent, &descent, &lineGap);                          // get the the ascent
 
 	int bottom = (int)((ascent - descent + lineGap) * scale);                              // calculate the bottom in pixels
@@ -127,11 +134,12 @@ Label::Label(	const string& labelText,
 				(int)codepoint,
 				(int)utf32text[ch + 1]);
 
-		if ((y1 - y0) > ymax)
-			ymax = (y1 - y0);
+		float diff = (float)(y1 - y0);
+		if (diff > ymax)
+			ymax = diff;
 	}
 
-	ymax = bottom;
+	ymax = (float)bottom;
 
 	float xmax = xpos;
 

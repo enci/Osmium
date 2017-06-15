@@ -5,7 +5,6 @@
 // Define the ASSERT and DEBUG macros
 #ifdef _WIN32
 	#define ASSERT _ASSERT
-	#define assert _ASSERT
 	#ifdef _DEBUG 
 		#define DEBUG
 	#endif
