@@ -33,8 +33,28 @@ AudioManager::AudioManager(CGame& owner) : Component(owner)
 	FMOD::Studio::Bank* masterBank = nullptr;
 	ERRCHECK(_studioSystem->loadBankFile("Assets/Audio/Master Bank.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &masterBank));
 
+
+	FMOD::Studio::Bank* stringsBank = nullptr;
+	ERRCHECK(_studioSystem->loadBankFile("Assets/Audio/Master Bank.strings.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &stringsBank));
+
 	FMOD::Studio::Bank* ambienceBank = nullptr;
 	ERRCHECK(_studioSystem->loadBankFile("Assets/Audio/Character.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &ambienceBank));
+	ambienceBank->loadSampleData();
+	
+	FMOD::Studio::EventDescription* desc[200];
+	int count;
+
+	ambienceBank->getEventList(desc, 200, &count);
+
+	char path[1024];
+	int retieved;
+
+	for (int i = 0; i < count; i++)
+	{
+		ERRCHECK(desc[i]->getPath(path, 1024, &retieved));
+		LOG("Path: %s", path);
+	}
+	
 
 	FMOD::Studio::EventDescription* eventDescription = nullptr;
 	ERRCHECK(_studioSystem->getEvent("event:/Character/Footsteps/Footsteps", &eventDescription));
