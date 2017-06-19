@@ -1,35 +1,65 @@
 #include <Audio/Audio.h>
 #include <fmod_studio.hpp>
 #include <Defines.h>
+#include <fmod_errors.h>
 
 using namespace Osm;
 using namespace std;
 
-int ErrorCheck(FMOD_RESULT result)
+void ERRCHECK_fn(FMOD_RESULT result, const char *file, int line);
+#define ERRCHECK(_result) ERRCHECK_fn(_result, __FILE__, __LINE__)
+
+void ERRCHECK_fn(FMOD_RESULT result, const char *file, int line)
 {
 	if (result != FMOD_OK)
 	{
-		LOG("[FMOD] ERROR: %d ", result);
-		return 1;
+		LOG("%s(%d): FMOD error %d - %s", file, line, result, FMOD_ErrorString(result));
 	}
-	return 0;
 }
 
 AudioManager::AudioManager(CGame& owner) : Component(owner)
 {	
-	ErrorCheck(FMOD::Studio::System::create(&_studioSystem));
-	ErrorCheck(	_studioSystem->initialize(32,
-				FMOD_STUDIO_INIT_LIVEUPDATE,
-				FMOD_INIT_PROFILE_ENABLE,
-				nullptr));
+	ERRCHECK(FMOD::Studio::System::create(&_studioSystem));
 
-	ErrorCheck(_studioSystem->getLowLevelSystem(&_system));
+	ERRCHECK(_studioSystem->initialize(1024, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr));
+
+	//ERRCHECK(	_studioSystem->initialize(1028,
+	//			FMOD_STUDIO_INIT_LIVEUPDATE,
+	//			FMOD_INIT_PROFILE_ENABLE,
+	//			nullptr));
+
+	ERRCHECK(_studioSystem->getLowLevelSystem(&_system));
+
+	FMOD::Studio::Bank* masterBank = nullptr;
+	ERRCHECK(_studioSystem->loadBankFile("Assets/Audio/Master Bank.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &masterBank));
+
+	FMOD::Studio::Bank* ambienceBank = nullptr;
+	ERRCHECK(_studioSystem->loadBankFile("Assets/Audio/Character.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &ambienceBank));
+
+	FMOD::Studio::EventDescription* eventDescription = nullptr;
+	ERRCHECK(_studioSystem->getEvent("event:/Character/Footsteps/Footsteps", &eventDescription));
+
+	// Find the parameter once and then set by index
+	// Or we can just find by name every time but by index is more efficient if we are setting lots of parameters
+	FMOD_STUDIO_PARAMETER_DESCRIPTION paramDesc;
+	ERRCHECK(eventDescription->getParameter("Surface", &paramDesc));
+	int surfaceIndex = paramDesc.index;
+
+	FMOD::Studio::EventInstance* eventInstance = nullptr;
+	ERRCHECK(eventDescription->createInstance(&eventInstance));
+
+	// Make the event audible to start with
+	float surfaceParameterValue = 0;
+	ERRCHECK(eventInstance->setParameterValueByIndex(surfaceIndex, 1.0f));
+	ERRCHECK(eventInstance->getParameterValueByIndex(surfaceIndex, &surfaceParameterValue));
+
+	ERRCHECK(eventInstance->start());
 }
 
 AudioManager::~AudioManager()
 {
-	ErrorCheck(_studioSystem->unloadAll());
-	ErrorCheck(_studioSystem->release());
+	ERRCHECK(_studioSystem->unloadAll());
+	ERRCHECK(_studioSystem->release());
 }
 
 void AudioManager::Update(float dt)
@@ -45,7 +75,7 @@ void AudioManager::Update(float dt)
 			++it;
 	}
 	
-	ErrorCheck(_studioSystem->update());
+	ERRCHECK(_studioSystem->update());
 }
 
 void AudioManager::LoadBank(const std::string& bankName,
@@ -56,7 +86,12 @@ void AudioManager::LoadBank(const std::string& bankName,
 		return;
 
 	FMOD::Studio::Bank* bank;
-	ErrorCheck(_studioSystem->loadBankFile(bankName.c_str(), flags, &bank));
+	ERRCHECK(_studioSystem->loadBankFile(bankName.c_str(), flags, &bank));
 	if (bank) 		
 		_banks[bankName] = bank;
+}
+
+void AudioManager::PlaySound(const std::string& soundName, const Vector3& vPos, float volumedB)
+{
+
 }
