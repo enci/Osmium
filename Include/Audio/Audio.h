@@ -2,14 +2,20 @@
 
 #include <Core/Game.h>
 #include <Math/Vector3.h>
+#include <Core/Entity.h>
+#include <Core/World.h>
 #include <fmod_studio.hpp>
 #include <map>
+#include "Graphics/Render.h"
 
 namespace Osm
 {
-	struct Vector3;
 
-	//	FMOD_VECTOR 
+struct Vector3;
+class AudioSource;
+class AudioListener;
+
+//	FMOD_VECTOR 
 class AudioManager : Component<CGame>
 {
 public:
@@ -68,6 +74,16 @@ public:
 
 	FMOD_VECTOR VectorToFmod(const Vector3& vPosition);
 
+	void Add(AudioSource* source);
+
+	void Remove(AudioSource* source);
+
+	void Add(AudioListener* listener);
+
+	void Remove(AudioListener* listener);
+
+
+
 private:
 	FMOD::System*										_system			= nullptr;
 	FMOD::Studio::System*								_studioSystem	= nullptr;
@@ -75,6 +91,67 @@ private:
 	std::map<int, FMOD::Channel*>						_channels;
 	std::map<std::string, FMOD::Studio::EventInstance*> _events;
 	std::map<std::string, FMOD::Studio::Bank*>			_banks;
+};
+
+
+///
+/// AudioManagerComponent
+/// A small utility to make sure object add/remove themselves from
+/// the manager.
+///
+template<class T>
+class AudioManagerComponent : public Component<Entity>
+{
+public:
+
+	AudioManagerComponent(Entity& entity) : Component<Entity>(entity)
+	{
+		auto rmng = _owner.GetWorld().GetComponent<AudioManager>();
+		ASSERT(rmng);
+		rmng->Add(static_cast<T*>(this));
+	}
+
+	virtual ~AudioManagerComponent()
+	{
+		auto rmng = _owner.GetWorld().GetComponent<AudioManager>();
+		ASSERT(rmng);
+		rmng->Remove(static_cast<T*>(this));
+	}
+};
+
+///
+/// AudioSource
+/// TODO: Document this further
+///
+class AudioSource : public AudioManagerComponent<AudioSource>
+{
+public:
+	/// Creates a new renderable and adds it to the render manager. 
+	/// When deletes it will automatically get removed.
+	AudioSource(Entity& entity);
+
+#ifdef INSPECTOR
+	virtual void Inspect() override;
+#endif
+
+protected:
+};
+
+///
+/// AudioListener
+/// TODO: Document this further
+///
+class AudioListener : public AudioManagerComponent<AudioListener>
+{
+public:
+
+	AudioListener(Entity& entity);
+
+#ifdef INSPECTOR
+	virtual void Inspect() override;
+#endif
+
+protected:
 };
 
 }
