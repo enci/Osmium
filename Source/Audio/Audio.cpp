@@ -2,6 +2,10 @@
 #include <fmod_studio.hpp>
 #include <Defines.h>
 #include <fmod_errors.h>
+#include <Core/Transform.h>
+#include <Physics/Physics2D.h>
+
+#define VERBOSE_LEVEL 4
 
 using namespace Osm;
 using namespace std;
@@ -17,22 +21,43 @@ void ERRCHECK_fn(FMOD_RESULT result, const char *file, int line)
 	}
 }
 
+FMOD_VECTOR Osm::VectorToFmod(const Vector3& vector)
+{
+	FMOD_VECTOR v = { vector.x, vector.y, vector.z };
+	return v;
+}
+
+FMOD_VECTOR Osm::VectorToFmod(const Vector2& vector)
+{
+	FMOD_VECTOR v = { vector.x, 0.0f, vector.y };
+	return v;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	AudioManagerComponent
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 AudioManager::AudioManager(CGame& owner) : Component(owner)
 {	
 	ERRCHECK(FMOD::Studio::System::create(&_studioSystem));
-
 	ERRCHECK(_studioSystem->initialize(1024, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr));
 
+#if VERBOSE_LEVEL > 0
+	LOG("FMOD Studio System Initialized.");
+#endif
+
+	/*
 	//ERRCHECK(	_studioSystem->initialize(1028,
 	//			FMOD_STUDIO_INIT_LIVEUPDATE,
 	//			FMOD_INIT_PROFILE_ENABLE,
 	//			nullptr));
 
-	ERRCHECK(_studioSystem->getLowLevelSystem(&_system));
+	//ERRCHECK(_studioSystem->getLowLevelSystem(&_system));
 
 	FMOD::Studio::Bank* masterBank = nullptr;
 	ERRCHECK(_studioSystem->loadBankFile("Assets/Audio/Master Bank.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &masterBank));
-
 
 	FMOD::Studio::Bank* stringsBank = nullptr;
 	ERRCHECK(_studioSystem->loadBankFile("Assets/Audio/Master Bank.strings.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &stringsBank));
@@ -74,6 +99,7 @@ AudioManager::AudioManager(CGame& owner) : Component(owner)
 	ERRCHECK(eventInstance->getParameterValueByIndex(surfaceIndex, &surfaceParameterValue));
 
 	ERRCHECK(eventInstance->start());
+	*/
 }
 
 AudioManager::~AudioManager()
@@ -84,17 +110,22 @@ AudioManager::~AudioManager()
 
 void AudioManager::Update(float dt)
 {
-	// Remove inactive channels
-	for (auto it = _channels.begin(); it != _channels.end();)
+
+
+	if(_listener)
 	{
-		bool isPlaying = false;
-		it->second->isPlaying(&isPlaying);
-		if (!isPlaying)
-			it = _channels.erase(it);
-		else
-			++it;
+		//_studioSystem->setListenerAttributes(0, )
 	}
-	
+	else
+	{
+		
+	}
+
+	for (auto s : _sources)
+	{
+		auto posData = s->GetPositionalData();		
+	}
+
 	ERRCHECK(_studioSystem->update());
 }
 
@@ -111,7 +142,128 @@ void AudioManager::LoadBank(const std::string& bankName,
 		_banks[bankName] = bank;
 }
 
-void AudioManager::PlaySound(const std::string& soundName, const Vector3& vPos, float volumedB)
+void AudioManager::PlayEvent(const std::string& eventName)
 {
+	LoadEvent(eventName);
+	auto found = _events.find(eventName);
+	if (found != _events.end())
+		found->second->start();	
+}
 
+void AudioManager::LoadEvent(const std::string& eventName)
+{
+	auto found = _events.find(eventName);
+	if (found != _events.end())
+		return;
+
+	FMOD::Studio::EventDescription* pEventDescription = nullptr;
+	ERRCHECK(_studioSystem->getEvent(eventName.c_str(), &pEventDescription));
+	if (pEventDescription)
+	{
+		FMOD::Studio::EventInstance* pEventInstance = nullptr;
+		ERRCHECK(pEventDescription->createInstance(&pEventInstance));
+		if (pEventInstance)
+		{
+			_events[eventName] = pEventInstance;
+		}
+	}
+}
+
+
+void AudioManager::Add(AudioSource* source)
+{
+	_sources.push_back(source);
+}
+
+void AudioManager::Remove(AudioSource* source)
+{
+}
+
+void AudioManager::Set(AudioListener* listener)
+{
+}
+
+void AudioManager::Remove(AudioListener* listener)
+{
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	AudioManagerComponent
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+AudioManagerComponent::AudioManagerComponent(Entity & entity)
+	: Component(entity)
+{
+	Init();
+}
+
+
+void AudioManagerComponent::Update(float dt)
+{
+	if (_body2D)
+	{
+		_attributes.position = VectorToFmod(_body2D->GetPosition());
+		_attributes.forward = VectorToFmod(_body2D->GetForward());
+		_attributes.velocity = VectorToFmod(_body2D->GetVelocity());
+		_attributes.up = { 0.0f, 1.0f, 0.0f };
+	}
+	else if (_transform)
+	{
+		Vector3 prevPos(_attributes.position.x, _attributes.position.y, _attributes.position.z);
+		Matrix44 world = _transform->GetWorld();
+		_attributes.position = VectorToFmod(_transform->GetPosition());
+		_attributes.forward = VectorToFmod(world.TransformDirectionVector(Vector3(0.0f, 0.0f, 1.0f)));
+		_attributes.velocity = { 0.0f, 0.0f, 0.0f };
+		_attributes.up = VectorToFmod(world.TransformDirectionVector(Vector3(0.0f, 1.0f, 0.0f)));
+	}
+}
+
+void AudioManagerComponent::Init()
+{
+	_transform = GetOwner().GetComponent<Transform>();
+	_body2D = GetOwner().GetComponent<PhysicsBody2D>();
+
+	if (_transform && !_body2D)
+	{
+		_attributes.position = VectorToFmod(_transform->GetPosition());
+	}
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//	AudioSource
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+AudioSource::AudioSource(Entity& entity) : AudioManagerComponent(entity)
+{
+	Game.Audio().Add(this);
+}
+
+AudioSource::~AudioSource()
+{
+	Game.Audio().Remove(this);
+}
+
+bool AudioSource::LoadEvent(const std::string& eventpath)
+{
+	return false;
+}
+
+bool AudioSource::Play()
+{
+	return false;
+}
+
+AudioListener::AudioListener(Entity& entity) : AudioManagerComponent(entity)
+{
+	Game.Audio().Set(this);
+}
+
+AudioListener::~AudioListener()
+{
+	Game.Audio().Remove(this);
 }

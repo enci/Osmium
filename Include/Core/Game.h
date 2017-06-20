@@ -80,6 +80,8 @@ public:
 
 	InputManager& Input() const { return *_input; }
 
+	AudioManager& Audio() const { return *_audio; }
+
 	Profiler& GetProfiler() const { return *_profiler; }
 
 	const GameSettings& Settings() const { return _settings; }
