@@ -29,9 +29,13 @@ public:
 	void LoadBank(const std::string& bankName,
 		FMOD_STUDIO_LOAD_BANK_FLAGS flags = FMOD_STUDIO_LOAD_BANK_NORMAL);
 
-	void PlayEvent(const std::string& eventName);
+	void PlayEvent(const std::string& eventName, const Vector3& position);
 
 	void LoadEvent(const std::string& eventName);
+
+	FMOD::Studio::EventDescription* LoadDescription(const std::string& eventName);
+
+	//void LoadEvent(const std::string& eventName);
 
 	/*
 	void PlaySound(	const std::string& soundName,
@@ -77,16 +81,22 @@ public:
 	void Remove(AudioListener* listener);
 
 private:
-	// FMOD::System*											_system			= nullptr;
+	
 	// std::map<std::string, FMOD::Sound*>						_sounds;
 	// std::map<int, FMOD::Channel*>							_channels;
 
+	FMOD::System*													_system = nullptr;
 	FMOD::Studio::System*											_studioSystem = nullptr;	
-	std::unordered_map<std::string, FMOD::Studio::EventInstance*>	_events;
-	std::unordered_map<std::string, FMOD::Studio::Bank*>			_banks;
 
-	std::vector<AudioSource*>								_sources;
-	AudioListener*											_listener	= nullptr;
+	//std::unordered_map<std::string, FMOD::Studio::EventInstance*>	_events;
+
+	std::unordered_map<std::string, FMOD::Studio::EventDescription*>	_descriptions;
+
+	std::unordered_map<std::string, FMOD::Studio::Bank*>				_banks;
+	std::vector<FMOD::Studio::EventInstance*>							_events;
+
+	std::vector<AudioSource*>											_sources;
+	AudioListener*														_listener	= nullptr;
 };
 
 
@@ -128,9 +138,13 @@ public:
 
 	virtual ~AudioSource();
 
-	bool LoadEvent(const std::string& eventpath);
+	bool LoadEvent(const std::string& eventPath);
 
-	bool Play();
+	void Play() const;
+
+	void SetParameter(const std::string& name, float value) const;
+
+	void UpdatePositionalData() const;
 
 #ifdef INSPECTOR
 	virtual void Inspect() override {}

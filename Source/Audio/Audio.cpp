@@ -9,6 +9,7 @@
 
 using namespace Osm;
 using namespace std;
+using namespace FMOD::Studio;
 
 void ERRCHECK_fn(FMOD_RESULT result, const char *file, int line);
 #define ERRCHECK(_result) ERRCHECK_fn(_result, __FILE__, __LINE__)
@@ -42,11 +43,18 @@ FMOD_VECTOR Osm::VectorToFmod(const Vector2& vector)
 AudioManager::AudioManager(CGame& owner) : Component(owner)
 {	
 	ERRCHECK(FMOD::Studio::System::create(&_studioSystem));
-	ERRCHECK(_studioSystem->initialize(1024, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr));
+	ERRCHECK(_studioSystem->initialize(
+		1024,
+		FMOD_STUDIO_INIT_NORMAL,
+		FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED,
+		nullptr));
+	ERRCHECK(_studioSystem->getLowLevelSystem(&_system));
 
 #if VERBOSE_LEVEL > 0
-	LOG("FMOD Studio System Initialized.");
+	LOG("FMOD Studio System Initialization Complete.");
 #endif
+
+	_system->set3DSettings(1.0f, 1.0f, 0.1f);
 
 	/*
 	//ERRCHECK(	_studioSystem->initialize(1028,
@@ -54,7 +62,7 @@ AudioManager::AudioManager(CGame& owner) : Component(owner)
 	//			FMOD_INIT_PROFILE_ENABLE,
 	//			nullptr));
 
-	//ERRCHECK(_studioSystem->getLowLevelSystem(&_system));
+	
 
 	FMOD::Studio::Bank* masterBank = nullptr;
 	ERRCHECK(_studioSystem->loadBankFile("Assets/Audio/Master Bank.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &masterBank));
@@ -111,19 +119,38 @@ AudioManager::~AudioManager()
 void AudioManager::Update(float dt)
 {
 
-
+	// Update listener
 	if(_listener)
-	{
-		//_studioSystem->setListenerAttributes(0, )
+	{		
+		//_studioSystem->setListenerAttributes();
 	}
 	else
 	{
-		
+		//_studioSystem->set
 	}
 
+	// Update sources
 	for (auto s : _sources)
 	{
-		auto posData = s->GetPositionalData();		
+		s->Update(dt);	
+		s->UpdatePositionalData();
+	}
+
+	// Update one-off sounds
+	for (auto itr = _events.begin(); itr != _events.end(); )
+	{
+		EventInstance* instance = *itr;
+		FMOD_STUDIO_PLAYBACK_STATE state;
+		ERRCHECK(instance->getPlaybackState(&state));
+		if (state == FMOD_STUDIO_PLAYBACK_STOPPED)
+		{
+			instance->release();
+			itr = _events.erase(itr);
+		}
+		else
+		{
+			++itr;
+		}
 	}
 
 	ERRCHECK(_studioSystem->update());
@@ -142,16 +169,38 @@ void AudioManager::LoadBank(const std::string& bankName,
 		_banks[bankName] = bank;
 }
 
-void AudioManager::PlayEvent(const std::string& eventName)
+void AudioManager::PlayEvent(const std::string& eventName, const Vector3& position)
 {
+	/*
 	LoadEvent(eventName);
 	auto found = _events.find(eventName);
 	if (found != _events.end())
 		found->second->start();	
+	*/
+
+	FMOD::Studio::EventDescription* description = nullptr;
+	ERRCHECK(_studioSystem->getEvent(eventName.c_str(), &description));
+	if (description)
+	{
+		FMOD::Studio::EventInstance* instance = nullptr;
+		ERRCHECK(description->createInstance(&instance));
+		if (instance)
+		{
+			_events.push_back(instance);
+			instance->start();
+			FMOD_3D_ATTRIBUTES attributes;
+			attributes.position = VectorToFmod(position);
+			attributes.forward = { 0.0f, 0.0f, 1.0f };
+			attributes.up = { 0.0f, 1.0f, 0.0f };
+			attributes.velocity = { 0.0f, 0.0f, 0.0f };
+			instance->set3DAttributes(&attributes);
+		}
+	}
 }
 
 void AudioManager::LoadEvent(const std::string& eventName)
 {
+	/*
 	auto found = _events.find(eventName);
 	if (found != _events.end())
 		return;
@@ -167,6 +216,19 @@ void AudioManager::LoadEvent(const std::string& eventName)
 			_events[eventName] = pEventInstance;
 		}
 	}
+	*/
+}
+
+EventDescription* AudioManager::LoadDescription(const std::string& eventName)
+{
+	auto found = _descriptions.find(eventName);
+	if (found != _descriptions.end())
+		return found->second;
+
+	EventDescription* description = nullptr;
+	ERRCHECK(_studioSystem->getEvent(eventName.c_str(), &description));
+	_descriptions[eventName] = description;
+	return description;
 }
 
 
@@ -248,14 +310,32 @@ AudioSource::~AudioSource()
 	Game.Audio().Remove(this);
 }
 
-bool AudioSource::LoadEvent(const std::string& eventpath)
+bool AudioSource::LoadEvent(const std::string& eventPath)
 {
+	EventDescription* description = Game.Audio().LoadDescription(eventPath);
+	if (description)
+	{
+		ERRCHECK(description->createInstance(&_event));
+		if (_event)		
+			return true;
+	}
+
 	return false;
 }
 
-bool AudioSource::Play()
+void AudioSource::Play() const
+{		
+	ERRCHECK(_event->start());
+}
+
+void AudioSource::SetParameter(const std::string& name, float value) const
 {
-	return false;
+	ERRCHECK(_event->setParameterValue(name.c_str(), value));
+}
+
+void AudioSource::UpdatePositionalData() const
+{
+	_event->set3DAttributes(&_attributes);
 }
 
 AudioListener::AudioListener(Entity& entity) : AudioManagerComponent(entity)
