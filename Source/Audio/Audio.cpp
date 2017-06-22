@@ -45,7 +45,7 @@ AudioManager::AudioManager(CGame& owner) : Component(owner)
 	ERRCHECK(FMOD::Studio::System::create(&_studioSystem));
 	ERRCHECK(_studioSystem->initialize(
 		1024,
-		FMOD_STUDIO_INIT_NORMAL,
+		FMOD_STUDIO_INIT_LIVEUPDATE,
 		FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED,
 		nullptr));
 	ERRCHECK(_studioSystem->getLowLevelSystem(&_system));
@@ -171,13 +171,6 @@ void AudioManager::LoadBank(const std::string& bankName,
 
 void AudioManager::PlayEvent(const std::string& eventName, const Vector3& position)
 {
-	/*
-	LoadEvent(eventName);
-	auto found = _events.find(eventName);
-	if (found != _events.end())
-		found->second->start();	
-	*/
-
 	FMOD::Studio::EventDescription* description = nullptr;
 	ERRCHECK(_studioSystem->getEvent(eventName.c_str(), &description));
 	if (description)
@@ -195,6 +188,14 @@ void AudioManager::PlayEvent(const std::string& eventName, const Vector3& positi
 			attributes.velocity = { 0.0f, 0.0f, 0.0f };
 			instance->set3DAttributes(&attributes);
 		}
+		else
+		{
+			LOG("Unable to create istance of sound event: %s", eventName.c_str());
+		}
+	}
+	else
+	{
+		LOG("Unable to locate sound event description: %s", eventName.c_str());
 	}
 }
 
@@ -239,6 +240,7 @@ void AudioManager::Add(AudioSource* source)
 
 void AudioManager::Remove(AudioSource* source)
 {
+	_sources.erase(remove(_sources.begin(), _sources.end(), source));
 }
 
 void AudioManager::Set(AudioListener* listener)
