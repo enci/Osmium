@@ -203,6 +203,13 @@ public:
 	/// Get bounding box
 	const AABB& GetBoundingBox() const { return _boundingBox; }
 
+	/// Gets wheter this body is kinematic (not simulated by physics)
+	bool GetKinematic() const { return _kinematic; }
+
+	/// Sets wheter this body is kinematic (not simulated by physics)
+	void SetKinematic(bool isKinematic) { _kinematic = isKinematic; }
+
+
 #ifdef INSPECTOR
 	virtual void Inspect() override;
 #endif
@@ -218,6 +225,7 @@ private:
 	/// Render the shape and the bounding volumes
 	void DebugRenderShape();
 
+	bool			_kinematic = false;
 	float			_radius = 1.0f;
 	float			_mass = 1.0f;
 	float			_momentOfInertia = 1.0f;
@@ -349,6 +357,10 @@ private:
 
 	/// Call events on all entities
 	void CallOnCollisionEvent();
+
+	static bool ResolveCollision(Collision2D& collision, PhysicsBody2D& first, PhysicsBody2D& second);
+
+	static bool ResolveCollision(Collision2D& collision, PhysicsBody2D& body);
 
 	/// Resolve overlap and velocity
 	void ResloveCollisions();

@@ -985,6 +985,109 @@ void PhysicsManager2D::CallOnCollisionEvent()
 	}
 }
 
+bool PhysicsManager2D::ResolveCollision(Collision2D& collision, PhysicsBody2D& first, PhysicsBody2D& second)
+{
+	//
+	// Resolve overlap
+	//
+	float totalMass = first._mass + second._mass;
+
+	// Calculate amount of penetration resoluion per total mass
+	Vector2 movePerMass = collision.Normal * (collision.Overlap / totalMass);
+
+	first._position += movePerMass * second.GetMass();
+	second._position -= movePerMass * first.GetMass();
+
+	first._position += collision.Normal * skin;
+	second._position -= collision.Normal * skin;
+
+	//
+	// Resolve impuleses
+	//
+
+	// Get velocity of point contact on first body
+	Vector2 rAP = collision.Position0 - first._position;
+	rAP = rAP.Perpendicular();
+	Vector2 velA = first._velocity + first._angularVelocity * rAP;
+
+	// Get velocity of point contact on first body
+	Vector2 rBP = collision.Position1 - second._position;
+	rBP = rBP.Perpendicular();
+	Vector2 velB = second._velocity + second._angularVelocity * rBP;
+			
+	Vector2 relativeVelocity = velA - velB;
+
+	// Get the velocity in the direction of the contact
+	float separatingVelocity = relativeVelocity.Dot(collision.Normal);
+
+	// Check if there is anything to resolve
+	if (separatingVelocity > 0)
+	{
+		// Contact separating or stationary, move along nothing to see
+		return true;
+	}
+
+	float inverseMass = 1 / first._mass + 1 / second._mass;
+	float denominator = Sqr(rAP.Dot(collision.Normal)) / first._momentOfInertia +
+		Sqr(rBP.Dot(collision.Normal)) / second._momentOfInertia +
+		inverseMass;
+	float impulse = (-(1 + collision.Restitution) * separatingVelocity) / denominator;
+			
+	first._velocity += (impulse / first._mass) * collision.Normal;
+	second._velocity -= (impulse / second._mass) * collision.Normal;
+
+	first._angularVelocity += rAP.Dot(impulse * collision.Normal) / first._momentOfInertia;
+	second._angularVelocity -= rBP.Dot(impulse * collision.Normal) / second._momentOfInertia;
+	return false;
+}
+
+bool PhysicsManager2D::ResolveCollision(Collision2D& collision, PhysicsBody2D& body)
+{
+	//
+	// Resolve overlap
+	//
+	float totalMass = body._mass;
+
+	// Calculate amount of penetration resoluion per total mass
+	//Vector2 movePerMass = collision.Normal * (collision.Overlap / totalMass);
+	//body._position -= movePerMass * body.GetMass();
+	//body._position -= collision.Normal * skin;
+
+	body._position += collision.Normal * collision.Overlap;
+
+	/*
+	//
+	// Resolve impuleses
+	//
+
+	// Get velocity of point contact on first body
+	Vector2 rAP = collision.Position0 - body._position;
+	rAP = rAP.Perpendicular();
+	Vector2 velA = body._velocity + body._angularVelocity * rAP;
+
+	Vector2 relativeVelocity = velA;
+
+	// Get the velocity in the direction of the contact
+	float separatingVelocity = relativeVelocity.Dot(collision.Normal);
+
+	// Check if there is anything to resolve
+	if (separatingVelocity > 0)
+	{
+		// Contact separating or stationary, move along nothing to see
+		return true;
+	}
+
+	float inverseMass = 1 / body._mass;
+	float denominator = Sqr(rAP.Dot(collision.Normal)) / body._momentOfInertia + inverseMass;
+	float impulse = (-(1 + collision.Restitution) * separatingVelocity) / denominator;
+
+	body._velocity += (impulse / body._mass) * collision.Normal;
+
+	body._angularVelocity += rAP.Dot(impulse * collision.Normal) / body._momentOfInertia;
+	*/
+	return false;
+}
+
 void PhysicsManager2D::ResloveCollisions()
 {
 	for (size_t i = 0; i < _collisions.size(); i++)
@@ -996,60 +1099,22 @@ void PhysicsManager2D::ResloveCollisions()
 			//
 			// Either a nasty hack or fantastic solution to having parented physics bodies
 			//
-			PhysicsBody2D& first = collision.FirstBody->_parent ? *collision.FirstBody->_parent : *collision.FirstBody ;
+			PhysicsBody2D& first = collision.FirstBody->_parent ? *collision.FirstBody->_parent : *collision.FirstBody;
 			PhysicsBody2D& second = collision.SecondBody->_parent ? *collision.SecondBody->_parent : *collision.SecondBody;
 
-			//
-			// Resolve overlap
-			//
-			float totalMass = first._mass + second._mass;
-
-			// Calculate amount of penetration resoluion per total mass
-			Vector2 movePerMass = collision.Normal * (collision.Overlap / totalMass);
-
-			first._position += movePerMass * second.GetMass();
-			second._position -= movePerMass * first.GetMass();
-
-			first._position += collision.Normal * skin;
-			second._position -= collision.Normal * skin;
-
-			//
-			// Resolve impuleses
-			//
-
-			// Get velocity of point contact on first body
-			Vector2 rAP = collision.Position0 - first._position;
-			rAP = rAP.Perpendicular();
-			Vector2 velA = first._velocity + first._angularVelocity * rAP;
-
-			// Get velocity of point contact on first body
-			Vector2 rBP = collision.Position1 - second._position;
-			rBP = rBP.Perpendicular();
-			Vector2 velB = second._velocity + second._angularVelocity * rBP;
-			
-			Vector2 relativeVelocity = velA - velB;
-
-			// Get the velocity in the direction of the contact
-			float separatingVelocity = relativeVelocity.Dot(collision.Normal);
-
-			// Check if there is anything to resolve
-			if (separatingVelocity > 0)
+			if (!first.GetKinematic() && !second.GetKinematic())
 			{
-				// Contact separating or stationary, move along nothing to see
-				continue;
+				ResolveCollision(collision, first, second);
 			}
-
-			float inverseMass = 1 / first._mass + 1 / second._mass;
-			float denominator = Sqr(rAP.Dot(collision.Normal)) / first._momentOfInertia +
-								Sqr(rBP.Dot(collision.Normal)) / second._momentOfInertia +
-								inverseMass;
-			float impulse = (-(1 + collision.Restitution) * separatingVelocity) / denominator;
-			
-			first._velocity += (impulse / first._mass) * collision.Normal;
-			second._velocity -= (impulse / second._mass) * collision.Normal;
-
-			first._angularVelocity += rAP.Dot(impulse * collision.Normal) / first._momentOfInertia;
-			second._angularVelocity -= rBP.Dot(impulse * collision.Normal) / second._momentOfInertia;
+			else if (first.GetKinematic() && !second.GetKinematic())
+			{
+				collision.Normal *= -1.0f;
+				ResolveCollision(collision, second);
+			}
+			else if (!first.GetKinematic() && second.GetKinematic())
+			{
+				ResolveCollision(collision, first);
+			}
 		}
 	}
 }
