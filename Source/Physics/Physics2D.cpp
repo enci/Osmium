@@ -128,33 +128,20 @@ Vector2 PhysicsBody2D::GetForward() const
 	return _matrix.TransformNormal(Vector2(0.0f, 1.0f));
 }
 
-void PhysicsBody2D::UpdateKinematc(float dt)
+// TODO: This packs parented and kinematic in one. Probably not a good idea.
+void PhysicsBody2D::UpdateKinematic(float dt)
 {
-	_parent = _transform->GetParent()->GetOwner().GetComponent<PhysicsBody2D>();
-
-	if(_parent)
+	Vector2 newPos = ToVector2(_transform->GetWorld() * Vector3(0, 0, 0));
+	if (!_initialized)
 	{
-		_parent->UpdateTransform();
-		_position = ToVector2(_transform->GetWorld() * Vector3(0, 0, 0));
-		_velocity = _parent->GetVelocity();
-		_angularVelocity = _parent->GetAngularVelocity();
-		_mass = _parent->GetMass();
-		_parent->SetMass(_mass * 10.0f);
+		_position = newPos;
 	}
 	else
 	{
-		Vector2 newPos = ToVector2(_transform->GetWorld() * Vector3(0, 0, 0));
-		if (!_initialized)
-		{
-			_position = newPos;
-		}
-		else
-		{
-			_velocity = (newPos - _position) / dt;
-			_position = newPos;
-			UpdateDerived();
-		}
-	}
+		_velocity = (newPos - _position) / dt;
+		_position = newPos;
+		UpdateDerived();
+	}	
 }
 
 void PhysicsBody2D::UpdateDynamic(float dt)
@@ -185,13 +172,32 @@ void PhysicsBody2D::UpdateDynamic(float dt)
 	UpdateDerived();
 }
 
+void PhysicsBody2D::UpdateParented(float dt)
+{
+	_parent = _transform->GetParent()->GetOwner().GetComponent<PhysicsBody2D>();
+
+	if (_parent)
+	{
+		_parent->UpdateTransform();
+		_position = ToVector2(_transform->GetWorld() * Vector3(0, 0, 0));
+		_velocity = _parent->GetVelocity();
+		_angularVelocity = _parent->GetAngularVelocity();
+		// _mass = _parent->GetMass();
+		// _parent->SetMass(_mass * 10.0f);
+	}
+	else
+	{
+		UpdateKinematic(dt);
+	}
+}
+
 void PhysicsBody2D::UpdateBody(float dt)
 {
 	// This is used during resolution. Keep it here!
 	_parent = nullptr;
 
-	if (_transform->GetParent())
-		UpdateKinematc(dt);		
+	if (_kinematic || _transform->GetParent())
+		UpdateKinematic(dt);		
 	else 
 		UpdateDynamic(dt);
 }
@@ -1055,7 +1061,7 @@ bool PhysicsManager2D::ResolveCollision(Collision2D& collision, PhysicsBody2D& b
 
 	body._position += collision.Normal * collision.Overlap;
 
-	/*
+	
 	//
 	// Resolve impuleses
 	//
@@ -1082,9 +1088,8 @@ bool PhysicsManager2D::ResolveCollision(Collision2D& collision, PhysicsBody2D& b
 	float impulse = (-(1 + collision.Restitution) * separatingVelocity) / denominator;
 
 	body._velocity += (impulse / body._mass) * collision.Normal;
-
 	body._angularVelocity += rAP.Dot(impulse * collision.Normal) / body._momentOfInertia;
-	*/
+
 	return false;
 }
 
