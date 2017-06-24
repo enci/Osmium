@@ -183,15 +183,13 @@ public:
 	Vector2 WorldToLocal(const Vector2& world) const;
 
 	/// Get the forward vector
-	Vector2 GetForward() const;
-	void UpdateKinematc(float dt);
-	void UpdateDynamic(float dt);
+	Vector2 GetForward() const;	
 
 	/// Update body - integrate forces
 	void UpdateBody(float dt);
 
 	/// Set collision shape
-	/// @param shap Covex polygon.
+	/// @param shape Covex polygon.
 	void SetCollisionShape(std::vector<Vector2>&& shape);
 
 	/// Get collision shape in local coordinates
@@ -224,6 +222,12 @@ private:
 
 	/// Render the shape and the bounding volumes
 	void DebugRenderShape();
+
+	void UpdateKinematic(float dt);
+
+	void UpdateDynamic(float dt);
+
+	void UpdateParented(float dt);
 
 	bool			_kinematic = false;
 	float			_radius = 1.0f;
