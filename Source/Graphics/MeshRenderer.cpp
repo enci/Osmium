@@ -183,18 +183,16 @@ bool MeshRenderer::CreateVAO()
 	return true;
 }
 
-
 #ifdef INSPECTOR
-
 void MeshRenderer::Inspect()
 {
+	ImGui::PushID(this);
+	ImGui::Checkbox("Enabled", &_enbled);
 	ImGui::OsmColor("Diffuse", _diffuse);
-	ImGui::OsmColor("Ambient", _ambient);
+	ImGui::OsmColor("Ambient", _ambient);		
+	ImGui::PopID();
 }
-
 #endif
-
-
 
 LightShaderParameter::LightShaderParameter(Shader* shader, const string& name) :
 	_positionParam(shader->GetParameter(name + ".position")),
