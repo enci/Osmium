@@ -19,9 +19,12 @@ void Entity::Inspect()
 	{
 		string name = typeid(*c).name();
 		name = StringReplace(name, "class ", "");
+
+		ImGui::PushID(c.get());
 		if (ImGui::CollapsingHeader(name.c_str()))
 		{
 			c->Inspect();
 		}
+		ImGui::PopID();
 	}
 }

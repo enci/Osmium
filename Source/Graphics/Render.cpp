@@ -177,7 +177,8 @@ void Camera::Inspect()
 
 void Light::Inspect()
 {
-	ImGui::OsmColor("Color", _color);
+	ImGui::Checkbox("Enabled", &_enbled);
+	ImGui::OsmColor("Color", _color);	
 }
 
 #endif

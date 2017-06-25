@@ -80,7 +80,7 @@ inline float DiskRadius(float A)
 
 #define LOG(macro_format, ...)										\
 {																	\
-	printf("[Osmium]");												\
+	printf("[Osmium] ");												\
 	printf(macro_format, ##__VA_ARGS__);							\
     const size_t macro_len = strlen(macro_format);					\
     if(macro_len > 0 && macro_format[macro_len - 1] != '\n')		\

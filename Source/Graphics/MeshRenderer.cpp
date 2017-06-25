@@ -96,6 +96,9 @@ void MeshRenderer::ActivateShader(	Camera* camera,
 	size_t maxPoint = _pointLightParams.size();
 	for (auto l : lights)
 	{
+		if(!l->GetEnbled())
+			continue;
+
 		if (l->GetLightType() == Light::DIRECTIONAL_LIGHT && dirLightsCount < maxDir)
 		{
 			_dirLightParams[dirLightsCount++]->SetValue(*l);
@@ -186,11 +189,9 @@ bool MeshRenderer::CreateVAO()
 #ifdef INSPECTOR
 void MeshRenderer::Inspect()
 {
-	ImGui::PushID(this);
 	ImGui::Checkbox("Enabled", &_enbled);
 	ImGui::OsmColor("Diffuse", _diffuse);
 	ImGui::OsmColor("Ambient", _ambient);		
-	ImGui::PopID();
 }
 #endif
 

@@ -30,8 +30,7 @@ GraphicsDevice::GraphicsDevice(CGame& engine) : Component(engine)
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // But also 4 if present
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-	
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);	
 
 	const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 	if(settings.FullScreen)
@@ -56,7 +55,7 @@ GraphicsDevice::GraphicsDevice(CGame& engine) : Component(engine)
 	int major = glfwGetWindowAttrib(_window, GLFW_CONTEXT_VERSION_MAJOR);
 	int minor = glfwGetWindowAttrib(_window, GLFW_CONTEXT_VERSION_MINOR);
 	int revision = glfwGetWindowAttrib(_window, GLFW_CONTEXT_REVISION);
-	std::cout << "OpenGL Version " << major << "." << minor << "." << revision << std::endl;
+	LOG("OpenGL Version %d.%d.%d", major, minor, revision);
 
 	if (!_window)
 	{

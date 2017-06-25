@@ -205,7 +205,7 @@ public:
 
 	Vector3 GetDirection() const { return _transform->GetOrientation().GetZAxis(); }
 
-	Vector3 GetPosition() const { return _transform->GetPosition(); }
+	Vector3 GetPosition() const { return _transform->GetWorld().GetTranslation(); }
 
 #ifdef INSPECTOR
 	virtual void Inspect() override;
