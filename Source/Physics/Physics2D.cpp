@@ -1052,16 +1052,10 @@ bool PhysicsManager2D::ResolveCollision(Collision2D& collision, PhysicsBody2D& b
 	//
 	// Resolve overlap
 	//
-	float totalMass = body._mass;
-
-	// Calculate amount of penetration resoluion per total mass
-	//Vector2 movePerMass = collision.Normal * (collision.Overlap / totalMass);
-	//body._position -= movePerMass * body.GetMass();
-	//body._position -= collision.Normal * skin;
+	//float totalMass = body._mass;
 
 	body._position += collision.Normal * collision.Overlap;
 
-	
 	//
 	// Resolve impuleses
 	//
@@ -1083,7 +1077,7 @@ bool PhysicsManager2D::ResolveCollision(Collision2D& collision, PhysicsBody2D& b
 		return true;
 	}
 
-	float inverseMass = 1 / body._mass;
+	float inverseMass = 1.0f / body._mass;
 	float denominator = Sqr(rAP.Dot(collision.Normal)) / body._momentOfInertia + inverseMass;
 	float impulse = (-(1 + collision.Restitution) * separatingVelocity) / denominator;
 
