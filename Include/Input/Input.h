@@ -58,6 +58,7 @@ class Joystick
 public:
 	Joystick()				{ _joystick = -1; }
 	bool IsValid() const	{ return _joystick != -1;  }
+	bool IsVirtual() const	{ return _joystick >= 256; }
 
 private:	
 	Joystick(int j)			{ _joystick = (int)j; }
@@ -113,10 +114,10 @@ public:
 
 	void RemoveJoystick(int joy);
 
+	void AddVirtualJoystick();
+
 #ifdef INSPECTOR
 	virtual void Inspect() override;
-
-	void AddVirtualJoystick();
 #endif
 
 private:

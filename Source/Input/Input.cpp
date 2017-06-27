@@ -36,6 +36,42 @@ void InputManager::Init()
 	}
 }
 
+unordered_map<JoystickButtons, int> joyMappingOne =
+{
+	{ JOYSTICK_BUTTON_A,			GLFW_KEY_G },
+	{ JOYSTICK_BUTTON_B,			GLFW_KEY_R },
+	{ JOYSTICK_BUTTON_X,			GLFW_KEY_F },
+	{ JOYSTICK_BUTTON_Y,			GLFW_KEY_0 },
+	{ JOYSTICK_BUTTON_LB,			GLFW_KEY_0 },
+	{ JOYSTICK_BUTTON_RB,			GLFW_KEY_0 },
+	{ JOYSTICK_BUTTON_BACK,			GLFW_KEY_Z },
+	{ JOYSTICK_BUTTON_START,		GLFW_KEY_X },
+	{ JOYSTICK_BUTTON_L3,			GLFW_KEY_0 },
+	{ JOYSTICK_BUTTON_R3,			GLFW_KEY_0 },
+	{ JOYSTICK_BUTTON_DPAD_UP,		GLFW_KEY_0 },
+	{ JOYSTICK_BUTTON_DPAD_RIGHT,	GLFW_KEY_E },
+	{ JOYSTICK_BUTTON_DPAD_DOWN,	GLFW_KEY_0 },
+	{ JOYSTICK_BUTTON_DPAD_LEFT,	GLFW_KEY_Q },
+};
+
+unordered_map<JoystickButtons, int> joyMappingTwo =
+{
+	{ JOYSTICK_BUTTON_A,			GLFW_KEY_M },
+	{ JOYSTICK_BUTTON_B,			GLFW_KEY_H },
+	{ JOYSTICK_BUTTON_X,			GLFW_KEY_N },
+	{ JOYSTICK_BUTTON_Y,			GLFW_KEY_0 },
+	{ JOYSTICK_BUTTON_LB,			GLFW_KEY_0 },
+	{ JOYSTICK_BUTTON_RB,			GLFW_KEY_0 },
+	{ JOYSTICK_BUTTON_BACK,			GLFW_KEY_Z	},
+	{ JOYSTICK_BUTTON_START,		GLFW_KEY_X },
+	{ JOYSTICK_BUTTON_L3,			GLFW_KEY_0 },
+	{ JOYSTICK_BUTTON_R3,			GLFW_KEY_0 },
+	{ JOYSTICK_BUTTON_DPAD_UP,		GLFW_KEY_0 },
+	{ JOYSTICK_BUTTON_DPAD_RIGHT,	GLFW_KEY_PERIOD },
+	{ JOYSTICK_BUTTON_DPAD_DOWN,	GLFW_KEY_0 },
+	{ JOYSTICK_BUTTON_DPAD_LEFT,	GLFW_KEY_COMMA },
+};
+
 void InputManager::Update()
 {	
 	if (_joyState.size() == 0)
@@ -46,27 +82,55 @@ void InputManager::Update()
 		int joy = i.first;
 		JoystickState& state = i.second;
 
+		// Virtual
 		if (joy >= 256)
-			continue;
-
-		int count;				
-		const float* axes = glfwGetJoystickAxes(joy, &count);
-
-		if (count != state.Axes.size())
-			state.Axes.resize(count);
-		for (int j = 0; j < count && j < JOYSTICK_AXIS_COUNT; j++)
 		{
-			state.LastAxes[j] = state.Axes[j];
-			state.Axes[j] = axes[j];
-		}		
+			const float f = 0.1f;
 
-		const unsigned char* buttons = glfwGetJoystickButtons(joy, &count);
-		if (count != state.Buttons.size())
-			state.Buttons.resize(count);
-		for (int j = 0; j < count && JOYSTICK_BUTTON_COUNT; j++)
+			for (int j = 0; j < JOYSTICK_AXIS_COUNT; j++)
+				state.LastAxes[j] = state.Axes[j];			
+
+			if (joy % 2 == 0)
+			{
+				state.Axes[JOYSTICK_AXIS_LEFT_THUMB_HORIZONTAL] = (float)(GetKey(GLFW_KEY_RIGHT) - GetKey(GLFW_KEY_LEFT));
+				state.Axes[JOYSTICK_AXIS_LEFT_THUMB_VERTICAL] = (float)(GetKey(GLFW_KEY_UP) - GetKey(GLFW_KEY_DOWN));
+				state.Axes[JOYSTICK_AXIS_RIGHT_TRIGGER] = (float)(GetKey(GLFW_KEY_J) * 2.0f - 1.0f);
+			}
+			else
+			{
+				state.Axes[JOYSTICK_AXIS_LEFT_THUMB_HORIZONTAL] = (float)(GetKey(GLFW_KEY_D) - GetKey(GLFW_KEY_A));
+				state.Axes[JOYSTICK_AXIS_LEFT_THUMB_VERTICAL] = (float)(GetKey(GLFW_KEY_W) - GetKey(GLFW_KEY_S));
+				state.Axes[JOYSTICK_AXIS_RIGHT_TRIGGER] = (float)(GetKey(GLFW_KEY_T) * 2.0f - 1.0f);
+			}
+
+			auto& mapping = joy % 2 != 0 ? joyMappingOne : joyMappingTwo;
+			for (int j = 0; j < JOYSTICK_BUTTON_COUNT; j++)
+			{
+				state.LastButtons[j] = state.Buttons[j];
+				state.Buttons[j] = GetKey(mapping[(JoystickButtons)j]);
+			}
+		}
+		else
 		{
-			state.LastButtons[j] = state.Buttons[j];
-			state.Buttons[j] = buttons[j];
+			int count;
+			const float* axes = glfwGetJoystickAxes(joy, &count);
+
+			if (count != state.Axes.size())
+				state.Axes.resize(count);
+			for (int j = 0; j < count && j < JOYSTICK_AXIS_COUNT; j++)
+			{
+				state.LastAxes[j] = state.Axes[j];
+				state.Axes[j] = axes[j];
+			}
+
+			const unsigned char* buttons = glfwGetJoystickButtons(joy, &count);
+			if (count != state.Buttons.size())
+				state.Buttons.resize(count);
+			for (int j = 0; j < count && JOYSTICK_BUTTON_COUNT; j++)
+			{
+				state.LastButtons[j] = state.Buttons[j];
+				state.Buttons[j] = buttons[j];
+			}
 		}
 	}
 }
