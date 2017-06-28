@@ -153,6 +153,11 @@ void AudioManager::Update(float dt)
 		}
 	}
 
+	for (auto& itr : _descriptions)
+	{
+		itr.second.Cooldown -= dt;
+	}
+
 	ERRCHECK(_studioSystem->update());
 }
 
@@ -172,7 +177,21 @@ void AudioManager::LoadBank(const std::string& bankName,
 void AudioManager::PlayEvent(const std::string& eventName, const Vector3& position)
 {
 	FMOD::Studio::EventDescription* description = nullptr;
-	ERRCHECK(_studioSystem->getEvent(eventName.c_str(), &description));
+	auto found = _descriptions.find(eventName);
+	if (found != _descriptions.end())
+	{
+		description = found->second.Description;
+		if (found->second.Cooldown > 0.0f)
+			return;
+	}
+	else
+	{
+		ERRCHECK(_studioSystem->getEvent(eventName.c_str(), &description));
+		_descriptions[eventName].Description = description;
+	}
+
+	
+	
 	if (description)
 	{
 		FMOD::Studio::EventInstance* instance = nullptr;
@@ -187,6 +206,7 @@ void AudioManager::PlayEvent(const std::string& eventName, const Vector3& positi
 			attributes.up = { 0.0f, 1.0f, 0.0f };
 			attributes.velocity = { 0.0f, 0.0f, 0.0f };
 			instance->set3DAttributes(&attributes);
+			_descriptions[eventName].Cooldown = 0.3f;
 		}
 		else
 		{
@@ -224,11 +244,11 @@ EventDescription* AudioManager::LoadDescription(const std::string& eventName)
 {
 	auto found = _descriptions.find(eventName);
 	if (found != _descriptions.end())
-		return found->second;
+		return found->second.Description;
 
 	EventDescription* description = nullptr;
 	ERRCHECK(_studioSystem->getEvent(eventName.c_str(), &description));
-	_descriptions[eventName] = description;
+	_descriptions[eventName].Description = description;
 	return description;
 }
 

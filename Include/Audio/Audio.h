@@ -85,12 +85,18 @@ private:
 	// std::map<std::string, FMOD::Sound*>						_sounds;
 	// std::map<int, FMOD::Channel*>							_channels;
 
+	struct DescriptionEntry
+	{
+		FMOD::Studio::EventDescription* Description;
+		float Cooldown;
+	};
+
 	FMOD::System*													_system = nullptr;
 	FMOD::Studio::System*											_studioSystem = nullptr;	
 
-	//std::unordered_map<std::string, FMOD::Studio::EventInstance*>	_events;
+	//std::unordered_map<std::string, FMOD::Studio::EventInstance*>	_events;	
 
-	std::unordered_map<std::string, FMOD::Studio::EventDescription*>	_descriptions;
+	std::unordered_map<std::string, DescriptionEntry>	_descriptions;
 
 	std::unordered_map<std::string, FMOD::Studio::Bank*>				_banks;
 	std::vector<FMOD::Studio::EventInstance*>							_events;

@@ -45,6 +45,11 @@ inline T Modulo(T x, T m) { return (x % m + m) % m; }
 template <class T>
 inline T Sqr(T x) { return x * x; }
 
+// https://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c
+///  Branchless, type-safe sign function
+template <typename T>
+int Sign(T val) { return (T(0) < val) - (val < T(0)); }
+
 template <class T>
 T Lerp(T a, T b, float t)
 {
