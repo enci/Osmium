@@ -118,7 +118,7 @@ void MeshRenderer::Draw()
 #ifdef INSPECTOR
 	if (_shader->Reloaded)
 		CreateVAO();
-#endif
+#endif	
 
 	const Matrix44& model = GetOwner().GetComponent<Transform>()->GetWorld();
 	Matrix44 modelView = _viewMatrix * model;

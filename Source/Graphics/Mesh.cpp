@@ -204,13 +204,14 @@ void Mesh::Apply()
 {
 	ClearGL();
 
+	if (_vertices.size() == 0 || _indices.size() == 0)
+		return;
+
 	// Allocate two buffers
-	glGenBuffers(2, _vbo);
-	
+	glGenBuffers(2, _vbo);	
 
 	// Array buffer contains the attribute data
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo[0]);
-	
 
 	// Copy into VBO
 	glBufferData(GL_ARRAY_BUFFER, sizeof(_vertices[0]) * _vertices.size(), &_vertices[0], GL_DYNAMIC_DRAW);
