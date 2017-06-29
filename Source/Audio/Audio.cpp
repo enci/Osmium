@@ -206,7 +206,7 @@ void AudioManager::PlayEvent(const std::string& eventName, const Vector3& positi
 			attributes.up = { 0.0f, 1.0f, 0.0f };
 			attributes.velocity = { 0.0f, 0.0f, 0.0f };
 			instance->set3DAttributes(&attributes);
-			_descriptions[eventName].Cooldown = 0.3f;
+			_descriptions[eventName].Cooldown = 0.066f;
 		}
 		else
 		{
