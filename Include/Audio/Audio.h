@@ -148,6 +148,10 @@ public:
 
 	void Play() const;
 
+	void SetVolume(float vol) const;
+
+	void SetPitch(float pitch) const;
+
 	void SetParameter(const std::string& name, float value) const;
 
 	void UpdatePositionalData() const;

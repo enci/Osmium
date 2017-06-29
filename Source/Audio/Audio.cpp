@@ -350,6 +350,16 @@ void AudioSource::Play() const
 	ERRCHECK(_event->start());
 }
 
+void AudioSource::SetVolume(float volume) const
+{
+	_event->setVolume(volume);
+}
+
+void AudioSource::SetPitch(float pitch) const
+{
+	_event->setPitch(pitch);
+}
+
 void AudioSource::SetParameter(const std::string& name, float value) const
 {
 	ERRCHECK(_event->setParameterValue(name.c_str(), value));
