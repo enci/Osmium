@@ -54,7 +54,24 @@ AudioManager::AudioManager(CGame& owner) : Component(owner)
 	LOG("FMOD Studio System Initialization Complete.");
 #endif
 
-	_system->set3DSettings(1.0f, 1.0f, 0.1f);
+	
+	_system->set3DSettings(1.0f, 1.0f, 0.05f);
+
+	/*
+	FMOD_VECTOR pos = { 0.0f, 20.0f, 0.0f };
+	FMOD_VECTOR vel = { 0.0f, 0.0f, 0.0f };
+	FMOD_VECTOR fwd = { 0.0f, 0.0f, 1.0f };
+	FMOD_VECTOR fwd = { 0.0f, 0.0f, 1.0f };
+	_system->set3DListenerAttributes(0, &pos, &vel,   )
+	*/
+
+	FMOD_3D_ATTRIBUTES attributes;
+	attributes.position = { 0.0f, 40.0f, 0.0f };
+	attributes.velocity = { 0.0f, 0.0f, 0.0f };
+	attributes.forward = { 0.0f, 0.0f, 1.0f };
+	attributes.up = { 0.0f, 1.0f, 0.0f };
+
+	_studioSystem->setListenerAttributes(0, &attributes);
 
 	/*
 	//ERRCHECK(	_studioSystem->initialize(1028,
