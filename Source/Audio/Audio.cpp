@@ -4,6 +4,7 @@
 #include <fmod_errors.h>
 #include <Core/Transform.h>
 #include <Physics/Physics2D.h>
+#include <imgui/imgui.h>
 
 #define VERBOSE_LEVEL 4
 
@@ -44,7 +45,7 @@ AudioManager::AudioManager(CGame& owner) : Component(owner)
 {	
 	ERRCHECK(FMOD::Studio::System::create(&_studioSystem));
 	ERRCHECK(_studioSystem->initialize(
-		1024,
+		128,
 		FMOD_STUDIO_INIT_LIVEUPDATE,
 		FMOD_INIT_NORMAL | FMOD_INIT_3D_RIGHTHANDED,
 		nullptr));
@@ -268,6 +269,27 @@ EventDescription* AudioManager::LoadDescription(const std::string& eventName)
 	_descriptions[eventName].Description = description;
 	return description;
 }
+
+#ifdef INSPECTOR
+void AudioManager::Inspect()
+{
+	size_t evCount = _events.size();
+	ImGui::LabelText("Event Count", "%d", evCount);
+
+	size_t srCount = _sources.size();
+	ImGui::LabelText("Sources Count", "%d", srCount);
+
+	EventDescription* des;
+	char path[256];
+	int retrieved;
+	for (auto ev : _events)
+	{
+		ERRCHECK(ev->getDescription(&des));
+		ERRCHECK(des->getPath(path, 256, &retrieved));
+		ImGui::LabelText("Path", path);
+	}
+}
+#endif
 
 
 void AudioManager::Add(AudioSource* source)

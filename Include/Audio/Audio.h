@@ -72,6 +72,10 @@ public:
 	FMOD_VECTOR VectorToFmod(const Vector3& vPosition);
 	*/
 
+#ifdef INSPECTOR
+	virtual void Inspect() override;
+#endif
+
 	void Add(AudioSource* source);
 
 	void Remove(AudioSource* source);
