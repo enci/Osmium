@@ -8,6 +8,7 @@
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
+#include <imgui/IconsFontAwesome.h>
 #include <Tools/Profiler.h>
 #include <cereal/archives/json.hpp>
 #include <fstream>
@@ -210,7 +211,8 @@ void CGame::Inspect()
 	
 	// Paused button
 	if (!_paused)
-		_paused = ImGui::Button("||");
+		//_paused = ImGui::Button("%s ICON_FA_PAUSE);
+		/*_paused = */ ImGui::Text("%s", ICON_FA_PAUSE);
 	else
 		_paused = !ImGui::Button("[>");
 	ImGui::SameLine();
