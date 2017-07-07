@@ -8,6 +8,7 @@
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <imgui/imgui_impl_glfw_gl3.h>
+#include <imgui/IconsFontAwesome.h>
 #include <Tools/Profiler.h>
 #include <cereal/archives/json.hpp>
 #include <fstream>
@@ -187,13 +188,13 @@ void CGame::Inspect()
 	bool p_open = true;
 
 	ImGui::BeginMainMenuBar();
-	if (ImGui::BeginMenu("Tools"))
+	if (ImGui::BeginMenu("View"))
 	{
-		ImGui::MenuItem("Game Inspector", nullptr, &_show_engine_compoents);
+		ImGui::MenuItem("Game", nullptr, &_show_engine_compoents);
 		// Just a reminder that this might be useful
 		// ImGui::MenuItem("Log", NULL, &show_app_log);
-		ImGui::MenuItem("World Inspector", nullptr, &_show_world_inspector);
-		ImGui::MenuItem("Settings Inspector", nullptr, &_show_settings);
+		ImGui::MenuItem("World", nullptr, &_show_world_inspector);
+		ImGui::MenuItem("Settings", nullptr, &_show_settings);
 		ImGui::MenuItem("Profiler", nullptr, &_show_profiler);
 #if SHOW_IMGUI
 		ImGui::MenuItem("ImGui Test", nullptr, &_show_imgui_test);
@@ -211,13 +212,14 @@ void CGame::Inspect()
 	
 	// Paused button
 	if (!_paused)
-		_paused = ImGui::Button("||");
+		//_paused = ImGui::Button("%s ICON_FA_PAUSE);
+		/*_paused = */ ImGui::Text(u8"%s", ICON_FA_PAUSE);
 	else
 		_paused = !ImGui::Button("[>");
 	ImGui::SameLine();
 	_advanceFrame = ImGui::Button(">|");
 	ImGui::SameLine();
-	_show_inspector = !ImGui::Button("X");				
+	_show_inspector = !ImGui::Button("X");
 	ImGui::SameLine();
 	ImGui::LabelText("Frame Time", "");
 	ImGui::SameLine();
@@ -226,7 +228,7 @@ void CGame::Inspect()
 
 	if (_show_world_inspector)
 	{
-		ImGui::Begin("World Inspector");
+		ImGui::Begin("World Inspector", &_show_world_inspector);
 		_world->Inspect();
 		ImGui::End();		
 	}
@@ -244,7 +246,7 @@ void CGame::Inspect()
 
 	if(_show_engine_compoents)
 	{		
-		ImGui::Begin("Game Inspector");
+		ImGui::Begin("Game Inspector", &_show_engine_compoents);
 		for (auto& c : _components)
 		{
 			string name = typeid(*c).name();
