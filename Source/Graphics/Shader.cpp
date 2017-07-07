@@ -111,7 +111,7 @@ bool ValidateProgram(GLuint prog)
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-void ShaderParameter::SetValue(float val)
+void ShaderParameter::SetValue(float val) const
 {
 	if (!IsValid())
 		return;
@@ -122,7 +122,7 @@ void ShaderParameter::SetValue(float val)
 }
 
 
-void ShaderParameter::SetValue(int val)
+void ShaderParameter::SetValue(int val) const
 {
 	if (!IsValid())
 		return;
@@ -132,7 +132,16 @@ void ShaderParameter::SetValue(int val)
 	
 }
 
-void ShaderParameter::SetValue(bool val)
+void ShaderParameter::SetValue(uint val) const
+{
+	if (!IsValid())
+		return;
+
+	ASSERT(_type == GL_UNSIGNED_INT);
+	glUniform1ui(_location, val);
+}
+
+void ShaderParameter::SetValue(bool val) const
 {
 	if (!IsValid())
 		return;
@@ -142,7 +151,7 @@ void ShaderParameter::SetValue(bool val)
 	
 }
 
-void ShaderParameter::SetValue(const Vector2& vec)
+void ShaderParameter::SetValue(const Vector2& vec) const
 {
 	if (!IsValid())
 		return;
@@ -152,7 +161,7 @@ void ShaderParameter::SetValue(const Vector2& vec)
 	
 }
 
-void ShaderParameter::SetValue(const Vector3& vec)
+void ShaderParameter::SetValue(const Vector3& vec) const
 {
 	if (!IsValid())
 		return;
@@ -162,7 +171,7 @@ void ShaderParameter::SetValue(const Vector3& vec)
 	
 }
 
-void ShaderParameter::SetValue(const Vector4& vec)
+void ShaderParameter::SetValue(const Vector4& vec) const
 {
 	if (!IsValid())
 		return;

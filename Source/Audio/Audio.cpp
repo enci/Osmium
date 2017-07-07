@@ -56,7 +56,8 @@ AudioManager::AudioManager(CGame& owner) : Component(owner)
 #endif
 
 	
-	_system->set3DSettings(1.0f, 1.0f, 0.05f);
+	//_system->set3DSettings(1.0f, 1.0f, 0.05f);
+	//_system->set3DSettings(1.0f, 1.0f, 0.05f);
 
 	/*
 	FMOD_VECTOR pos = { 0.0f, 20.0f, 0.0f };
@@ -72,7 +73,7 @@ AudioManager::AudioManager(CGame& owner) : Component(owner)
 	attributes.forward = { 0.0f, 0.0f, 1.0f };
 	attributes.up = { 0.0f, 1.0f, 0.0f };
 
-	_studioSystem->setListenerAttributes(0, &attributes);
+	//_studioSystem->setListenerAttributes(0, &attributes);
 
 	/*
 	//ERRCHECK(	_studioSystem->initialize(1028,
@@ -140,7 +141,8 @@ void AudioManager::Update(float dt)
 	// Update listener
 	if(_listener)
 	{		
-		//_studioSystem->setListenerAttributes();
+		const auto& data =_listener->GetPositionalData();
+		_studioSystem->setListenerAttributes(0, &data);
 	}
 	else
 	{

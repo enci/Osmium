@@ -10,6 +10,12 @@
 	#endif
 #endif
 
+#ifdef DEBUG
+	#define LOGGING 1
+#else
+	#define LOGGING 1
+#endif
+
 #define INSPECTOR
 
 namespace Osm
@@ -81,7 +87,7 @@ inline float DiskRadius(float A)
 	return sqrt(A / Pi);
 }
 
-#ifdef DEBUG
+#if LOGGING
 
 #define LOG(macro_format, ...)										\
 {																	\

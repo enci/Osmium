@@ -131,7 +131,7 @@ void World::Inspect()
 	*/
 
 
-	for(int i = 0; i < _entities.size(); i++)
+	for(size_t i = 0; i < _entities.size(); i++)
 	{
 		auto& e = _entities[i];
 		string name = e->GetName();
