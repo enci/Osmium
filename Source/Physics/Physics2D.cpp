@@ -291,10 +291,10 @@ void PhysicsBody2D::DebugRenderShape()
 {
 	auto& shape = _collisionShapeWorld;
 
-	auto n = shape.size();
+	size_t n = shape.size();
 	Color color(105, 105, 105);
 	
-	for (auto i = 0; i < n; i++)
+	for (size_t i = 0; i < n; i++)
 	{
 		Vector2& v0 = shape[i];
 		Vector2& v1 = shape[(i + 1) % n];

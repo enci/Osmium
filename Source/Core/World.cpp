@@ -131,8 +131,12 @@ void World::Inspect()
 		InspectEntity(_entities[i].get(), inspected);
 	}
 
+<<<<<<< HEAD
+	for(size_t i = 0; i < _entities.size(); i++)
+=======
 	/*
 	for(int i = 0; i < _entities.size(); i++)
+>>>>>>> af4e0d8c116e96549e3868e56880240ba63f0fa3
 	{
 		auto& e = _entities[i];
 		string name = e->GetName();

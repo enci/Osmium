@@ -86,7 +86,7 @@ Label::Label(	const string& labelText,
 
 	float xpos = 0;
 	float ymax = -FLT_MAX;
-	for (int ch = 0; ch < utf32text.size(); ++ch)
+	for (size_t ch = 0; ch < utf32text.size(); ++ch)
 	{
 		auto codepoint = utf32text[ch];
 		int advance, lsb, x0, y0, x1, y1;

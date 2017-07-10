@@ -55,5 +55,6 @@ namespace Osm
 namespace ImGui
 {
 	void OsmColor(const char* label, Osm::Color& color, bool showAplha = true);
+	void SetUIStyle(bool darkStyle, float alpha);
 	//   void    Value(const char* prefix, const MyMatrix44& v, const char* float_format = NULL);
 }

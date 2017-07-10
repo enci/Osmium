@@ -116,7 +116,7 @@ bool Osm::StringStartsWith(const std::string& subject,
 	}
 
 	// Compare per character:
-	for (int i = 0; i < prefix.length(); ++i)
+	for (size_t i = 0; i < prefix.length(); ++i)
 	{
 		if (subject[i] != prefix[i])
 		{

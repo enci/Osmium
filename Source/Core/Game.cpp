@@ -80,6 +80,7 @@ void CGame::Initialize(const GameSettings& options)
 {
 	_settings = options;
 	InitializeInternal();
+	ImGui::SetUIStyle(true, 1.0f);
 }
 
 void CGame::Shutdown()

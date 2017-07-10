@@ -51,14 +51,14 @@ void MeshRenderer::SetShader(Shader* shader)
 	_fogFarColorParam = shader->GetParameter("u_fogColorFar");
 	_timeParam = shader->GetParameter("u_time");
 
-	for (size_t i = 0; i < kMaxDirecationalLights; i++)
+	for (int i = 0; i < kMaxDirecationalLights; i++)
 	{
 		string name = "u_directionalLights[" + to_string(i) + "]";
 		auto lprm = new LightShaderParameter(_shader, name);
 		_dirLightParams.push_back(unique_ptr<LightShaderParameter>(lprm));
 	}
 
-	for (size_t i = 0; i < kMaxPointLights; i++)
+	for (int i = 0; i < kMaxPointLights; i++)
 	{
 		string name = "u_pointLights[" + to_string(i) + "]";
 		auto lprm = new LightShaderParameter(_shader, name);
@@ -99,11 +99,11 @@ void MeshRenderer::ActivateShader(	Camera* camera,
 		if(!l->GetEnbled())
 			continue;
 
-		if (l->GetLightType() == Light::DIRECTIONAL_LIGHT && dirLightsCount < maxDir)
+		if (l->GetLightType() == Light::DIRECTIONAL_LIGHT && dirLightsCount < (int)maxDir)
 		{
 			_dirLightParams[dirLightsCount++]->SetValue(*l);
 		}
-		else if (l->GetLightType() == Light::POINT_LIGHT && pointLightsCount < maxPoint)
+		else if (l->GetLightType() == Light::POINT_LIGHT && pointLightsCount < (int)maxPoint)
 		{
 			_pointLightParams[pointLightsCount++]->SetValue(*l);
 		}

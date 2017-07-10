@@ -38,22 +38,25 @@ public:
 	GLint GetLocation() const { return _location; }
 
 	/// Set the value. Parameter should be float.
-	void SetValue(float val);
+	void SetValue(float val) const;
 
 	/// Set the value. Parameter should be int.
-	void SetValue(int val);
+	void SetValue(int val) const;
+
+	/// Set the value. Parameter should be int.
+	void SetValue(uint val) const;
 
 	/// Set the value. Parameter should be bool.
-	void SetValue(bool val);
+	void SetValue(bool val) const;
 
 	/// Set the value. Parameter should be Vector2.
-	void SetValue(const Vector2& vec);
+	void SetValue(const Vector2& vec) const;
 
 	/// Set the value. Parameter should be Vector3.
-	void SetValue(const Vector3& vec);
+	void SetValue(const Vector3& vec) const;
 
 	/// Set the value. Parameter should be Vector4.
-	void SetValue(const Vector4& vec);
+	void SetValue(const Vector4& vec) const;
 
 	/// Set the value. Parameter should be Color.
 	void SetValue(const Color& color);
