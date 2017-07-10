@@ -441,12 +441,14 @@ vector<PhysicsBody2D*> Steering::GetFlockingNeighbors()
 	neighbors = _physicsManager->GetInRadius(v, FlockingRadius);
 	if (FlockingTag != 0)
 	{
-		remove_if(	neighbors.begin(), 
-					neighbors.end(), 
-					[this](PhysicsBody2D* b)
-		{
-			return b->GetOwner().GetTag() != FlockingTag;
-		});
+		neighbors.erase(
+			remove_if(	neighbors.begin(), 
+						neighbors.end(), 
+						[this](PhysicsBody2D* b)
+			{
+				return b->GetOwner().GetTag() != FlockingTag;
+			})
+		);
 	}
 	return neighbors;
 }

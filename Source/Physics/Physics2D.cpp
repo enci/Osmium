@@ -894,7 +894,7 @@ void PhysicsManager2D::AccumulateContactsBruteForce()
 			const AABB& box0 = body0->GetBoundingBox();
 			const AABB& box1 = body1->GetBoundingBox();
 
-			if (!box0.IsValid() || !box0.IsValid())
+			if (!box0.IsValid() || !box1.IsValid())
 				break;
 
 			if (Overlap(box0, box1))
@@ -933,7 +933,7 @@ void PhysicsManager2D::AccumulateContactsAutoGrid()
 				const AABB& box0 = b->GetBoundingBox();
 				const AABB& box1 = n->GetBoundingBox();
 
-				if (!box0.IsValid() || !box0.IsValid())
+				if (!box0.IsValid() || !box1.IsValid())
 					break;
 
 				if (Overlap(box0, box1))

@@ -126,7 +126,7 @@ void InputManager::Update()
 			const unsigned char* buttons = glfwGetJoystickButtons(joy, &count);
 			if (count != state.Buttons.size())
 				state.Buttons.resize(count);
-			for (int j = 0; j < count && JOYSTICK_BUTTON_COUNT; j++)
+			for (int j = 0; j < count && j < JOYSTICK_BUTTON_COUNT; j++)
 			{
 				state.LastButtons[j] = state.Buttons[j];
 				state.Buttons[j] = buttons[j];
