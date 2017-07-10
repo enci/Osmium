@@ -64,6 +64,7 @@ struct Collision2D
 		, Overlap(overlap)
 		, Position(position)
 		, Resolved(false)
+		, Restitution(0.8f)
 	{}
 
 	float SeparatingVelocity() const;

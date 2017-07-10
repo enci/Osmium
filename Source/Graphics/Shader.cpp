@@ -18,7 +18,7 @@ bool CompileShader(GLuint* shader, GLenum type, const GLchar* source)
 
 	if (!source)
 	{
-		LOG("Failed to load shader %s \n", source);
+		LOG("Failed to load empty shader");
 		return false;
 	}
 
@@ -34,7 +34,7 @@ bool CompileShader(GLuint* shader, GLenum type, const GLchar* source)
 	{
 		GLchar *log = static_cast<GLchar *>(malloc(logLength));
 		glGetShaderInfoLog(*shader, logLength, &logLength, log);
-		LOG("Shader compile log:\n%s", log);
+		if(log) LOG("Shader compile log:\n%s", log);
 		free(log);
 	}
 #endif
@@ -67,7 +67,7 @@ bool LinkProgram(GLuint prog)
 	{
 		GLchar *log = static_cast<GLchar *>(malloc(logLength));
 		glGetProgramInfoLog(prog, logLength, &logLength, log);
-		LOG("Program link log:\n%s", log);
+		if(log) LOG("Program link log:\n%s", log);
 		free(log);
 	}
 #endif
