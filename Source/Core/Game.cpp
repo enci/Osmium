@@ -18,7 +18,7 @@ using namespace std;
 
 CGame Osm::Game;
 
-#define SHOW_IMGUI 0
+#define SHOW_IMGUI 1
 
 void GameSettings::LoadFromFile(const std::string& file)
 {
@@ -202,6 +202,8 @@ void CGame::Inspect()
 		ImGui::EndMenu();
 	}
 
+	//ImGui::ShowStyleEditor();
+
 	if (ImGui::BeginMenu("About"))
 	{
 		string timestamp = __TIMESTAMP__;
@@ -212,14 +214,13 @@ void CGame::Inspect()
 	
 	// Paused button
 	if (!_paused)
-		//_paused = ImGui::Button("%s ICON_FA_PAUSE);
-		/*_paused = */ ImGui::Text(u8"%s", ICON_FA_PAUSE);
+		_paused = ImGui::Button(ICON_FA_PAUSE);
 	else
-		_paused = !ImGui::Button("[>");
+		_paused = !ImGui::Button(ICON_FA_PLAY);
 	ImGui::SameLine();
-	_advanceFrame = ImGui::Button(">|");
+	_advanceFrame = ImGui::Button(ICON_FA_FAST_FORWARD);
 	ImGui::SameLine();
-	_show_inspector = !ImGui::Button("X");
+	_show_inspector = !ImGui::Button(ICON_FA_TIMES);
 	ImGui::SameLine();
 	ImGui::LabelText("Frame Time", "");
 	ImGui::SameLine();

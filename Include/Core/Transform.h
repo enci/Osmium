@@ -62,8 +62,8 @@ inline Transform::Transform(Entity& entity)
 	: Component(entity)
 	, _parent(nullptr)
 	, _orientation()
-	, _position(0, 0, 0)
-	, _scale(1, 1, 1)
+	, _position(0.0f, 0.0f, 0.0f)
+	, _scale(1.0f, 1.0f, 1.0f)
 {
 }
 

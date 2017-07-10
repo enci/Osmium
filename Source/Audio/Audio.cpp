@@ -29,11 +29,12 @@ FMOD_VECTOR Osm::VectorToFmod(const Vector3& vector)
 	return v;
 }
 
+
 FMOD_VECTOR Osm::VectorToFmod(const Vector2& vector)
 {
-	FMOD_VECTOR v = { vector.x, 0.0f, vector.y };
-	return v;
+	return VectorToFmod(ToVector3(vector));
 }
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -55,9 +56,10 @@ AudioManager::AudioManager(CGame& owner) : Component(owner)
 	LOG("FMOD Studio System Initialization Complete.");
 #endif
 
+	float size = 80.0f;
 	
 	//_system->set3DSettings(1.0f, 1.0f, 0.05f);
-	//_system->set3DSettings(1.0f, 1.0f, 0.05f);
+	_system->set3DSettings(1.0f / size, size, 1.0f / size);
 
 	/*
 	FMOD_VECTOR pos = { 0.0f, 20.0f, 0.0f };
@@ -68,20 +70,18 @@ AudioManager::AudioManager(CGame& owner) : Component(owner)
 	*/
 
 	FMOD_3D_ATTRIBUTES attributes;
-	attributes.position = { 0.0f, 40.0f, 0.0f };
+	attributes.position = { 0.0f, 0.0f, 0.0f };
 	attributes.velocity = { 0.0f, 0.0f, 0.0f };
 	attributes.forward = { 0.0f, 0.0f, 1.0f };
 	attributes.up = { 0.0f, 1.0f, 0.0f };
 
-	//_studioSystem->setListenerAttributes(0, &attributes);
+	_studioSystem->setListenerAttributes(0, &attributes);
 
 	/*
 	//ERRCHECK(	_studioSystem->initialize(1028,
 	//			FMOD_STUDIO_INIT_LIVEUPDATE,
 	//			FMOD_INIT_PROFILE_ENABLE,
 	//			nullptr));
-
-	
 
 	FMOD::Studio::Bank* masterBank = nullptr;
 	ERRCHECK(_studioSystem->loadBankFile("Assets/Audio/Master Bank.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &masterBank));
@@ -137,16 +137,16 @@ AudioManager::~AudioManager()
 
 void AudioManager::Update(float dt)
 {
-
 	// Update listener
 	if(_listener)
 	{		
+		_listener->Update(dt);
 		const auto& data =_listener->GetPositionalData();
 		_studioSystem->setListenerAttributes(0, &data);
 	}
 	else
 	{
-		//_studioSystem->set
+		// Do nothing for now
 	}
 
 	// Update sources
@@ -209,8 +209,6 @@ void AudioManager::PlayEvent(const std::string& eventName, const Vector3& positi
 		ERRCHECK(_studioSystem->getEvent(eventName.c_str(), &description));
 		_descriptions[eventName].Description = description;
 	}
-
-	
 	
 	if (description)
 	{
@@ -306,10 +304,12 @@ void AudioManager::Remove(AudioSource* source)
 
 void AudioManager::Set(AudioListener* listener)
 {
+	_listener = listener;
 }
 
 void AudioManager::Remove(AudioListener* listener)
 {
+	_listener = nullptr;
 }
 
 
