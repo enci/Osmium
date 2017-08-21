@@ -22,9 +22,11 @@ void joystick_callback(int joy, int event)
 InputManager::InputManager(CGame& engine)
 	: Component(engine)
 	, _joyState(0)
+	, _profiles(3)
 {
 	Init();
 	glfwSetJoystickCallback(joystick_callback);
+	InitProfiles();
 }
 
 void InputManager::Init()
@@ -139,7 +141,17 @@ bool InputManager::GetJoystickButton(Joystick joystick, JoystickButtons button)
 {
 	if (_joyState.find(joystick) != _joyState.end())
 	{
-		return _joyState[joystick].Buttons[button] == 1;
+		JoystickProfile profile = _joyState[joystick].Profile;
+		ProfileMapping& mapping = _profiles[(int)profile];
+
+		if ((int)button < (int)mapping.Buttons.size())
+		{
+			int btnIdx = mapping.Buttons[(int)button];
+			if (btnIdx < (int)_joyState[joystick].Buttons.size())
+			{
+				return		_joyState[joystick].Buttons[btnIdx] == 1;
+			}
+		}
 	}
 	return false;
 }
@@ -148,14 +160,41 @@ bool InputManager::GetJoystickButtonPressed(Joystick joystick, JoystickButtons b
 {
 	if (_joyState.find(joystick) != _joyState.end())
 	{
-		return		_joyState[joystick].Buttons[button]
-				&&	!_joyState[joystick].LastButtons[button];
+		JoystickProfile profile = _joyState[joystick].Profile;
+		ProfileMapping& mapping = _profiles[(int)profile];
+
+		if((int)button < (int)mapping.Buttons.size())
+		{
+			int btnIdx = mapping.Buttons[button];
+			if (btnIdx < (int)_joyState[joystick].Buttons.size())
+			{
+				return		_joyState[joystick].Buttons[btnIdx]
+					&& !_joyState[joystick].LastButtons[btnIdx];
+			}
+		}		
 	}
 	return false;
 }
 
 float InputManager::GetJoystickAxis(Joystick joystick, JoystickAxes axis)
 {
+	if (_joyState.find(joystick) != _joyState.end())
+	{
+		JoystickProfile profile = _joyState[joystick].Profile;
+		ProfileMapping& mapping = _profiles[(int)profile];
+
+		if (axis < (int)mapping.Axes.size())
+		{
+			int axsIdx = mapping.Axes[axis];
+			int dir = mapping.AxisDirections[axis];						
+			if (axsIdx < (int)_joyState[joystick].Axes.size())
+			{
+				return	_joyState[joystick].Axes[axsIdx] * dir;
+			}
+		}
+	}
+	return 0.0f;
+
 	if (_joyState.find(joystick) != _joyState.end())
 	{
 		return _joyState[joystick].Axes[axis];
@@ -177,6 +216,12 @@ void InputManager::AddJoystick(int joy)
 	JoystickState state;
 	state.Name = name + " " + to_string(joy);
 	LOG("Joystick %s connected.", name.c_str());
+	
+	if (name == "Wireless Gamepad")
+		state.Profile = JOYSTICK_PROFILE_JOYCON;
+	else if(name == "Wireless Controller")
+		state.Profile = JOYSTICK_PROFILE_PS4;
+
 	_joyState[joy] = state;
 }
 
@@ -234,27 +279,24 @@ void InputManager::AddVirtualJoystick()
 
 void InputManager::InitProfiles()
 {
-	/*
-	Profile xboxOne;
-	xboxOne.Buttons		= 
-	{
-		0,		// JOYSTICK_BUTTON_A
-		1,		// JOYSTICK_BUTTON_B
-		2,		// JOYSTICK_BUTTON_X
-		3,		// JOYSTICK_BUTTON_Y
-		// JOYSTICK_BUTTON_LB
-		// JOYSTICK_BUTTON_RB
-		// JOYSTICK_BUTTON_BACK
-		// JOYSTICK_BUTTON_START
-		// JOYSTICK_BUTTON_DPAD_UP
-		// JOYSTICK_BUTTON_DPAD_DOWN
-		// JOYSTICK_BUTTON_DPAD_LEFT
-		// JOYSTICK_BUTTON_DPAD_RIGHT
-		// JOYSTICK_BUTTON_R3
-		// JOYSTICK_BUTTON_L3
-	};
-	xboxOne.Axes		= {0, 1,  5, 4};
-	*/
+	ProfileMapping xbox;
+	xbox.Buttons	=  { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
+	xbox.Axes		=  { 0, 1, 2, 3, 4, 5 };
+	xbox.AxisDirections = { 1, 1, 1, 1, 1, 1 };
+	_profiles[JOYSTICK_PROFILE_XBOX] = xbox;
+
+	ProfileMapping ps4;
+	ps4.Buttons = { 1, 2, 0, 3, 4, 5, 8, 9, 10, 11, 10, 11, 12, 13 };
+	ps4.Axes = { 0, 1, 2, 5, 3, 4 };
+	ps4.AxisDirections = { 1, -1, 1, -1, 1, 1 };
+	_profiles[JOYSTICK_PROFILE_PS4] = ps4;
+
+
+	ProfileMapping joycon;
+	joycon.Buttons = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
+	joycon.Axes = { 0, 1, 2, 3, 4, 5 };
+	joycon.AxisDirections = { 1, -1, 1, 1, 1, 1 };
+	_profiles[JOYSTICK_PROFILE_JOYCON] = joycon;
 }
 
 bool InputManager::GetKeyOnce(char key)

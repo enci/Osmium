@@ -126,7 +126,7 @@ void World::Inspect()
 
 	
 	set<Entity*> inspected;	
-	for (int i = 0; i < _entities.size(); i++)
+	for (size_t i = 0; i < _entities.size(); i++)
 	{
 		InspectEntity(_entities[i].get(), inspected);
 	}

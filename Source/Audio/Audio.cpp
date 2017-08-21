@@ -25,7 +25,8 @@ void ERRCHECK_fn(FMOD_RESULT result, const char *file, int line)
 
 FMOD_VECTOR Osm::VectorToFmod(const Vector3& vector)
 {
-	FMOD_VECTOR v = { vector.x, vector.y, vector.z };
+	float f = 1.0f / 80.0f;
+	FMOD_VECTOR v = { vector.x * f, vector.y * f, vector.z * f };
 	return v;
 }
 
@@ -45,6 +46,9 @@ FMOD_VECTOR Osm::VectorToFmod(const Vector2& vector)
 AudioManager::AudioManager(CGame& owner) : Component(owner)
 {	
 	ERRCHECK(FMOD::Studio::System::create(&_studioSystem));
+	ERRCHECK(_studioSystem->getLowLevelSystem(&_system));
+	ERRCHECK(_system->setSoftwareFormat(0, FMOD_SPEAKERMODE_5POINT1, 0));
+
 	ERRCHECK(_studioSystem->initialize(
 		128,
 		FMOD_STUDIO_INIT_LIVEUPDATE,
@@ -59,7 +63,7 @@ AudioManager::AudioManager(CGame& owner) : Component(owner)
 	float size = 80.0f;
 	
 	//_system->set3DSettings(1.0f, 1.0f, 0.05f);
-	_system->set3DSettings(1.0f / size, size, 1.0f / size);
+	//_system->set3DSettings(1.0f / size, size, 1.0f / size);
 
 	/*
 	FMOD_VECTOR pos = { 0.0f, 20.0f, 0.0f };
@@ -67,7 +71,7 @@ AudioManager::AudioManager(CGame& owner) : Component(owner)
 	FMOD_VECTOR fwd = { 0.0f, 0.0f, 1.0f };
 	FMOD_VECTOR fwd = { 0.0f, 0.0f, 1.0f };
 	_system->set3DListenerAttributes(0, &pos, &vel,   )
-	*/
+
 
 	FMOD_3D_ATTRIBUTES attributes;
 	attributes.position = { 0.0f, 0.0f, 0.0f };
@@ -77,56 +81,8 @@ AudioManager::AudioManager(CGame& owner) : Component(owner)
 
 	_studioSystem->setListenerAttributes(0, &attributes);
 
-	/*
-	//ERRCHECK(	_studioSystem->initialize(1028,
-	//			FMOD_STUDIO_INIT_LIVEUPDATE,
-	//			FMOD_INIT_PROFILE_ENABLE,
-	//			nullptr));
-
-	FMOD::Studio::Bank* masterBank = nullptr;
-	ERRCHECK(_studioSystem->loadBankFile("Assets/Audio/Master Bank.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &masterBank));
-
-	FMOD::Studio::Bank* stringsBank = nullptr;
-	ERRCHECK(_studioSystem->loadBankFile("Assets/Audio/Master Bank.strings.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &stringsBank));
-
-	FMOD::Studio::Bank* ambienceBank = nullptr;
-	ERRCHECK(_studioSystem->loadBankFile("Assets/Audio/Character.bank", FMOD_STUDIO_LOAD_BANK_NORMAL, &ambienceBank));
-	ambienceBank->loadSampleData();
-	
-	FMOD::Studio::EventDescription* desc[200];
-	int count;
-
-	ambienceBank->getEventList(desc, 200, &count);
-
-	char path[1024];
-	int retieved;
-
-	for (int i = 0; i < count; i++)
-	{
-		ERRCHECK(desc[i]->getPath(path, 1024, &retieved));
-		LOG("Path: %s", path);
-	}
-	
-
-	FMOD::Studio::EventDescription* eventDescription = nullptr;
-	ERRCHECK(_studioSystem->getEvent("event:/Character/Footsteps/Footsteps", &eventDescription));
-
-	// Find the parameter once and then set by index
-	// Or we can just find by name every time but by index is more efficient if we are setting lots of parameters
-	FMOD_STUDIO_PARAMETER_DESCRIPTION paramDesc;
-	ERRCHECK(eventDescription->getParameter("Surface", &paramDesc));
-	int surfaceIndex = paramDesc.index;
-
-	FMOD::Studio::EventInstance* eventInstance = nullptr;
-	ERRCHECK(eventDescription->createInstance(&eventInstance));
-
-	// Make the event audible to start with
-	float surfaceParameterValue = 0;
-	ERRCHECK(eventInstance->setParameterValueByIndex(surfaceIndex, 1.0f));
-	ERRCHECK(eventInstance->getParameterValueByIndex(surfaceIndex, &surfaceParameterValue));
-
-	ERRCHECK(eventInstance->start());
 	*/
+	
 }
 
 AudioManager::~AudioManager()
@@ -218,13 +174,18 @@ void AudioManager::PlayEvent(const std::string& eventName, const Vector3& positi
 		{
 			_events.push_back(instance);
 			instance->start();
-			FMOD_3D_ATTRIBUTES attributes;
-			attributes.position = VectorToFmod(position);
-			attributes.forward = { 0.0f, 0.0f, 1.0f };
-			attributes.up = { 0.0f, 1.0f, 0.0f };
-			attributes.velocity = { 0.0f, 0.0f, 0.0f };
-			instance->set3DAttributes(&attributes);
 			_descriptions[eventName].Cooldown = 0.066f;
+			bool is3D = false;
+			ERRCHECK(description->is3D(&is3D));
+			if (is3D)
+			{
+				FMOD_3D_ATTRIBUTES attributes;
+				attributes.position =	VectorToFmod(position);
+				attributes.forward =	{ 0.0f, 0.0f, 1.0f };
+				attributes.up =			{ 0.0f, 1.0f, 0.0f };
+				attributes.velocity =	{ 0.0f, 0.0f, 0.0f };
+				instance->set3DAttributes(&attributes);
+			}
 		}
 		else
 		{
@@ -377,10 +338,15 @@ bool AudioSource::LoadEvent(const std::string& eventPath)
 {
 	EventDescription* description = Game.Audio().LoadDescription(eventPath);
 	if (description)
-	{
+	{		
 		ERRCHECK(description->createInstance(&_event));
-		if (_event)		
+		if (_event)
+		{
+			bool _is3D = false;
+			ERRCHECK(description->is3D(&_is3D));
+
 			return true;
+		}
 	}
 
 	return false;

@@ -40,16 +40,6 @@ enum JoystickAxes
 	JOYSTICK_AXIS_COUNT							// 6
 };
 
-struct Profile
-{
-	std::vector<int>	Axes;
-	std::vector<int>	Buttons;
-
-	Profile()
-		: Axes(JOYSTICK_AXIS_COUNT)
-		, Buttons(JOYSTICK_BUTTON_COUNT) {}
-};
-
 class InputManager;
 
 class Joystick
@@ -70,6 +60,25 @@ class InputManager : public Component<CGame>
 {
 private:
 
+	enum JoystickProfile
+	{
+		JOYSTICK_PROFILE_XBOX = 0,
+		JOYSTICK_PROFILE_PS4,
+		JOYSTICK_PROFILE_JOYCON,
+		JOYSTICK_PROFILE_COUNT
+	};
+
+	struct ProfileMapping
+	{
+		std::vector<int>	Axes;
+		std::vector<int>	Buttons;
+		std::vector<int>	AxisDirections;
+
+		ProfileMapping()
+			: Axes(JOYSTICK_AXIS_COUNT)
+			, Buttons(JOYSTICK_BUTTON_COUNT) {}
+	};
+
 	struct JoystickState
 	{
 		//int					Joystick;		// Implementation ID of the joystick 
@@ -78,11 +87,11 @@ private:
 		std::vector<int>	Buttons;		// All the buttons		
 		std::vector<float>	LastAxes;		// All the axes from previous update
 		std::vector<int>	LastButtons;	// All the buttons from previous update
-		int					Profile;		// The profile (default -1 = Xbox)
+		JoystickProfile		Profile;		// The profile (default -1 = Xbox)
 
 		JoystickState()
 			: /*Joystick(-1),*/ Axes(8), Buttons(24)
-			, LastAxes(8), LastButtons(24), Profile(-1) {}
+			, LastAxes(8), LastButtons(24), Profile(JOYSTICK_PROFILE_XBOX) {}
 	};
 
 public:
@@ -122,7 +131,7 @@ public:
 
 private:
 	uint									_count;
-	std::vector<Profile>					_profiles;
+	std::vector<ProfileMapping>				_profiles;
 	std::unordered_map<int, JoystickState>	_joyState;	// Indexed by tokens
 	int										_nextVirtual = 256;
 	char									_keyOnce[256 + 1];
