@@ -71,8 +71,8 @@ Entity* World::GetEntityByID(uint id)
 
 #ifdef INSPECTOR
 
-void InspectEntity(Entity* entity, set<Entity*>& inspected)
-{
+void InspectEntity(Entity* entity, set<Entity*>& inspected, uint& selected)
+{ 
 	if(inspected.find(entity) != inspected.end())
 		return;	
 
@@ -92,13 +92,17 @@ void InspectEntity(Entity* entity, set<Entity*>& inspected)
 		if (ImGui::TreeNodeEx(id, node_flags, name.c_str()))
 		//if (ImGui::TreeNode(name.c_str()))
 		{
+			ImGui::PushID((int)selected);
+			selected = entity->GetID();
+
 			auto childern = trn->GetChildern();
 			for (auto child : childern)
 			{
 				auto e = &child->GetOwner();
-				InspectEntity(e, inspected);
+				InspectEntity(e, inspected, selected);
 			}
-			ImGui::TreePop();
+			ImGui::PopID();
+			ImGui::TreePop();			
 		}			
 		//}
 		//else
@@ -121,19 +125,21 @@ void World::Inspect()
 	}
 
 	ImGui::Separator();
-	vector<bool> selected(_entities.size(), false);
-	static uint Id = -1;
 
-	
+	// vector<bool> selected(_entities.size(), false);
+	// static uint Id = -1;
+	static uint selectedId = -1;
+
+	/*
 	set<Entity*> inspected;	
 	for (size_t i = 0; i < _entities.size(); i++)
 	{
-		InspectEntity(_entities[i].get(), inspected);
+		InspectEntity(_entities[i].get(), inspected, selectedId);
 	}
+	*/
 
-	/*
+
 	for(size_t i = 0; i < _entities.size(); i++)
-	for(int i = 0; i < _entities.size(); i++)
 	{
 		auto& e = _entities[i];
 		string name = e->GetName();
@@ -144,14 +150,13 @@ void World::Inspect()
 
 		if(ImGui::Selectable(name.c_str()))
 		{
-			Id = e->GetID();
+			selectedId = e->GetID();
 		}
 	}
-	*/
 
-	if (Id != -1)
+	if (selectedId != -1)
 	{
-		Entity* e = GetEntityByID(Id);
+		Entity* e = GetEntityByID(selectedId);
 		if (e)
 		{
 			ImGui::Begin("Entity Inspector");
