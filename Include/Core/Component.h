@@ -59,8 +59,7 @@ template <class E>
 template <class T>
 T* ComponentContainer<E>::CreateComponent()
 {
-	E* _this = dynamic_cast<E*>(this);
-	ASSERT(_this);
+	E* _this = static_cast<E*>(this);
 	T* component = new T(*_this);
 	_components.push_back(std::unique_ptr<Component<E>>(component));
 	return component;

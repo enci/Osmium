@@ -16,7 +16,7 @@
 	#define LOGGING 1
 #endif
 
-#define INSPECTOR
+#define INSPECTOR 1
 
 namespace Osm
 {
