@@ -75,11 +75,11 @@ void ToolModel::Setup()
 	switch (_model)
 	{
 	case Sphere:
-		_mesh = new Mesh();
+		_mesh = Game.Resources().CreateResource<Mesh>();
 		GenerateIcosphere(_size, _sphereTesselation, vertices, indices);
 		break;
 	case Plane:
-		_mesh = new Mesh();
+		_mesh = Game.Resources().CreateResource<Mesh>();
 		GeneratePlane(10.0f * _size, _planeResolution, vertices, indices);
 		break;
 	case Monkey:

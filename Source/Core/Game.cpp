@@ -180,7 +180,6 @@ void CGame::Inspect()
 	ImGui::GetIO().FontGlobalScale = _settings.InspectorFontSize;
 
 	ImGuiWindowFlags window_flags = 0;
-	//window_flags |= ImGuiWindowFlags_NoTitleBar;	
 	window_flags |= ImGuiWindowFlags_MenuBar;
 
 	ImGui_ImplGlfwGL3_NewFrame();
@@ -201,8 +200,6 @@ void CGame::Inspect()
 #endif
 		ImGui::EndMenu();
 	}
-
-	//ImGui::ShowStyleEditor();
 
 	if (ImGui::BeginMenu("About"))
 	{
@@ -262,7 +259,7 @@ void CGame::Inspect()
 
 	if (_show_settings)
 	{
-		ImGui::Begin("Settings Inspector");
+		ImGui::Begin("Settings Inspector", &_show_settings);
 		_settings.Inspect();
 		ImGui::End();
 	}

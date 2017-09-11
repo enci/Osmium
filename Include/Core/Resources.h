@@ -17,12 +17,17 @@ public:
 	template<typename T, typename... Args>
 	T* LoadResource(Args... args);
 
+	template<typename T, typename... Args>
+	T* CreateResource(Args... args);
+
 	void ReleaseResource(Resource* res);
 
 	void Update(float deltaTime);
 
 #ifdef INSPECTOR
 	void Inspect() override;
+	uint FliterFlags = 0xFFFFFFFF;
+	bool ShowGenerated = false;
 #endif
 
 protected:
@@ -39,6 +44,18 @@ protected:
 	/// A map of reference counters
 	std::unordered_map<ullong, uint>				_refCounters;
 };
+
+template <typename T, typename ... Args>
+T* ResourceManager::CreateResource(Args ... args)
+{
+	T* resource = new T(args...);
+	ullong id = T::CalculateResourceID(resource->Path());
+	_resources.insert(std::make_pair(id, resource));
+	_refCounters.insert(std::make_pair(id, 1));
+	resource->_resourceID = id;
+	resource->_generated = true;
+	return resource;
+}
 
 template<typename T, typename... Args>
 T* ResourceManager::LoadResource(Args... args)

@@ -53,8 +53,10 @@ public:
 
 	Entity* GetEntityByID(uint id);
 
-#ifdef INSPECTOR
+#ifdef INSPECTOR	
 	virtual void Inspect();
+	void InspectEntity(Entity* entity, std::set<Entity*>& inspected, uint& selected);
+	bool _entityInspect = true;
 #endif
 
 protected:

@@ -23,12 +23,11 @@ uint64_t trihash(short k, short l, short m)
 
 }
 
-Mesh::Mesh(const std::string& filename)
+Mesh::Mesh(const std::string& filename, bool apply)
 	: Resource(RESOURCE_TYPE_MESH)
 	, _indexCount(0)
 	, _vbo{0, 0}
-{
-	_resourcePath = filename;
+{	
 	bool success = Load(filename);
 	if (!success)
 	{
@@ -36,7 +35,16 @@ Mesh::Mesh(const std::string& filename)
 		LOG("Mesh::Mesh(%s) - Unable to load mesh.", filename.c_str());
 			return;
 	}
-	Apply();
+	
+	if(apply)	
+	{
+		_resourcePath = filename;
+		Apply();
+	}	
+	else
+	{
+		_resourcePath = filename + " [CPU]";
+	}
 }
 
 Mesh::Mesh()
@@ -62,6 +70,16 @@ bool Mesh::Load(const std::string& filename)
 	if (StringEndsWith(filename, ".binarymesh"))
 		return LoadBINMESH(filename);
 	return false;
+}
+
+ullong Mesh::CalculateResourceID(const std::string& filename)
+{ return Resource::CalculateResourceID(filename); }
+
+ullong Mesh::CalculateResourceID(const std::string& filename, bool apply)
+{
+	if(apply)
+		return Resource::CalculateResourceID(filename);
+	return Resource::CalculateResourceID(filename + " [CPU]");
 }
 
 bool Mesh::LoadOBJ(const string& filename)

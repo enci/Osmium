@@ -49,6 +49,11 @@ public:
 	/// @returns the resource path.
 	///
 	const std::string& Path() const { return _resourcePath; }
+	
+
+	/// Returns true if the resource has been generated, rather than loaded
+	///
+	bool Generated() const { return _generated; }
 
 	/// A default way to create a resource ID. Resources that have more than a single parameter
 	/// (shader for example) can overload the method. The Resources class will no complie if
@@ -82,6 +87,9 @@ protected:
 
 	/// The type of this resource, as set by the constructor.
 	ResourceType                _type;
+
+	/// True if the resource has been generated, rather than loaded
+	bool						_generated = false;
 
 #ifdef INSPECTOR
 public:

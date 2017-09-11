@@ -13,6 +13,7 @@ Entity::Entity(World& world)
 	, _world(world)	
 {}
 
+#ifdef INSPECTOR
 void Entity::Inspect()
 {
 	for (auto& c : _components)
@@ -21,10 +22,12 @@ void Entity::Inspect()
 		name = StringReplace(name, "class ", "");
 
 		ImGui::PushID(c.get());
-		if (ImGui::CollapsingHeader(name.c_str()))
+		if (ImGui::CollapsingHeader(name.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			c->Inspect();
 		}
 		ImGui::PopID();
 	}
 }
+
+#endif

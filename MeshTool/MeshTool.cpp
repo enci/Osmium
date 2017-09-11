@@ -1,4 +1,6 @@
 #include <Graphics/Mesh.h>
+#include <Core/Resources.h>
+#include <Core/Game.h>
 #include <fstream>
 
 using namespace std;
@@ -15,8 +17,7 @@ int main(int argc, char *argv[])
 	if (!StringEndsWith(filename, ".obj"))
 		return 2;
 
-	Mesh* m = new Mesh();
-	m->Load(filename);
+	Mesh* m = Game.Resources().LoadResource<Mesh>(filename, false);
 
 	const auto& vertices = m->GetVertices();
 	const auto& indices = m->GetIndices();

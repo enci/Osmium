@@ -18,10 +18,11 @@ struct VertexFormat
 
 class Mesh : public Resource
 {
-public:
+	friend class ResourceManager;
 
+protected:
 	/// Imports an OBJ model mesh
-	Mesh(const std::string& filename);
+	Mesh(const std::string& filename, bool apply = true);
 
 	/// Create an empty mesh
 	Mesh();
@@ -32,6 +33,7 @@ public:
 	/// Imports an model mesh
 	bool Load(const std::string& filename);
 
+public:
 	/// Set the mesh vertices 
 	void SetVertices(std::vector<VertexFormat>&& vertices);
 
@@ -74,6 +76,10 @@ public:
 		uint IndexCount		= 0;
 		uint VertexCount	= 0;
 	};
+
+	static ullong CalculateResourceID(const std::string& filename);
+
+	static ullong CalculateResourceID(const std::string& filename, bool apply);
 
 protected:	
 

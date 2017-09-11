@@ -25,6 +25,7 @@ public:
 
 #ifdef INSPECTOR
 	virtual void Inspect() {}
+	bool InspectorOpen = true;
 #endif
 
 protected:

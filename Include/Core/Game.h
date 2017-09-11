@@ -27,7 +27,6 @@ struct GameSettings
 	void Inspect();
 #endif
 
-
 	int ScreenWidth = 1920;
 	int ScreenHeight = 1080;
 	bool FullScreen = false;
