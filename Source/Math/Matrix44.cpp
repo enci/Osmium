@@ -15,15 +15,6 @@ Osm::Matrix44::Matrix44(	float m00, float m01, float m02, float m03,
 
 Osm::Matrix44::Matrix44()
 {
-	/*
-	// Set zeros
-	memset(static_cast<void*>(m), 0x0, 4 * 4 * sizeof(float));
-	//
-	m[0][0] = 1.0f;
-	m[1][1] = 1.0f;
-	m[2][2] = 1.0f;
-	m[3][3] = 1.0f;
-	*/
 	m[0][0] = 1.0f; m[0][1] = 0.0f; m[0][2] = 0.0f; m[0][3] = 0.0f;
 	m[1][0] = 0.0f; m[1][1] = 1.0f; m[1][2] = 0.0f; m[1][3] = 0.0f;
 	m[2][0] = 0.0f; m[2][1] = 0.0f; m[2][2] = 1.0f; m[2][3] = 0.0f;
@@ -493,27 +484,10 @@ void Osm::Matrix44::SetOrientation(	const Vector3 &x,
 	m[2][0] = z.x; m[2][1] = z.y; m[2][2] = z.z;
 }
 
-void Osm::Matrix44::SetEulerAxis(float yaw, float pitch, float roll)
+void Osm::Matrix44::SetEulerAngles(const Vector3& angles)
 {
-	float phi = pitch;
-	float psi = yaw;
-	float theta = roll;
-
-	*this = CreateIdentity();
-	m[0][0] = cosf(psi) * cosf(phi) - cosf(theta) * sinf(phi) * sinf(psi);
-	m[0][1] = cosf(psi) * sinf(phi) + cosf(theta) * cosf(phi) * sinf(psi);
-	m[0][2] = sinf(psi) * sinf(theta);
-	//
-	m[1][0] = -sinf(psi) * cosf(phi) - cosf(theta) * sinf(phi) * cosf(psi);
-	m[1][1] = -sinf(psi) * sinf(phi) + cosf(theta) * cosf(phi) * cosf(psi);
-	m[1][2] = cosf(psi) * sinf(theta);
-	//
-	m[2][0] = sinf(theta) * sinf(phi);
-	m[2][1] = -sinf(theta) * cosf(phi);
-	m[2][2] = cosf(theta);
-	Transpose();
+	*this = CreateRotateX(angles.x) * CreateRotateY(angles.y) * CreateRotateZ(angles.z);
 }
-
 
 Osm::Vector3 Osm::Matrix44::TransformDirectionVector(const Vector3& dir)
 {
@@ -529,4 +503,27 @@ Osm::Vector3 Osm::Matrix44::TransformDirectionVector(const Vector3& dir)
 		dir.y * m[1][2] +
 		dir.z * m[2][2]);
 	return res;
+}
+
+Osm::Vector3 Osm::Matrix44::GetEulerAngles() const
+{
+	float sy = sqrt(m[0][0] * m[0][0] + m[1][0] * m[1][0]);
+
+	bool singular = sy < 1e-6; // If
+
+	float x, y, z;
+	if (!singular)
+	{
+		x = atan2(m[2][1], m[2][2]);
+		y = atan2(-m[2][0], sy);
+		z = atan2(m[1][0], m[0][0]);
+	}
+	else
+	{
+		x = atan2(-m[1][2], m[1][1]);
+		y = atan2(-m[2][0], sy);
+		z = 0;
+	}
+
+	return Vector3(-x, -y, -z);
 }

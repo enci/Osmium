@@ -98,7 +98,10 @@ struct Matrix44
 						const Vector3& z);
 
 	/// Set orientation using Euler angles. Broken at current!
-	void SetEulerAxis(float yaw, float pitch, float roll);
+	void SetEulerAngles(const Vector3& angles);
+
+	/// Set orientation using Euler angles. Broken at current!
+	//void SetEulerAxis(float yaw, float pitch, float roll);
 
 	/// Creates an identity matrix
 	///
@@ -143,6 +146,8 @@ struct Matrix44
 
 	/// Transfrom just the direction
 	Vector3 TransformDirectionVector(const Vector3& direction);
+
+	Osm::Vector3 GetEulerAngles() const;
 };
 
 }

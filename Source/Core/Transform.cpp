@@ -49,8 +49,15 @@ void Transform::SetParent(Transform* parent)
 	_parent->_childern.push_back(this);
 }
 
+#ifdef INSPECTOR
 void Transform::Inspect()
 {
 	ImGui::DragFloat3("Position", _position.f);
 	ImGui::DragFloat3("Scale", _scale.f);
+
+	Vector3 euler = _orientation.GetEulerAngles();
+	ImGui::DragFloat3("Rotation", euler.f, 0.001f);
+	_orientation.SetEulerAngles(euler);
 }
+#endif
+
