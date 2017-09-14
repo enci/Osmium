@@ -13,6 +13,11 @@ RenderManager::RenderManager(World& world)
 	, _framebufferName(0)
 	, _renderedTexture(0)
 {
+
+#ifdef INSPECTOR
+	glGenQueries(RENDER_PASSES_NUM, _queries);
+#endif
+
 	/*
 	// Get settings
 	auto settings = Game.Settings();
@@ -71,6 +76,18 @@ void RenderManager::Render()
 
 	Shader* activeShader = nullptr;
 
+#ifdef INSPECTOR
+	DrawCalls = 0;
+	ShaderSwitches = 0;
+
+	if (!_firstFrame)
+		glGetQueryObjectuiv(_queries[FORWARD_PASS],
+			GL_QUERY_RESULT,
+			&_queryResults[FORWARD_PASS]);
+
+	glBeginQuery(GL_TIME_ELAPSED, _queries[FORWARD_PASS]);
+#endif
+
 	for (auto c : _cameras)
 	{
 		Matrix44 view = c->GetView();
@@ -85,10 +102,23 @@ void RenderManager::Render()
 			{
 				renderer->ActivateShader(c, _lights);
 				activeShader = renderer->GetShader();
+#ifdef INSPECTOR
+				ShaderSwitches++;
+#endif
 			}
 			renderer->Draw();
+#ifdef INSPECTOR
+			DrawCalls++;
+#endif
 		}
 	}
+
+#ifdef INSPECTOR
+	glEndQuery(GL_TIME_ELAPSED);
+	DrawCalls++;
+	_firstFrame = false;
+#endif
+
 }
 
 void RenderManager::Add(Renderable* renderable)
@@ -121,10 +151,17 @@ void RenderManager::Remove(Camera* camera)
 	_cameras.erase(remove(_cameras.begin(), _cameras.end(), camera));
 }
 
+#ifdef INSPECTOR
 void RenderManager::Inspect()
 {
 	ImGui::Text("Total renderables: %d", _renderables.size());
+	ImGui::Text("Draw Calls: %d", DrawCalls);
+	ImGui::Text("Shader Switches: %d", ShaderSwitches);
+	
+	double time = _queryResults[FORWARD_PASS] / 1000000.0;
+	ImGui::Text("Render Time: %.3f", time);
 }
+#endif
 
 Renderable::Renderable(Entity& entity) :  RenderManagerComponent(entity)
 {

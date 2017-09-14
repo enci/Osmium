@@ -67,7 +67,7 @@ void ToolModel::Setup()
 	if (_mesh && _mesh == _teapot)
 		Game.Resources().ReleaseResource(_mesh);
 	else
-		delete _mesh;
+		Game.Resources().ReleaseResource(_mesh);
 	
 	vector<VertexFormat> vertices;
 	vector<ushort> indices;

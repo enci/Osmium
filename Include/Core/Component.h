@@ -8,7 +8,7 @@ namespace Osm
 {
 
 template <class E>
-class Component : public IDable<Component<E>>
+class Component
 {
 public:
 	explicit Component(E& entity) : _owner(entity), _enbled(true) {}

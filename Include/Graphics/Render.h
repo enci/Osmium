@@ -42,6 +42,9 @@ public:
 
 #ifdef INSPECTOR
 	virtual void Inspect() override;
+
+	int DrawCalls = 0;
+	int ShaderSwitches = 0;
 #endif
 
 protected:
@@ -53,6 +56,22 @@ protected:
 	GLuint _framebufferName;
 	GLuint _renderedTexture;
 	GLuint _depthrenderbuffer;
+
+#ifdef 	INSPECTOR
+	enum
+	{
+		GEOMETRY_PASS = 0,
+		LIGHT_PASS,
+		SSAO_PASS,
+		BLOOM_PASS,
+		FORWARD_PASS,
+		SHADOW_PASS,
+		RENDER_PASSES_NUM
+	} RenderPasses;
+	GLuint	_queries[RENDER_PASSES_NUM];
+	GLuint	_queryResults[RENDER_PASSES_NUM];
+	bool	_firstFrame = true;
+#endif
 };
 
 ///
