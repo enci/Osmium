@@ -76,6 +76,8 @@ void World::InspectEntity(Entity* entity, set<Entity*>& inspected, uint& selecte
 	if(inspected.find(entity) != inspected.end())
 		return;	
 
+	inspected.insert(entity);
+
 	static ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 
 	string name = entity->GetName();
