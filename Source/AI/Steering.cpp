@@ -16,7 +16,11 @@ Steering::Steering(Entity& entity)
 Vector2 Steering::GetSteering()
 {
 	CalculatePrioritized();
+
+#if DEBUG_RENDER
 	DebugRender();
+#endif
+
 	return _current;
 }
 
@@ -180,7 +184,7 @@ Vector2 Steering::OffsetPursuit(const PhysicsBody2D* agent, const Vector2& offse
 	// for the evader's current position.
 	Vector2 toTarget = target - _physicsBody->GetPosition();
 
-	gDebugRenderer.AddLine(ToVector3(target), ToVector3(_physicsBody->GetPosition()));
+	gDebugRenderer.AddLine(DebugRenderer::AI, ToVector3(target), ToVector3(_physicsBody->GetPosition()));
 
 	// The lookahead time is propotional to the distance between the evader
 	// and the pursuer; and is inversely proportional to the sum of the
@@ -356,12 +360,14 @@ Vector2 Steering::ObstacleAvoidance()
 				//if(_inspect)
 				{
 					gDebugRenderer.AddCircle(
+						DebugRenderer::AI,
 						//ToVector3(localPos),
 						ToVector3(pos),
 						ob->GetRadius(),
 						Color::White);
 
 					gDebugRenderer.AddCircle(
+						DebugRenderer::AI,
 						ToVector3(localPos),
 						ob->GetRadius(),
 						Color::Orange);
@@ -409,6 +415,7 @@ Vector2 Steering::ObstacleAvoidance()
 		{
 			gDebugRenderer.AddCircle(
 				//ToVector3(localPos),
+				DebugRenderer::AI,
 				ToVector3(pos),
 				closestIntersectingObstacle->GetRadius() * 1.2f,
 				Color::Yellow);
@@ -551,26 +558,31 @@ Vector2 Steering::Alignment(const std::vector<PhysicsBody2D*>& agents)
 	return averageHeading;
 }
 
+#if DEBUG_RENDER
 void Steering::DebugRender()
 {
 	if (_inspect)
 	{
 		auto pos = _physicsBody->GetPosition();
 		gDebugRenderer.AddCircle(
+			DebugRenderer::AI,
 			ToVector3(pos),
 			_physicsBody->GetRadius(),
 			Color::Purple);
 		gDebugRenderer.AddLine(
+			DebugRenderer::AI,
 			ToVector3(pos),
 			ToVector3(pos + _current),
 			Color::Orange);
 		gDebugRenderer.AddCircle(
+			DebugRenderer::AI,
 			ToVector3(pos),
 			FlockingRadius,
 			Color::Purple);
 	}
 	_inspect = false;
 }
+#endif
 
 #ifdef INSPECTOR
 void Steering::Inspect()

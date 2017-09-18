@@ -41,6 +41,7 @@ void AABB::AddPoint(const Vector2& point)
 		Min.y = point.y;
 }
 
+#if DEBUG_RENDER
 void AABB::DebugRender() const
 {
 	Color color = Color::Orange;
@@ -48,11 +49,12 @@ void AABB::DebugRender() const
 	Vector3 B(Max.x, 0.0f, Min.y);
 	Vector3 D(Min.x, 0.0f, Max.y);
 	Vector3 C(Max.x, 0.0f, Max.y);
-	gDebugRenderer.AddLine(A, B, color);
-	gDebugRenderer.AddLine(B, C, color);
-	gDebugRenderer.AddLine(C, D, color);
-	gDebugRenderer.AddLine(D, A, color);
+	gDebugRenderer.AddLine(DebugRenderer::PHYSICS, A, B, color);
+	gDebugRenderer.AddLine(DebugRenderer::PHYSICS, B, C, color);
+	gDebugRenderer.AddLine(DebugRenderer::PHYSICS, C, D, color);
+	gDebugRenderer.AddLine(DebugRenderer::PHYSICS, D, A, color);
 }
+#endif
 
 bool AABB::IsValid() const
 {
@@ -98,7 +100,9 @@ void Osm::PhysicsBody2D::AddForceAtWorldPoint(const Vector2& f, const Vector2& p
 	_torque += toP.Cross(f);
 	_force += f;
 
-	gDebugRenderer.AddLine(ToVector3(p), ToVector3(p+f), Color::Purple);
+#if DEBUG_RENDER
+	gDebugRenderer.AddLine(DebugRenderer::PHYSICS, ToVector3(p), ToVector3(p+f), Color::Purple);
+#endif
 }
 
 void PhysicsBody2D::AddForceAtLocalPoint(const Vector2& f, const Vector2& p)
@@ -278,7 +282,9 @@ void PhysicsBody2D::UpdateDerived()
 
 void PhysicsBody2D::UpdateTransform()
 {
+#if DEBUG_RENDER
 	DebugRenderShape();
+#endif
 
 	if (!_initialized || _transform->GetParent())
 		return;
@@ -287,24 +293,27 @@ void PhysicsBody2D::UpdateTransform()
 	_transform->SetOrientation(Matrix44::CreateRotateY(_orientation));
 }
 
+#if DEBUG_RENDER
 void PhysicsBody2D::DebugRenderShape()
 {
 	auto& shape = _collisionShapeWorld;
 
 	size_t n = shape.size();
-	Color color(105, 105, 105);
+	Color color = Color::Red;
 	
 	for (size_t i = 0; i < n; i++)
 	{
 		Vector2& v0 = shape[i];
 		Vector2& v1 = shape[(i + 1) % n];
 
-		gDebugRenderer.AddLine( ToVector3(v0), ToVector3(v1), color);
+		gDebugRenderer.AddLine(DebugRenderer::PHYSICS, ToVector3(v0), ToVector3(v1), color);
 	}
 
 	//gDebugRenderer.AddCircle(_transform->GetPosition(), _radius * 1.02f);
 	//_boundingBox.DebugRender();
 }
+
+#endif
 
 MultiGrid::MultiGrid(const std::vector<PhysicsBody2D*>& bodies)
 {
@@ -358,13 +367,14 @@ void MultiGrid::DebugRender()
 
 		Vector2 pos(i * _cellSize, j * _cellSize);
 
-		gDebugRenderer.AddCircle(ToVector3(pos));
+		gDebugRenderer.AddCircle(DebugRenderer::PHYSICS, ToVector3(pos));
 
 
 		auto& v = cell.second;
 		for (auto b : v)
 		{
 			gDebugRenderer.AddLine(
+				DebugRenderer::PHYSICS,
 				ToVector3(b->GetPosition()),
 				ToVector3(pos));
 		}
@@ -527,12 +537,14 @@ void AutoGrid::DebugRender()
 	
 	for (int i = 0; i <= _gridx; i++, x += dx)
 		gDebugRenderer.AddLine(
+			DebugRenderer::PHYSICS,
 			ToVector3(Vector2(x, _min.y)),
 			ToVector3(Vector2(x, _max.y)),
 			Color::Grey);
 
 	for (int i = 0; i <= _gridy; i++, y += dy)
 		gDebugRenderer.AddLine(
+			DebugRenderer::PHYSICS,
 			ToVector3(Vector2(_min.x, y)),
 			ToVector3(Vector2(_max.x, y)),
 			Color::Grey);
@@ -544,11 +556,12 @@ void AutoGrid::DebugRender()
 			Vector2 c(i * dx, j * dy);
 			c += Vector2(dx / 2, dy / 2);
 			c += _min;
-			gDebugRenderer.AddCircle(ToVector3(c), 0.3f, Color::Red, 3);
+			gDebugRenderer.AddCircle(DebugRenderer::PHYSICS, ToVector3(c), 0.3f, Color::Red, 3);
 
 			for (auto b : _grid[i][j])
 			{
 				gDebugRenderer.AddLine(
+					DebugRenderer::PHYSICS,
 					ToVector3(b->GetPosition()),
 					ToVector3(c),
 					Color::Red);
@@ -560,6 +573,7 @@ void AutoGrid::DebugRender()
 					if (n < b)
 					{
 						gDebugRenderer.AddLine(
+							DebugRenderer::PHYSICS,
 							ToVector3(b->GetPosition()),
 							ToVector3(n->GetPosition()),
 							Color::Orange);
@@ -632,7 +646,7 @@ vector<PhysicsBody2D*> PhysicsManager2D::GetInRadius(const Vector2& position, fl
 	}
 }
 
-Interection2D PhysicsManager2D::RayIntersect(const Vector2& origin, const Vector2& direction)
+Intersection2D PhysicsManager2D::RayIntersect(const Vector2& origin, const Vector2& direction)
 {
 	Vector2 dir = direction;
 	dir.Normalize();
@@ -648,7 +662,7 @@ Interection2D PhysicsManager2D::RayIntersect(const Vector2& origin, const Vector
 	auto toLocal = toWorld.Inverse();
 
 	float minY = FLT_MAX;
-	Interection2D intersection;	// Invalid when created
+	Intersection2D intersection;	// Invalid when created
 
 	for (size_t b = 0; b < _bodies.size(); b++)
 	{
@@ -742,7 +756,7 @@ Vector2 FindSupport(const Vector2& axis, const vector<Vector2>& shape)
 
 	Vector2 supportPoint = support.size() >= 2 ? (support[0] + support[1]) * 0.5f : support[0];
 
-	gDebugRenderer.AddCircle(ToVector3(supportPoint), 0.5, Color::Orange, 3);
+	gDebugRenderer.AddCircle(DebugRenderer::PHYSICS, ToVector3(supportPoint), 0.5, Color::Orange, 3);
 
 	return supportPoint;
 }
@@ -830,12 +844,10 @@ bool CheckCollision(PhysicsBody2D* body0, PhysicsBody2D* body1, Collision2D& col
 	 
 
 	Vector2 vel0 = collision.FirstBody->GetVelocityAtPoint(collision.Position0);
-	gDebugRenderer.AddLine(ToVector3(collision.Position0), ToVector3(collision.Position0 + vel0), Color::Purple);
+	gDebugRenderer.AddLine(DebugRenderer::PHYSICS, ToVector3(collision.Position0), ToVector3(collision.Position0 + vel0), Color::Purple);
 
 	Vector2 vel1 = collision.SecondBody->GetVelocityAtPoint(collision.Position1);
-	gDebugRenderer.AddLine(ToVector3(collision.Position1), ToVector3(collision.Position1 + vel1), Color::Purple);
-
-	//gDebugRenderer.AddLine(ToVector3(collision.Position0), ToVector3(collision.Position1), Color::Orange);
+	gDebugRenderer.AddLine(DebugRenderer::PHYSICS, ToVector3(collision.Position1), ToVector3(collision.Position1 + vel1), Color::Purple);
 
 	return true;
 }

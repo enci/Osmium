@@ -27,52 +27,27 @@ struct AABB
 	/// Add a point to the AABB. If inside, extends the bound, otherwise nothing.
 	void AddPoint(const Vector2& point);
 
-	/// Debug renders the AABB in orange.
-	void DebugRender() const;
-
 	/// Check if valid
 	bool IsValid() const;
+
+#if DEBUG_RENDER
+	/// Debug renders the AABB in orange.
+	void DebugRender() const;
+#endif
 };
 
 struct Ray2D
 {
 	Vector2 Origin;
-
 	Vector2 Direction;
-
-//	Ray2D(const Vector2& origin, )
 };
 
-struct Interection2D
+struct Intersection2D
 {
-	//bool			IsValid		= false;
 	Vector2			Position;
 	Vector2			Normal;	
 	PhysicsBody2D*	PhysicsBody = nullptr;
 	bool			IsValid() const { return PhysicsBody != nullptr; }
-};
-
-/// 
-/// Rotation
-///
-struct Rotation
-{
-	/// cos(a)
-	float c;
-
-	/// -sin(a)
-	float s;	
-
-	/// Ctor at angle 0
-	Rotation() { c = 1, s = 0; }
-
-	// Mat33 GetRotationMatrix();
-
-	float GetAngle();
-
-	float SetAngle(float angle);
-
-	float AddAngle(float angle);
 };
 
 ///
@@ -220,8 +195,10 @@ private:
 	/// Updates the transform from position, scale and orientation
 	void UpdateTransform();
 
+#if DEBUG_RENDER
 	/// Render the shape and the bounding volumes
 	void DebugRenderShape();
+#endif
 
 	void UpdateKinematic(float dt);
 
@@ -328,7 +305,7 @@ public:
 	/// Get all bodies in the specified reariuis arround the given postion
 	std::vector<PhysicsBody2D*> GetInRadius(const Vector2& position, float radius);
 
-	Interection2D RayIntersect(const Vector2& origin, const Vector2& direction);
+	Intersection2D RayIntersect(const Vector2& origin, const Vector2& direction);
 
 	/// A choice of algorithms for accumulating contacts
 	enum ContactsAlgorithm { CA_BRUTE_FORCE = 0, CA_AUTO_GRID = 1, CA_MULTI_GRID = 2 };

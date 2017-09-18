@@ -20,6 +20,11 @@
 	#define INSPECTOR 1
 #endif
 
+#ifndef DEBUG_RENDER
+	#define DEBUG_RENDER 1
+#endif
+
+
 namespace Osm
 {
 

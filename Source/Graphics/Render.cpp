@@ -70,6 +70,9 @@ RenderManager::RenderManager(World& world)
 
 void RenderManager::Render()
 {
+	if (!_enbled)
+		return;
+
 	//glBindFramebuffer(GL_FRAMEBUFFER, _framebufferName);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -154,6 +157,7 @@ void RenderManager::Remove(Camera* camera)
 #ifdef INSPECTOR
 void RenderManager::Inspect()
 {
+	ImGui::Checkbox("Enabled", &_enbled);
 	ImGui::Text("Total renderables: %d", _renderables.size());
 	ImGui::Text("Draw Calls: %d", DrawCalls);
 	ImGui::Text("Shader Switches: %d", ShaderSwitches);

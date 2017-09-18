@@ -10,6 +10,8 @@ using namespace std;
 // This serves as a manager
 DebugRenderer Osm::gDebugRenderer;
 
+#if DEBUG_RENDER
+
 ////////////////////////////////////////////////////////////////////////////////
 // No args constructor
 ////////////////////////////////////////////////////////////////////////////////
@@ -134,8 +136,16 @@ void DebugRenderer::Clear()
 ////////////////////////////////////////////////////////////////////////////////
 // Add line
 ////////////////////////////////////////////////////////////////////////////////
-void DebugRenderer::AddLine(const Vector3& from, const Vector3& to, const Color& color)
+void DebugRenderer::AddLine(
+	uint category,
+	const Vector3& from,
+	const Vector3& to,
+	const Color& color)
 {
+	if ((category & _categoryFlags) == 0)
+		return;
+
+
 	if (_linesCount < _maxLines)
     {
 		_vertexArray[_linesCount * 2].Position     = from;
@@ -152,10 +162,12 @@ void DebugRenderer::AddLine(const Vector3& from, const Vector3& to, const Color&
 ////////////////////////////////////////////////////////////////////////////////
 // AddCircle
 ////////////////////////////////////////////////////////////////////////////////
-void DebugRenderer::AddCircle(const Vector3& center,
-                            float radius,
-                            const Color& color,
-                            int divs)
+void DebugRenderer::AddCircle(
+	uint category,
+	const Vector3& center,
+    float radius,
+    const Color& color,
+    int divs)
 {
 	float dt = Pi / float(divs);
 	float t = 0.0f;
@@ -164,7 +176,7 @@ void DebugRenderer::AddCircle(const Vector3& center,
 	for (; t < TwoPi - dt; t += dt)
 	{
 		Vector3 v1(center.x + radius * cos(t + dt), center.y, center.z + radius * sin(t + dt));
-		AddLine(v0, v1, color);
+		AddLine(category, v0, v1, color);
 		v0 = v1;
 	}
 }
@@ -172,12 +184,14 @@ void DebugRenderer::AddCircle(const Vector3& center,
 ////////////////////////////////////////////////////////////////////////////////
 // Add Sphere
 ////////////////////////////////////////////////////////////////////////////////
-void DebugRenderer::AddAxisSphere(const Vector3& center,
-                                float radius,
-                                const Color& xzColor,
-                                const Color& xyColor,
-                                const Color& yzColor,
-                                int divs)
+void DebugRenderer::AddAxisSphere(
+	uint category,
+	const Vector3& center,
+    float radius,
+    const Color& xzColor,
+    const Color& xyColor,
+    const Color& yzColor,
+    int divs)
 {
 	float dt = Pi / float(divs);
 	float t = 0.0f;
@@ -188,7 +202,7 @@ void DebugRenderer::AddAxisSphere(const Vector3& center,
 		Vector3 vh1(center.x + radius * cos(t + dt),
                     center.y,
                     center.z + radius * sin(t + dt));
-		AddLine(vh0, vh1, xzColor);
+		AddLine(category, vh0, vh1, xzColor);
 		vh0 = vh1;
 	}
     
@@ -201,7 +215,7 @@ void DebugRenderer::AddAxisSphere(const Vector3& center,
 		Vector3 vv1(center.x + radius * cos(t + dt),
                     center.y + radius * sin(t + dt),
                     center.z);
-		AddLine(vv0, vv1, xyColor);
+		AddLine(category, vv0, vv1, xyColor);
 		vv0 = vv1;
 	}
     
@@ -214,17 +228,27 @@ void DebugRenderer::AddAxisSphere(const Vector3& center,
 		Vector3 vv1(center.x,
                     center.y + radius * sin(t + dt),
                     center.z + radius * cos(t + dt));
-		AddLine(vv0, vv1, yzColor);
+		AddLine(category, vv0, vv1, yzColor);
 		vv0 = vv1;
 	}
 
 }
 
 
+void DebugRenderer::AddSphere(
+	uint category,
+	const Vector3& center, 
+	float radius,
+	const Color& color,
+	int divs)
+{
+	AddAxisSphere(category, center, radius, color, color, color, divs);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // Add Axis
 ////////////////////////////////////////////////////////////////////////////////
-void DebugRenderer::AddAxis(const Matrix44 &trans, float size)
+void DebugRenderer::AddAxis(uint category, const Matrix44 &trans, float size)
 {
     Vector3 x(size, 0, 0);
     Vector3 y(0, size, 0);
@@ -236,7 +260,41 @@ void DebugRenderer::AddAxis(const Matrix44 &trans, float size)
     z = trans * z;
     o = trans * o;
     
-    AddLine(o, x, Color::Red);          // X is red
-    AddLine(o, y, Color::Green);        // Y is greeen
-    AddLine(o, z, Color::Blue);         // Z is blue
+    AddLine(category, o, x, Color::Red);          // X is red
+    AddLine(category, o, y, Color::Green);        // Y is greeen
+    AddLine(category, o, z, Color::Blue);         // Z is blue
 }
+
+#else
+
+DebugRenderer::DebugRenderer(): _linesCount(0) {}
+
+DebugRenderer::~DebugRenderer() {}
+
+void DebugRenderer::Initialize() {}
+
+void DebugRenderer::Draw(Matrix44& vp) {}
+
+void DebugRenderer::Clear() {}
+
+void DebugRenderer::AddLine(uint category, const Vector3& from, const Vector3& to, const Color& color) { }
+
+void DebugRenderer::AddCircle(uint category, const Vector3& center, float radius, const Color& color, int divs) {}
+
+void DebugRenderer::AddAxisSphere(
+	uint category,
+	const Vector3& center,
+	float radius,
+	const Color& xzColor,
+	const Color& xyColor,
+	const Color& yzColor,
+	int divs)
+{}
+
+void DebugRenderer::AddSphere(	uint category, const Vector3& center,
+								float radius, const Color& color, int divs)
+{}
+
+void DebugRenderer::AddAxis(uint category, const Matrix44 &trans, float size) {}
+
+#endif

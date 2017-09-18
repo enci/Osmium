@@ -154,7 +154,9 @@ protected:
 
 	Vector2 Alignment(const std::vector<PhysicsBody2D*> &agents);
 
+#if DEBUG_RENDER
 	void DebugRender();
+#endif
 
 #ifdef INSPECTOR
 	virtual void Inspect() override;

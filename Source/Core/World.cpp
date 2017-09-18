@@ -136,60 +136,39 @@ void World::Inspect()
 		}
 	}
 
-
-	ImGui::Text("Entities");
-	ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 2.0f);
-	ImGui::BeginChild("Entities Window", ImVec2(0, 0), true);
-
-	// set<Entity*> inspected;
-	// vector<bool> selected(_entities.size(), false);
-	// static uint Id = -1;
-	static uint selectedId = -1;
-
-	
-	set<Entity*> inspected;
-	for (size_t i = 0; i < _entities.size(); i++)
+	if (ImGui::CollapsingHeader("Entities"))
 	{
-		InspectEntity(_entities[i].get(), inspected, selectedId);
-	}
+		ImGui::PushStyleVar(ImGuiStyleVar_ChildWindowRounding, 2.0f);
+		ImGui::BeginChild("Entities Window", ImVec2(0, 0), true);
 
+		static uint selectedId = -1;
 
-
-	/*
-	for (size_t i = 0; i < _entities.size(); i++)
-	{
-		auto& e = _entities[i];
-		string name = e->GetName();
-		if (name.empty())
-			name = typeid(*e).name();
-		name = StringReplace(name, "class ", "");
-		name += " - ID:" + to_string(e->GetID());
-
-		if (ImGui::Selectable(name.c_str()))
+		set<Entity*> inspected;
+		for (size_t i = 0; i < _entities.size(); i++)
 		{
-			selectedId = e->GetID();
-		}
-	}
-	*/
-
-	if (selectedId != -1)
-	{
-		Entity* e = GetEntityByID(selectedId);
-		if (e)
-		{
-			ImGui::Begin("Entity Inspector", &_entityInspect);
-			ImGui::Text("Name: %s", e->GetName().c_str());
-			ImGui::Text("ID: %d", e->GetID());
-			ImGui::Separator();
-			e->Inspect();
-			ImGui::End();
+			InspectEntity(_entities[i].get(), inspected, selectedId);
 		}
 
-		if (!_entityInspect)
-			selectedId = -1;
-	}
 
-	ImGui::EndChild();
-	ImGui::PopStyleVar();
+		if (selectedId != -1)
+		{
+			Entity* e = GetEntityByID(selectedId);
+			if (e)
+			{
+				ImGui::Begin("Entity Inspector", &_entityInspect);
+				ImGui::Text("Name: %s", e->GetName().c_str());
+				ImGui::Text("ID: %d", e->GetID());
+				ImGui::Separator();
+				e->Inspect();
+				ImGui::End();
+			}
+
+			if (!_entityInspect)
+				selectedId = -1;
+		}
+
+		ImGui::EndChild();
+		ImGui::PopStyleVar();
+	}
 }
 #endif
