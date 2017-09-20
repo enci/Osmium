@@ -125,6 +125,10 @@ public:
 
 	void AddVirtualJoystick();
 
+	bool GetLeft(Joystick joystick);
+
+	bool GetRight(Joystick joystick);
+
 #ifdef INSPECTOR
 	virtual void Inspect() override;
 #endif

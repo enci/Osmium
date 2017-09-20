@@ -236,6 +236,50 @@ void InputManager::RemoveJoystick(int joy)
 	}	
 }
 
+bool InputManager::GetLeft(Joystick joystick)
+{
+	JoystickAxes axis = JOYSTICK_AXIS_LEFT_THUMB_HORIZONTAL;
+	if (_joyState.find(joystick) != _joyState.end())
+	{
+		JoystickProfile profile = _joyState[joystick].Profile;
+		ProfileMapping& mapping = _profiles[(int)profile];
+
+		if (axis < (int)mapping.Axes.size())
+		{
+			int axsIdx = mapping.Axes[axis];
+			int dir = mapping.AxisDirections[axis];
+			if (axsIdx < (int)_joyState[joystick].Axes.size())
+			{
+				return	_joyState[joystick].Axes[axsIdx] * dir < -0.5f &&
+						_joyState[joystick].LastAxes[axsIdx] * dir >= -0.5f;
+			}
+		}
+	}
+	return false;
+}
+
+bool InputManager::GetRight(Joystick joystick)
+{
+	JoystickAxes axis = JOYSTICK_AXIS_LEFT_THUMB_HORIZONTAL;
+	if (_joyState.find(joystick) != _joyState.end())
+	{
+		JoystickProfile profile = _joyState[joystick].Profile;
+		ProfileMapping& mapping = _profiles[(int)profile];
+
+		if (axis < (int)mapping.Axes.size())
+		{
+			int axsIdx = mapping.Axes[axis];
+			int dir = mapping.AxisDirections[axis];
+			if (axsIdx < (int)_joyState[joystick].Axes.size())
+			{
+				return	_joyState[joystick].Axes[axsIdx] * dir > 0.5f &&
+						_joyState[joystick].LastAxes[axsIdx] * dir <= 0.5f;
+			}
+		}
+	}
+	return false;
+}
+
 #ifdef INSPECTOR
 void InputManager::Inspect()
 {
