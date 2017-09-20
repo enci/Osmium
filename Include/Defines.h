@@ -16,9 +16,9 @@
 	#define LOGGING 1
 #endif
 
-#ifndef INSPECTOR 
+//#ifndef INSPECTOR 
 	#define INSPECTOR 1
-#endif
+//#endif
 
 #ifndef DEBUG_RENDER
 	#define DEBUG_RENDER 1

@@ -9,6 +9,9 @@ using namespace Osm;
 
 void ResourceManager::ReleaseResource(Resource* res)
 {
+	if(!res)
+		return;
+
 	// Get id
 	auto id = res->ResourceID();
 

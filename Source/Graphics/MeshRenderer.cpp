@@ -189,7 +189,7 @@ bool MeshRenderer::CreateVAO()
 #ifdef INSPECTOR
 void MeshRenderer::Inspect()
 {
-	ImGui::Checkbox("Enabled", &_enbled);
+	ImGui::Checkbox("Enabled", &_enabled);
 	ImGui::OsmColor("Diffuse", _diffuse);
 	ImGui::OsmColor("Ambient", _ambient);		
 }

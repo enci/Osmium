@@ -21,7 +21,7 @@ public:
 
 	bool GetEnbled() const			{ return _enabled; }
 
-	void SetEnbled(bool enabled)		{ _enabled = enabled; }
+	void SetEnabled(bool enabled)		{ _enabled = enabled; }
 
 #ifdef INSPECTOR
 	virtual void Inspect() {}

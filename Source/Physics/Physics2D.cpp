@@ -668,7 +668,7 @@ Intersection2D PhysicsManager2D::RayIntersect(const Vector2& origin, const Vecto
 	{
 		auto body = _bodies[b];
 
-		if(!body->_enbled)
+		if(!body->_enabled)
 			continue;
 
 		Vector2 pos = body->GetPosition();
