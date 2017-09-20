@@ -127,7 +127,9 @@ void CGame::Run()
 			uint updateID = _profiler->StartSection("Update");
 			_input->Update();
 			_world->Update(deltaTime);
+			uint audioID = _profiler->StartSection("Audio");
 			_audio->Update(deltaTime);
+			_profiler->EndSection(audioID);
 			_profiler->EndSection(updateID);
 			_advanceFrame = false;
 		}
