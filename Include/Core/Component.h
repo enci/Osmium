@@ -11,7 +11,7 @@ template <class E>
 class Component : public IDable<Component<E>>
 {
 public:
-	explicit Component(E& entity) : _owner(entity), _enabled()bled(true) {}
+	explicit Component(E& entity) : _owner(entity), _enabled(true) {}
 
 	Component(Component& other) = delete;
 
@@ -120,7 +120,9 @@ template <class E>
 void ComponentContainer<E>::SetComponentsEnabled(bool enabled)
 {
 	for (auto& c : _components)
+	{
 		c->SetEnabled(enabled);
+	}
 }
 
 }
