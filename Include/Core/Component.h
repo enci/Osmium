@@ -8,10 +8,10 @@ namespace Osm
 {
 
 template <class E>
-class Component
+class Component : public IDable<Component<E>>
 {
 public:
-	explicit Component(E& entity) : _owner(entity), _enbled(true) {}
+	explicit Component(E& entity) : _owner(entity), _enabled()bled(true) {}
 
 	Component(Component& other) = delete;
 
@@ -19,20 +19,19 @@ public:
 
 	E& GetOwner() const				{ return _owner; }
 
-	bool GetEnbled() const			{ return _enbled; }
+	bool GetEnbled() const			{ return _enabled; }
 
-	void SetEnbled(bool enbled)		{ _enbled = enbled; }
+	void SetEnbled(bool enabled)		{ _enabled = enabled; }
 
 #ifdef INSPECTOR
 	virtual void Inspect() {}
-	bool InspectorOpen = true;
 #endif
 
 protected:
 	E& _owner;
 
 protected:
-	bool _enbled;
+	bool _enabled;
 };
 
 template <class E>
@@ -47,9 +46,16 @@ public:
 	template<class T>
 	T* GetComponent();
 
+	/// Get all components of a certain kind
+	template<class T>
+	std::vector<T*> GetComponents();
+
 	/// Remove a component of a certain kind
 	template<class T>
 	void RemoveComponent();
+
+	/// Set enabled for all components
+	void SetComponentsEnabled(bool enbled);
 
 protected:
 	std::vector<std::unique_ptr<Component<E>>> _components;
@@ -81,6 +87,20 @@ T* ComponentContainer<E>::GetComponent()
 
 template <class E>
 template <class T>
+std::vector<T*> ComponentContainer<E>::GetComponents()
+{
+	std::vector<T*> components;
+	for (auto& c : _components)
+	{
+		T* found = dynamic_cast<T*>(c.get());
+		if (found)
+			components.push_back(found);
+	}
+	return components;
+}
+
+template <class E>
+template <class T>
 void ComponentContainer<E>::RemoveComponent()
 {
 	auto itr = _components.begin();
@@ -94,6 +114,13 @@ void ComponentContainer<E>::RemoveComponent()
 
 	if (found)
 		_components.erase(itr);
+}
+
+template <class E>
+void ComponentContainer<E>::SetComponentsEnabled(bool enabled)
+{
+	for (auto& c : _components)
+		c->SetEnabled(enabled);
 }
 
 }
