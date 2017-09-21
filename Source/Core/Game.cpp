@@ -51,8 +51,9 @@ void GameSettings::Inspect()
 	ImGui::InputInt("Screen Height", &ScreenHeight, 240, 5600);
 	ImGui::Checkbox("Full Screen", &FullScreen);
 	ImGui::Checkbox("Native Resolution", &UseNativeResolution);
+	ImGui::InputInt("MSAA Samples", &MSAASamples);
 	ImGui::SliderFloat("Inspector Font Size", &InspectorFontSize, 0.5f, 2.0f);
-
+	
 	if (ImGui::Button("Save Settings"))
 	{
 		SaveToFile();
@@ -172,7 +173,7 @@ void CGame::SwapWorld(World* world)
 
 #ifdef INSPECTOR
 void CGame::Inspect()
-{	
+{		
 	if (_input->GetKey(GLFW_KEY_RIGHT_SHIFT) && _input->GetKeyOnce(GLFW_KEY_I))
 		_show_inspector = !_show_inspector;
 
@@ -184,14 +185,13 @@ void CGame::Inspect()
 	ImGuiWindowFlags window_flags = 0;
 	window_flags |= ImGuiWindowFlags_MenuBar;
 
-	ImGui_ImplGlfwGL3_NewFrame();
-
+	ImGui_ImplGlfwGL3_NewFrame();	
 	bool p_open = true;
 
 	ImGui::BeginMainMenuBar();
 	if (ImGui::BeginMenu("View"))
 	{
-		ImGui::MenuItem("Game", nullptr, &_show_engine_compoents);
+		ImGui::MenuItem("Game", nullptr, &_show_engine_components);
 		// Just a reminder that this might be useful
 		// ImGui::MenuItem("Log", NULL, &show_app_log);
 		ImGui::MenuItem("World", nullptr, &_show_world_inspector);
@@ -226,10 +226,13 @@ void CGame::Inspect()
 	ImGui::ProgressBar((float)(_profiler->GetTimePerFrame() / (1.0 / 60.0)));	
 	ImGui::EndMainMenuBar();
 
+
 	if (_show_world_inspector)
 	{
 		ImGui::Begin("World Inspector", &_show_world_inspector);
+		ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.4f);
 		_world->Inspect();
+		ImGui::PopItemWidth();
 		ImGui::End();		
 	}
 
@@ -244,9 +247,9 @@ void CGame::Inspect()
 		ImGui::ShowTestWindow(&_show_imgui_test);
 	}
 
-	if(_show_engine_compoents)
+	if(_show_engine_components)
 	{		
-		ImGui::Begin("Game Inspector", &_show_engine_compoents);
+		ImGui::Begin("Game Inspector", &_show_engine_components);
 		for (auto& c : _components)
 		{
 			string name = typeid(*c).name();
@@ -264,9 +267,9 @@ void CGame::Inspect()
 		ImGui::Begin("Settings Inspector", &_show_settings);
 		_settings.Inspect();
 		ImGui::End();
-	}
+	}	
 
-	ImGui::Render();
+	ImGui::Render();	
 }
 #endif
 

@@ -32,6 +32,7 @@ struct GameSettings
 	bool FullScreen = false;
 	bool UseNativeResolution = true;
 	float InspectorFontSize = 1.0f;
+	int MSAASamples = 4;
 	std::string ResourcePath = "";
 	std::string SavePath = "";
 	std::string WindowName = "Window";
@@ -49,6 +50,7 @@ void GameSettings::serialize(Archive& archive)
 		CEREAL_NVP(ScreenHeight),
 		CEREAL_NVP(FullScreen),
 		CEREAL_NVP(UseNativeResolution),
+		CEREAL_NVP(MSAASamples),
 		CEREAL_NVP(ResourcePath),
 		CEREAL_NVP(InspectorFontSize),
 		CEREAL_NVP(SavePath),
@@ -125,10 +127,12 @@ protected:
 	CTime _time;
 
 #ifdef INSPECTOR
+public:
+	void SetShowInspector(bool showInspector) { _show_inspector = showInspector; }
+private:
 	void Inspect();
-
 	bool _show_inspector = false;
-	bool _show_engine_compoents = false;
+	bool _show_engine_components = false;
 	bool _show_input_debug = false;
 	bool _show_world_inspector = false;
 	bool _show_profiler = false;
