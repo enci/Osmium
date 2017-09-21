@@ -81,7 +81,8 @@ void Steering::CalculatePrioritized()
 
 	if(IsOn(STEERING_OBSTACLE_AVOIDANCE))
 	{
-		force = ObstacleAvoidance() * ObstacleAvoidanceWeight;
+		//force = ObstacleAvoidance() * ObstacleAvoidanceWeight;
+		force = ObstacleAvoidance2() * ObstacleAvoidanceWeight;
 		if (!AccumulateForce(force)) return;
 	}
 	if (IsOn(STEERING_SEEK))
@@ -461,6 +462,27 @@ Vector2 Steering::ObstacleAvoidance()
 
 	// finally, convert the steering vector from local to world space
 	return _physicsBody->GetToWorldDirection(steeringForce);
+}
+
+Vector2 Steering::ObstacleAvoidance2()
+{
+	const Vector2& position = _physicsBody->GetPosition();
+	const Vector2& velocity = _physicsBody->GetVelocity();
+	Vector2 direction(velocity);
+	direction.Normalize();
+
+	auto intersection = _physicsManager->RayIntersect(position, direction);
+	if(intersection.IsValid())
+	{
+		gDebugRenderer.AddCircle(
+			DebugRenderer::AI,
+			ToVector3(intersection.PhysicsBody->GetPosition()),
+			intersection.PhysicsBody->GetRadius()
+		);
+		intersection.PhysicsBody->GetOwner();
+	}
+
+	return Vector2();
 }
 
 vector<PhysicsBody2D*> Steering::GetFlockingNeighbors()

@@ -126,6 +126,8 @@ protected:
 	// away from any obstacles it may encounter
 	Vector2 ObstacleAvoidance();
 
+	Vector2 ObstacleAvoidance2();
+
 	//this returns a steering force which will keep the agent away from any
 	//walls it may encounter
 	//SteeringOutput WallAvoidance(const std::vector<Wall2D> &walls);
