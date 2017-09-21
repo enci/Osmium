@@ -17,9 +17,13 @@ Vector2 Steering::GetSteering()
 {
 	CalculatePrioritized();
 
+	Vector2 prev = _current;
+
 #if DEBUG_RENDER
 	DebugRender();
 #endif
+
+	_current = Lerp(prev, _current, 0.3f);
 
 	return _current;
 }
@@ -316,6 +320,18 @@ Vector2 Steering::ObstacleAvoidance()
 	Vector2 v = _physicsBody->GetPosition();
 	auto obstacles = _physicsManager->GetInRadius(v, boxLength);
 
+	gDebugRenderer.AddCircle(
+		DebugRenderer::AI,
+		ToVector3(_physicsBody->GetPosition()),
+		ObstacleAvoidanceRaduis,
+		Color::Yellow);
+
+	gDebugRenderer.AddCircle(
+		DebugRenderer::AI,
+		ToVector3(_physicsBody->GetPosition()),
+		boxLength,
+		Color::Yellow);
+
 	// Early out
 	if (obstacles.size() == 0)
 		return Vector2();
@@ -326,7 +342,8 @@ Vector2 Steering::ObstacleAvoidance()
 			obstacles.end(),
 			[this](PhysicsBody2D* b)
 		{
-			return (b == _physicsBody) || (b->GetOwner().GetTag() != ObstacleTag);
+			return (b == _physicsBody) || !CheckBitFlagOverlap(b->GetOwner().GetTag(), ObstacleTag);
+			//return b == _physicsBody;
 		}), obstacles.end());
 	}
 
@@ -436,6 +453,11 @@ Vector2 Steering::ObstacleAvoidance()
 		steeringForce.y = (closestIntersectingObstacle->GetRadius() -
 			localPosOfClosestObstacle.y) * BrakingWeight;
 	}
+
+	gDebugRenderer.AddLine(
+		DebugRenderer::AI,
+		ToVector3(_physicsBody->GetPosition()),
+		ToVector3(_physicsBody->GetPosition()) + ToVector3(steeringForce), Color::Green);
 
 	// finally, convert the steering vector from local to world space
 	return _physicsBody->GetToWorldDirection(steeringForce);
@@ -562,23 +584,27 @@ Vector2 Steering::Alignment(const std::vector<PhysicsBody2D*>& agents)
 void Steering::DebugRender()
 {
 	if (_inspect)
-	{
+	{		
 		auto pos = _physicsBody->GetPosition();
+		/*
 		gDebugRenderer.AddCircle(
 			DebugRenderer::AI,
 			ToVector3(pos),
 			_physicsBody->GetRadius(),
 			Color::Purple);
+		*/
 		gDebugRenderer.AddLine(
 			DebugRenderer::AI,
 			ToVector3(pos),
 			ToVector3(pos + _current),
 			Color::Orange);
+		/*
 		gDebugRenderer.AddCircle(
 			DebugRenderer::AI,
 			ToVector3(pos),
 			FlockingRadius,
 			Color::Purple);
+		*/
 	}
 	_inspect = false;
 }
@@ -589,6 +615,7 @@ void Steering::Inspect()
 {
 	_inspect = true;
 
+	ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.4f);
 	ImGui::InputFloat("Max Accelearation", &MaxAccelearation);
 	ImGui::InputFloat("Max Force", &MaxForce);
 	ImGui::InputFloat("Max Speed", &MaxSpeed);
@@ -596,10 +623,39 @@ void Steering::Inspect()
 	ImGui::InputFloat("Wander Radius", &WanderRadius);
 	ImGui::InputFloat("Wander Distance", &WanderDistance);
 
+	ImGui::InputFloat("Seek Weight", &SeekWeight);
+	ImGui::InputFloat("Obstacle Avoidance Weight", &ObstacleAvoidanceWeight);
+	ImGui::InputFloat("Obstacle Avoidance Radius", &ObstacleAvoidanceRaduis);
+
+	/*
+	ImGui::InputFloat("Wander Distance", &WanderDistance);
+	ImGui::InputFloat("Wander Distance", &WanderDistance);
+	ImGui::InputFloat("Wander Distance", &WanderDistance);
+	ImGui::InputFloat("Wander Distance", &WanderDistance);
+	ImGui::InputFloat("Wander Distance", &WanderDistance);
+	ImGui::InputFloat("Wander Distance", &WanderDistance);
+	ImGui::InputFloat("Wander Distance", &WanderDistance);
+
+	// Weights
+	float FleeWeight = 1.0f;
+	float ArriveWeight = 1.0f;
+	float WanderWeight = 1.0f;
+	float CohesionWeight = 1.0f;
+	float SeparationWeight = 1.0f;
+	float WallAvoidanceWeight = 1.0f;
+	float PursuitWeight = 1.0f;
+	float EvadeWeight = 1.0f;
+	float FoollowPathWeight = 1.0f;
+	float HideWeight = 1.0f;
+	float OffsetPursuitWeight = 1.0f;
+	float AlignmentWeight = 10.0f;
+	*/
+
 	float maxed = _current.Magnitude() / MaxSpeed;
 	ImGui::ProgressBar(maxed);
 	// ImGui::SameLine();
 	//ImGui::LabelText("Total Used ","");	
+	ImGui::PopItemWidth();
 }
 #endif
 
