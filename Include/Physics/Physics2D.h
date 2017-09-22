@@ -305,7 +305,10 @@ public:
 	/// Get all bodies in the specified reariuis arround the given postion
 	std::vector<PhysicsBody2D*> GetInRadius(const Vector2& position, float radius);
 
-	Intersection2D RayIntersect(const Vector2& origin, const Vector2& direction);
+	Intersection2D RayIntersect(
+		const Vector2& origin,
+		const Vector2& direction,
+		float maxDistance = FLT_MAX);
 
 	/// A choice of algorithms for accumulating contacts
 	enum ContactsAlgorithm { CA_BRUTE_FORCE = 0, CA_AUTO_GRID = 1, CA_MULTI_GRID = 2 };

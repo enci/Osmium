@@ -471,7 +471,11 @@ Vector2 Steering::ObstacleAvoidance2()
 	Vector2 direction(velocity);
 	direction.Normalize();
 
-	auto intersection = _physicsManager->RayIntersect(position, direction);
+
+	auto intersection = _physicsManager->RayIntersect(position, direction, 50.0f);
+	Vector2 worldFeeler = _physicsBody->GetToWorld(Vector2(0.0f, 50.0f));
+	gDebugRenderer.AddLine(DebugRenderer::GAMEPLAY, ToVector3(position), ToVector3(worldFeeler));
+
 	if(intersection.IsValid())
 	{
 		gDebugRenderer.AddCircle(
@@ -480,6 +484,7 @@ Vector2 Steering::ObstacleAvoidance2()
 			intersection.PhysicsBody->GetRadius()
 		);
 		intersection.PhysicsBody->GetOwner();
+		//intersection.Position
 	}
 
 	return Vector2();
