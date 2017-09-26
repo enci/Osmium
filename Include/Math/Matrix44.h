@@ -97,7 +97,7 @@ struct Matrix44
 						const Vector3& y,
 						const Vector3& z);
 
-	/// Set orientation using Euler angles. Broken at current!
+	/// Set orientation using Euler angles.
 	void SetEulerAngles(const Vector3& angles);
 
 	/// Set orientation using Euler angles. Broken at current!

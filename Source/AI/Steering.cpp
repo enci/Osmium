@@ -81,8 +81,8 @@ void Steering::CalculatePrioritized()
 
 	if(IsOn(STEERING_OBSTACLE_AVOIDANCE))
 	{
-		//force = ObstacleAvoidance() * ObstacleAvoidanceWeight;
-		force = ObstacleAvoidance2() * ObstacleAvoidanceWeight;
+		force = ObstacleAvoidance() * ObstacleAvoidanceWeight;
+		//force = ObstacleAvoidance2() * ObstacleAvoidanceWeight;
 		if (!AccumulateForce(force)) return;
 	}
 	if (IsOn(STEERING_SEEK))

@@ -6,7 +6,11 @@
 #include <Core/Game.h>
 #include <imgui.h> 
 
+#define PROFILE_OPENGL 0
+
 using namespace Osm;
+
+
 
 RenderManager::RenderManager(World& world)
 	: Component(world)
@@ -14,7 +18,7 @@ RenderManager::RenderManager(World& world)
 	, _renderedTexture(0)
 {
 
-#ifdef INSPECTOR
+#if defined(INSPECTOR) && PROFILE_OPENGL 
 	glGenQueries(RENDER_PASSES_NUM, _queries);
 #endif
 
@@ -79,7 +83,7 @@ void RenderManager::Render()
 
 	Shader* activeShader = nullptr;
 
-#ifdef INSPECTOR
+#if defined(INSPECTOR) && PROFILE_OPENGL
 	DrawCalls = 0;
 	ShaderSwitches = 0;
 
@@ -116,7 +120,7 @@ void RenderManager::Render()
 		}
 	}
 
-#ifdef INSPECTOR
+#if defined(INSPECTOR) && PROFILE_OPENGL
 	glEndQuery(GL_TIME_ELAPSED);
 	DrawCalls++;
 	_firstFrame = false;
@@ -162,8 +166,10 @@ void RenderManager::Inspect()
 	ImGui::Text("Draw Calls: %d", DrawCalls);
 	ImGui::Text("Shader Switches: %d", ShaderSwitches);
 	
+#if PROFILE_OPENGL
 	double time = _queryResults[FORWARD_PASS] / 1000000.0;
 	ImGui::Text("Render Time: %.3f", time);
+#endif
 }
 #endif
 
