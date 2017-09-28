@@ -70,9 +70,9 @@ void ResourceManager::Update(float dt)
 #ifdef INSPECTOR
 void ResourceManager::Inspect()
 {
-	ImGui::CheckboxFlags("Meshes", &FliterFlags, RESOURCE_TYPE_MESH); ImGui::SameLine();
-	ImGui::CheckboxFlags("Textures", &FliterFlags, RESOURCE_TYPE_TEXTURE); ImGui::SameLine();
-	ImGui::CheckboxFlags("Shaders", &FliterFlags, RESOURCE_TYPE_SHADER); ImGui::SameLine();
+	ImGui::CheckboxFlags("Meshes", &FilterFlags, RESOURCE_TYPE_MESH); ImGui::SameLine();
+	ImGui::CheckboxFlags("Textures", &FilterFlags, RESOURCE_TYPE_TEXTURE); ImGui::SameLine();
+	ImGui::CheckboxFlags("Shaders", &FilterFlags, RESOURCE_TYPE_SHADER); ImGui::SameLine();
 	ImGui::Checkbox("Generated", &ShowGenerated);
 	
 	static ImGuiTextFilter filter;
@@ -89,7 +89,7 @@ void ResourceManager::Inspect()
 		if (r->Generated() && !ShowGenerated)
 			continue;
 
-		if (r->Type() & FliterFlags && filter.PassFilter(r->Path().c_str()))
+		if (r->Type() & FilterFlags && filter.PassFilter(r->Path().c_str()))
 		{
 			ImGui::PushID(i++);
 			if (ImGui::Button("Reload"))

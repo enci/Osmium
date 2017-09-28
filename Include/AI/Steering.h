@@ -71,6 +71,12 @@ public:
 
 	float EvadeDistance = 35.0f;
 
+	float ObstacleFrontFeelerLength = 40.0f;
+
+	float ObstacleSideFeelerLength = 20.0f;
+
+	float ObstacleSideFeelerSpread = 15.0f;
+
 	// Weights
 	float SeekWeight = 1.0f;
 	float FleeWeight = 1.0f;

@@ -649,7 +649,8 @@ vector<PhysicsBody2D*> PhysicsManager2D::GetInRadius(const Vector2& position, fl
 Intersection2D PhysicsManager2D::RayIntersect(
 	const Vector2& origin,
 	const Vector2& direction,
-	float maxDistance)
+	float maxDistance,
+	uint TagMask)
 {
 	Vector2 dir = direction;
 	dir.Normalize();
@@ -674,7 +675,7 @@ Intersection2D PhysicsManager2D::RayIntersect(
 	{
 		auto body = _bodies[b];
 
-		if(!body->_enabled)
+		if(!body->_enabled || !CheckBitFlagOverlap(body->GetOwner().GetTag(), TagMask))
 			continue;
 
 		Vector2 pos = body->GetPosition();
@@ -683,7 +684,7 @@ Intersection2D PhysicsManager2D::RayIntersect(
 		if (pos != origin &&
 			localPos.y > 0.0f &&
 			abs(localPos.x) <= body->GetRadius() &&
-			localPos.y - body->GetRadius() < maxDistance)
+			(localPos.y - body->GetRadius()) < maxDistance)
 		{
 			const auto& collision = body->GetCollisionShapeWorld();
 			for (size_t i = 0; i < collision.size(); i++)
@@ -710,7 +711,7 @@ Intersection2D PhysicsManager2D::RayIntersect(
 						intersection.Normal = edge.Perpendicular();
 						intersection.Normal.Normalize();
 					}
-					//gDebugRenderer.AddLine(DebugRenderer::AI, ToVector3(from), ToVector3(to), Color::Yellow);
+					//gDebugRenderer.AddLine(DebugRenderer::PHYSICS, ToVector3(from), ToVector3(to), Color::Yellow);
 				}
 			}
 		}
@@ -718,9 +719,10 @@ Intersection2D PhysicsManager2D::RayIntersect(
 
 	if (intersection.IsValid())
 	{
+		intersection.Depth = minY;
 		intersection.Position = Vector2(0.0f, minY);
 		intersection.Position = toWorld.TransformVector(intersection.Position);
-		gDebugRenderer.AddCircle(DebugRenderer::PHYSICS, ToVector3(intersection.Position), 1.3f, Color::White);
+		//gDebugRenderer.AddCircle(DebugRenderer::PHYSICS, ToVector3(intersection.Position), 1.3f, Color::White);
 	}
 
 	return intersection;

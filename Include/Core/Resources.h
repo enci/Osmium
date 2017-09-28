@@ -26,7 +26,7 @@ public:
 
 #ifdef INSPECTOR
 	void Inspect() override;
-	uint FliterFlags = 0xFFFFFFFF;
+	uint FilterFlags = 0xFFFFFFFF;
 	bool ShowGenerated = false;
 #endif
 

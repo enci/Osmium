@@ -47,6 +47,7 @@ struct Intersection2D
 	Vector2			Position;
 	Vector2			Normal;	
 	PhysicsBody2D*	PhysicsBody = nullptr;
+	float			Depth;
 	bool			IsValid() const { return PhysicsBody != nullptr; }
 };
 
@@ -308,7 +309,8 @@ public:
 	Intersection2D RayIntersect(
 		const Vector2& origin,
 		const Vector2& direction,
-		float maxDistance = FLT_MAX);
+		float maxDistance = FLT_MAX,
+		uint TagMask = 0xFFFFFFFF);
 
 	/// A choice of algorithms for accumulating contacts
 	enum ContactsAlgorithm { CA_BRUTE_FORCE = 0, CA_AUTO_GRID = 1, CA_MULTI_GRID = 2 };

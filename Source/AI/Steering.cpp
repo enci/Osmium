@@ -2,6 +2,7 @@
 #include <Graphics/DebugRenderer.h>
 #include <imgui.h>
 #include <Core/World.h>
+#include <Core/Game.h>
 
 using namespace Osm;
 
@@ -23,7 +24,8 @@ Vector2 Steering::GetSteering()
 	DebugRender();
 #endif
 
-	_current = Lerp(prev, _current, 0.3f);
+	_current = Lerp(prev, _current, 0.1f);
+	//_current = Lerp(prev, _current, 0.9f);
 
 	return _current;
 }
@@ -242,7 +244,7 @@ Vector2 Steering::Wander()
 
 	// This behavior is dependent on the update rate, so this line must
 	// be included when using time independent framerate.
-	float jitterThisTimeSlice = WanderJitter * 0.016f; // m_pVehicle->TimeElapsed();
+	float jitterThisTimeSlice = WanderJitter * Game.Time().ElapsedTime;
 
 													   // First, add a small random vector to the target's position
 	_wanderTarget += Vector2(
@@ -470,21 +472,71 @@ Vector2 Steering::ObstacleAvoidance2()
 	const Vector2& velocity = _physicsBody->GetVelocity();
 	Vector2 direction(velocity);
 	direction.Normalize();
+	Vector2 perp = direction.Perpendicular();
 
+	Matrix33 local;
+	local.SetUp(direction);
+	local.SetRight(perp);
+	float a = DegToRad(ObstacleSideFeelerSpread + 90.0f);
 
-	auto intersection = _physicsManager->RayIntersect(position, direction, 50.0f);
-	Vector2 worldFeeler = _physicsBody->GetToWorld(Vector2(0.0f, 50.0f));
-	gDebugRenderer.AddLine(DebugRenderer::GAMEPLAY, ToVector3(position), ToVector3(worldFeeler));
+	vector<Vector2> feelers =
+	{
+		Vector2(0.0f, 1.0f),
+		Vector2(cos(a), sin(a)),
+		Vector2(0.0f, 1.0f)
+	};
+	feelers[2].x = -feelers[1].x;
+	feelers[2].y = feelers[1].y;
 
-	if(intersection.IsValid())
+	vector<float> lenghts =
+	{
+		ObstacleFrontFeelerLength,
+		ObstacleSideFeelerLength,
+		ObstacleSideFeelerLength
+	};
+
+	Intersection2D closestIntersection;	
+	float closestDist = FLT_MAX;
+	int closestIdx = -1;
+
+	for (int i = 0; i < 3; i++)
+	{
+		Vector2 feeler = local.TransformNormal(feelers[i]);
+
+		auto intersection = _physicsManager->RayIntersect(
+			position,
+			feeler,
+			lenghts[i],
+			ObstacleTag);
+
+		if (intersection.IsValid())
+		{
+			if (intersection.Depth < closestDist)
+			{				
+				closestDist = intersection.Depth;
+				closestIntersection = intersection;
+				closestIdx = i;
+			}			
+		}
+	}
+
+	if (closestIntersection.IsValid())
 	{
 		gDebugRenderer.AddCircle(
 			DebugRenderer::AI,
-			ToVector3(intersection.PhysicsBody->GetPosition()),
-			intersection.PhysicsBody->GetRadius()
-		);
-		intersection.PhysicsBody->GetOwner();
-		//intersection.Position
+			ToVector3(closestIntersection.Position),
+			2.0f,
+			Color::Orange);
+
+		float overshot = lenghts[closestIdx] - closestDist;
+
+		gDebugRenderer.AddLine(
+			DebugRenderer::AI,
+			ToVector3(closestIntersection.Position),
+			ToVector3(closestIntersection.Position + closestIntersection.Normal * overshot),
+			Color::Orange);
+
+		return closestIntersection.Normal * overshot;
 	}
 
 	return Vector2();
@@ -503,7 +555,8 @@ vector<PhysicsBody2D*> Steering::GetFlockingNeighbors()
 						[this](PhysicsBody2D* b)
 			{
 				return b->GetOwner().GetTag() != FlockingTag;
-			})
+			}),
+			neighbors.end()
 		);
 	}
 	return neighbors;
@@ -651,18 +704,15 @@ void Steering::Inspect()
 	ImGui::InputFloat("Wander Distance", &WanderDistance);
 
 	ImGui::InputFloat("Seek Weight", &SeekWeight);
+
+	// Obstacle avoidance
 	ImGui::InputFloat("Obstacle Avoidance Weight", &ObstacleAvoidanceWeight);
 	ImGui::InputFloat("Obstacle Avoidance Radius", &ObstacleAvoidanceRaduis);
+	ImGui::InputFloat("Obstacle Avd Front Feeler Length", &ObstacleFrontFeelerLength);
+	ImGui::InputFloat("Obstacle Avd Side Feeler Length", &ObstacleSideFeelerLength);
+	ImGui::InputFloat("Obstacle Avd Side Feeler Spread", &ObstacleSideFeelerSpread);
 
 	/*
-	ImGui::InputFloat("Wander Distance", &WanderDistance);
-	ImGui::InputFloat("Wander Distance", &WanderDistance);
-	ImGui::InputFloat("Wander Distance", &WanderDistance);
-	ImGui::InputFloat("Wander Distance", &WanderDistance);
-	ImGui::InputFloat("Wander Distance", &WanderDistance);
-	ImGui::InputFloat("Wander Distance", &WanderDistance);
-	ImGui::InputFloat("Wander Distance", &WanderDistance);
-
 	// Weights
 	float FleeWeight = 1.0f;
 	float ArriveWeight = 1.0f;
