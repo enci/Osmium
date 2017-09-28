@@ -126,6 +126,8 @@ void RenderManager::Render()
 	_firstFrame = false;
 #endif
 
+
+
 }
 
 void RenderManager::Add(Renderable* renderable)

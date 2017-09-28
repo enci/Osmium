@@ -8,7 +8,6 @@
 #define ENABLE_CACHING 0
 
 #if ENABLE_PROFILING
-//#include "cinder/Timer.h"
 #endif
 
 using namespace Osm;
@@ -56,7 +55,7 @@ string ShaderPreprocessor::ParseRecursive(
 	}
 #endif	
 
-	string parent = GetParentPath(path);
+	string parent = GetParentPath(fullPath);
 	string inputString = ReadFile(fullPath);
 	if(inputString.empty())
 	{
@@ -75,7 +74,7 @@ string ShaderPreprocessor::ParseRecursive(
 	{
 		if (regex_search(line, matches, sIncludeRegex))
 		{
-			output << ParseRecursive(matches[1].str(), parentPath + parent, includeTree);
+			output << ParseRecursive(matches[1].str(), parent, includeTree);
 			//output << "#line " << lineNumber << endl;
 		}
 		else
