@@ -10,6 +10,7 @@ struct PointLight
 {
     vec3 position;
     vec3 color;
+    float radius;
 };
 
 // Uniforms
@@ -65,8 +66,11 @@ vec3 CalculatePointLights(in vec3 position, in vec3 normal)
     float dist = length(light_dir);
     light_dir = normalize(light_dir);
     float intensity = max(0.0, dot(normal, light_dir));
-    float attenuation = 1.5 / (1.0 + (dist / kLightRadius));
-    color = u_pointLights[i].color  * intensity * attenuation * u_diffuse;
+
+    vec3 l = u_pointLights[i].position - position;
+    float d = length(l);
+    float attenuation = 1.0 - clamp((d * d) / (u_pointLights[i].radius * u_pointLights[i].radius), 0.0, 1.0);
+    color += u_pointLights[i].color * intensity * attenuation * u_diffuse;
   }
 
   return color;
@@ -94,12 +98,9 @@ vec3 CalculateDirectionalLightsSpecular(
   return color;
 }
 
-vec3 CalculateRimLight(in vec3 position, in vec3 normal)
+vec3 CalculateRimLight(in vec3 normal)
 {
-  vec3 vPos = (u_view * u_model * vec4(position, 1.0)).xyz;
-  vec3 toEye = normalize(-vPos);
-  vec3 vNormal =  normalize((u_view * u_model * vec4(normal, 0.0)).xyz);
-  float rim = 1 - max(0.0, dot(vNormal, toEye));
-  rim = pow(rim, kRimGamma);
-  return vec3(u_diffuse * rim);
+  float rim = 1.0 - max(0.0, dot(normal, normalize(u_eyePos)));
+  rim = pow(rim, kRimGamma) * 1.0;
+  return u_diffuse * rim;
 }

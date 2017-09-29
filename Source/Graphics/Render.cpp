@@ -5,6 +5,7 @@
 #include <Graphics/Shader.h>
 #include <Core/Game.h>
 #include <imgui.h> 
+#include "Graphics/DebugRenderer.h"
 
 #define PROFILE_OPENGL 0
 
@@ -17,7 +18,6 @@ RenderManager::RenderManager(World& world)
 	, _framebufferName(0)
 	, _renderedTexture(0)
 {
-
 #if defined(INSPECTOR) && PROFILE_OPENGL 
 	glGenQueries(RENDER_PASSES_NUM, _queries);
 #endif
@@ -94,6 +94,18 @@ void RenderManager::Render()
 
 	glBeginQuery(GL_TIME_ELAPSED, _queries[FORWARD_PASS]);
 #endif
+
+	for (auto l : _lights)
+	{
+		if (l->GetLightType() == Light::POINT_LIGHT)
+		{
+			gDebugRenderer.AddSphere(
+				DebugRenderer::Categories::RENDERING,
+				l->GetPosition(),
+				l->GetRadius(),
+				l->GetColor());
+		}
+	}
 
 	for (auto c : _cameras)
 	{
@@ -227,7 +239,9 @@ void Camera::Inspect()
 void Light::Inspect()
 {
 	ImGui::Checkbox("Enabled", &_enabled);
-	ImGui::OsmColor("Color", _color);	
+	ImGui::OsmColor("Color", _color);
+	ImGui::DragFloat("Intensity", &_intensity, 0.01f);
+	ImGui::DragFloat("Radius", &_radius, 0.1f);
 }
 
 #endif

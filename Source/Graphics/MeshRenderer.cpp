@@ -199,12 +199,13 @@ LightShaderParameter::LightShaderParameter(Shader* shader, const string& name) :
 	_positionParam(shader->GetParameter(name + ".position")),
 	_directionParam(shader->GetParameter(name + ".direction")),
 	_colorParam(shader->GetParameter(name + ".color")),
+	_radiusParam(shader->GetParameter(name + ".radius")),
 	_attenuationParam(shader->GetParameter(name + ".attenuation"))
 {}
 
 void LightShaderParameter::SetValue(const Light& light)
 {
-	_colorParam->SetValue(light.GetColor());
+	_colorParam->SetValue(light.GetColorAsVector());
 
 	if (light.GetLightType() == Light::DIRECTIONAL_LIGHT)
 	{
@@ -215,6 +216,7 @@ void LightShaderParameter::SetValue(const Light& light)
 	{
 		Vector3 pos = light.GetPosition();
 		_positionParam->SetValue(pos);
+		_radiusParam->SetValue(light.GetRadius());
 	}
 }
 

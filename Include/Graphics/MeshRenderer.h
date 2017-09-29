@@ -109,6 +109,7 @@ protected:
 	ShaderParameter* _directionParam;
 	ShaderParameter* _colorParam;
 	ShaderParameter* _attenuationParam;
+	ShaderParameter* _radiusParam;
 };
 
 }

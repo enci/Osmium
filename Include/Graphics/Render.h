@@ -216,7 +216,7 @@ public:
 
 	Color GetColor() const { return _color; }
 
-	void SetColor(Color color) { _color = color; }
+	void SetColor(Color color) { _color = color; }	
 
 	float GetAttenuation() const { return _attenuation; }
 
@@ -225,6 +225,16 @@ public:
 	Vector3 GetDirection() const { return _transform->GetOrientation().GetZAxis(); }
 
 	Vector3 GetPosition() const { return _transform->GetWorld().GetTranslation(); }
+
+	float GetIntensity() const { return _intensity; }
+
+	void SetIntensity(float intensity) { _intensity = intensity; }
+
+	float GetRadius() const { return _radius; }
+
+	void SetRadius(float radius) { _radius = radius; }
+
+	Vector3 GetColorAsVector() const;
 
 #ifdef INSPECTOR
 	virtual void Inspect() override;
@@ -235,7 +245,17 @@ protected:
 	LightType	_lightType		= DIRECTIONAL_LIGHT;
 	Color		_color			= Color::White;
 	float		_attenuation	= 0.5f;
-	Transform* _transform		= nullptr;
+	Transform*	_transform		= nullptr;
+	float		_intensity		= 1.0f;
+	float		_radius			= 10.0f;
 };
+
+inline Vector3 Light::GetColorAsVector() const
+
+{ return Vector3(
+	_color.r * (_intensity / 255.0f),
+	_color.g * (_intensity / 255.0f),
+	_color.b * (_intensity / 255.0f));
+}
 
 }
