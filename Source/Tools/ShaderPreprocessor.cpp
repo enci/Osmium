@@ -29,6 +29,8 @@ string ShaderPreprocessor::Read(const string& path)
 	return ParseRecursive(path, "", includeTree);
 }
 
+// Based on
+// https://www.opengl.org/discussion_boards/showthread.php/169209-include-in-glsl
 string ShaderPreprocessor::ParseRecursive(
 	const string& path,
 	const string& parentPath,
@@ -75,7 +77,7 @@ string ShaderPreprocessor::ParseRecursive(
 		if (regex_search(line, matches, sIncludeRegex))
 		{
 			output << ParseRecursive(matches[1].str(), parent, includeTree);
-			//output << "#line " << lineNumber << endl;
+			output << "#line " << lineNumber << endl;
 		}
 		else
 		{

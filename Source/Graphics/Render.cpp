@@ -5,7 +5,9 @@
 #include <Graphics/Shader.h>
 #include <Core/Game.h>
 #include <imgui.h> 
-#include "Graphics/DebugRenderer.h"
+#include <Graphics/DebugRenderer.h>
+#include <Core/Resources.h>
+#include <Graphics/Texture.h>
 
 #define PROFILE_OPENGL 0
 
@@ -22,11 +24,10 @@ RenderManager::RenderManager(World& world)
 	glGenQueries(RENDER_PASSES_NUM, _queries);
 #endif
 
-	/*
 	// Get settings
-	auto settings = Game.Settings();
-	auto width = settings.ScreenWidth;
-	auto height = settings.ScreenHeight;
+	const auto& settings = Game.Settings();
+	const auto width = settings.ScreenWidth;
+	const auto height = settings.ScreenHeight;
 
 	// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
 	glGenFramebuffers(1, &_framebufferName);
@@ -64,12 +65,56 @@ RenderManager::RenderManager(World& world)
 		ASSERT(false);
 
 	// Render to our framebuffer
-
-	
-
 	// Render on the whole framebuffer, complete from the lower left corner to the upper right
 	//	glViewport(0, 0, 1024, 768); 
+
+	_fullScreenPass = Game.Resources().LoadResource<Shader>(
+		"./Assets/Shaders/Include/RenderTexture.vsh",
+		"./Assets/Shaders/Include/RenderTexture.fsh");
+
+	/*
+	_bloomShader = Game.Resources().LoadResource<Shader>(
+		"./Assets/Shaders/Include/RenderTexture.vsh",
+		"./Assets/Shaders/Include/Bloom.fsh");
 	*/
+
+	_FXAAShader = Game.Resources().LoadResource<Shader>(
+		"./Assets/Shaders/Include/FXAA.vsh",
+		"./Assets/Shaders/Include/FXAA.fsh");
+
+	int g = 0;
+}
+
+
+// renderQuad() renders a 1x1 XY quad in NDC
+// -----------------------------------------
+unsigned int quadVAO = 0;
+unsigned int quadVBO;
+void RenderQuad()
+{
+	if (quadVAO == 0)
+	{
+		float quadVertices[] = {
+			// positions        // texture Coords
+			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+			1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+		};
+		// setup plane VAO
+		glGenVertexArrays(1, &quadVAO);
+		glGenBuffers(1, &quadVBO);
+		glBindVertexArray(quadVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	}
+	glBindVertexArray(quadVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
 }
 
 void RenderManager::Render()
@@ -77,16 +122,15 @@ void RenderManager::Render()
 	if (!_enabled)
 		return;
 
-	//glBindFramebuffer(GL_FRAMEBUFFER, _framebufferName);
+	// Get settings
+	const auto& settings = Game.Settings();
+	const auto width = settings.ScreenWidth;
+	const auto height = settings.ScreenHeight;
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	Shader* activeShader = nullptr;
-
-#if defined(INSPECTOR) && PROFILE_OPENGL
+#if defined(INSPECTOR)
 	DrawCalls = 0;
 	ShaderSwitches = 0;
-
+#if PROFILE_OPENGL
 	if (!_firstFrame)
 		glGetQueryObjectuiv(_queries[FORWARD_PASS],
 			GL_QUERY_RESULT,
@@ -94,6 +138,16 @@ void RenderManager::Render()
 
 	glBeginQuery(GL_TIME_ELAPSED, _queries[FORWARD_PASS]);
 #endif
+#endif
+
+	glBindFramebuffer(GL_FRAMEBUFFER, _framebufferName);
+	const Color clear = _cameras.size() > 0 ? _cameras[0]->GetClearColor() : Color::Black;
+	glClearColor(clear.r / 255.0f, clear.g / 255.0f, clear.b / 255.0f, 10.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+
+	Shader* activeShader = nullptr;
 
 	for (auto l : _lights)
 	{
@@ -132,14 +186,31 @@ void RenderManager::Render()
 		}
 	}
 
-#if defined(INSPECTOR) && PROFILE_OPENGL
-	glEndQuery(GL_TIME_ELAPSED);
-	DrawCalls++;
+#if defined(INSPECTOR)
+	DrawCalls = 0;
+#if PROFILE_OPENGL
+	glEndQuery(GL_TIME_ELAPSED);	
 	_firstFrame = false;
+#endif	
 #endif
 
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+	
+	_FXAAShader->Activate();
+	_FXAAShader->GetParameter("frameBufSize")->SetValue(
+		Vector2((float)width, (float)height)
+	);
+	uint program = _FXAAShader->GetProgram();	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, _renderedTexture);
+	
+	RenderQuad();
 }
 
 void RenderManager::Add(Renderable* renderable)

@@ -6,6 +6,7 @@
 #include <Graphics/Shader.h>
 #include <Graphics/Color.h>
 #include <Core/Transform.h>
+#include <Graphics/Mesh.h>
 
 namespace Osm
 {
@@ -16,6 +17,7 @@ class Renderable;
 class Light;
 class Camera;
 class Transform;
+class FullScreenPass;
 
 ///
 /// RenderManager
@@ -53,10 +55,14 @@ protected:
 	std::vector<Light*>			_lights;
 	std::vector<Camera*>		_cameras;
 
-	GLuint _framebufferName;
-	GLuint _renderedTexture;
-	GLuint _depthrenderbuffer;
+	GLuint						_framebufferName;
+	GLuint						_renderedTexture;
+	GLuint						_depthrenderbuffer;
 
+	Shader*						_fullScreenPass	= nullptr;
+	Shader*						_bloomShader	= nullptr;
+	Shader*						_FXAAShader		= nullptr;
+	
 #ifdef 	INSPECTOR
 	enum
 	{
