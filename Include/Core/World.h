@@ -41,15 +41,15 @@ public:
 	/// into the engine, this can go)
 	virtual void Render();
 
-	// TODO: Remove maybe
-	virtual bool IsDone() { return false; }
-
 	/// Removes and deletes all entities in this container
 	void Clear();
 
-	/// Get the first entity of a certain type
+	/// Get the all entities of a certain type
 	template<class T>
 	std::vector<T*> GetEntitiesByType();
+
+	/// Get the all entities with a certain tag
+	std::vector<Entity*> GetEntitiesByTag(uint tag);
 
 	Entity* GetEntityByID(uint id);
 
