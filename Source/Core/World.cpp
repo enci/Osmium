@@ -59,6 +59,17 @@ void Osm::World::Clear()
 }
 
 
+vector<Entity*> World::GetEntitiesByTag(uint tag)
+{
+	vector<Entity*> selection;
+	for (auto& e : _entities)
+	{
+		if (e->GetTag() == tag)
+			selection.push_back(e.get());
+	}
+	return selection;
+}
+
 Entity* World::GetEntityByID(uint id)
 {
 	for (auto& e : _entities)
