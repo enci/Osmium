@@ -29,6 +29,7 @@ uniform float u_fogExp;
 uniform float u_time;
 uniform vec4 u_fogColorNear;
 uniform vec4 u_fogColorFar;
+uniform float u_emissive;
 
 const float kRimGamma = 4.0;
 const float kLightRadius = 5.2;

@@ -50,6 +50,7 @@ void MeshRenderer::SetShader(Shader* shader)
 	_fogNearColorParam = shader->GetParameter("u_fogColorNear");
 	_fogFarColorParam = shader->GetParameter("u_fogColorFar");
 	_timeParam = shader->GetParameter("u_time");
+	_emissiveParam = shader->GetParameter("u_emissive");
 
 	for (int i = 0; i < kMaxDirecationalLights; i++)
 	{
@@ -129,6 +130,7 @@ void MeshRenderer::Draw()
 	_modelViewProjParam->SetValue(modelViewProjection);
 	_diffuseParam->SetValue(_diffuse);
 	_ambientParam->SetValue(_ambient);
+	_emissiveParam->SetValue( (_ambient.r + _ambient.g + _ambient.b) / (3.0f * 255.0f));
 	_textureParam->SetValue(*_texture);
 
 	glBindVertexArray(_vao);

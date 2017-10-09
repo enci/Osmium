@@ -72,6 +72,7 @@ protected:
 	ShaderParameter* _eyePosParam = nullptr;
 	ShaderParameter* _diffuseParam = nullptr;
 	ShaderParameter* _ambientParam = nullptr;
+	ShaderParameter* _emissiveParam = nullptr;
 	ShaderParameter* _fogNearParam = nullptr;
 	ShaderParameter* _fogFarParam = nullptr;
 	ShaderParameter* _fogExpParam = nullptr;

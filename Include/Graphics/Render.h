@@ -7,6 +7,7 @@
 #include <Graphics/Color.h>
 #include <Core/Transform.h>
 #include <Graphics/Mesh.h>
+#include <Graphics/Texture.h>
 
 namespace Osm
 {
@@ -18,6 +19,7 @@ class Light;
 class Camera;
 class Transform;
 class FullScreenPass;
+class LightShaderParameter;
 
 ///
 /// RenderManager
@@ -27,6 +29,8 @@ class RenderManager : public Component<World>
 public:
 
 	RenderManager(World& world);
+
+	~RenderManager();
 
 	void Render();
 
@@ -46,7 +50,7 @@ public:
 	virtual void Inspect() override;
 
 	int DrawCalls = 0;
-	int ShaderSwitches = 0;
+	int ShaderSwitches = 0;	
 #endif
 
 protected:
@@ -55,13 +59,30 @@ protected:
 	std::vector<Light*>			_lights;
 	std::vector<Camera*>		_cameras;
 
-	GLuint						_framebufferName;
-	GLuint						_renderedTexture;
-	GLuint						_depthrenderbuffer;
+	GLuint						_frameBuffer;
+	//GLuint						_renderedTexture;
+	GLuint						_depthBuffer;
+	GLuint						_positionBuffer;
+	GLuint						_normalBuffer;
+	GLuint						_albedoBuffer;
+
+	RenderTarget*				_positionTarget = nullptr;
+	RenderTarget*				_normalTarget	= nullptr;
+	RenderTarget*				_albedoTarget	= nullptr;
+
+	const int kMaxDirecationalLights = 5;
+	const int kMaxPointLights = 10;
+	std::vector<std::unique_ptr<LightShaderParameter>> _dirLightParams;
+	std::vector<std::unique_ptr<LightShaderParameter>> _pointLightParams;
+	ShaderParameter* _directionaLightsCountParam = nullptr;
+	ShaderParameter* _pointLightsCountParam = nullptr;
+	ShaderParameter* _eyePosParam;
 
 	Shader*						_fullScreenPass	= nullptr;
 	Shader*						_bloomShader	= nullptr;
 	Shader*						_FXAAShader		= nullptr;
+	Shader*						_deferredPass	= nullptr;
+
 	
 #ifdef 	INSPECTOR
 	enum

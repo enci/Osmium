@@ -8,8 +8,9 @@
 #include <Graphics/DebugRenderer.h>
 #include <Core/Resources.h>
 #include <Graphics/Texture.h>
+#include <Graphics/MeshRenderer.h>
 
-#define PROFILE_OPENGL 0
+#define PROFILE_OPENGL 1
 
 using namespace Osm;
 
@@ -17,8 +18,8 @@ using namespace Osm;
 
 RenderManager::RenderManager(World& world)
 	: Component(world)
-	, _framebufferName(0)
-	, _renderedTexture(0)
+	, _frameBuffer(0)
+	//, _renderedTexture(0)
 {
 #if defined(INSPECTOR) && PROFILE_OPENGL 
 	glGenQueries(RENDER_PASSES_NUM, _queries);
@@ -30,59 +31,92 @@ RenderManager::RenderManager(World& world)
 	const auto height = settings.ScreenHeight;
 
 	// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
-	glGenFramebuffers(1, &_framebufferName);
-	glBindFramebuffer(GL_FRAMEBUFFER, _framebufferName);
+	glGenFramebuffers(1, &_frameBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffer);
 
-	// The texture we're going to render to
-	glGenTextures(1, &_renderedTexture);
-
-	// "Bind" the newly created texture : all future texture functions will modify this texture
-	glBindTexture(GL_TEXTURE_2D, _renderedTexture);
-
-	// Give an empty image to OpenGL ( the last "0" )
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-
-	// Poor filtering. Needed !
+	// Position
+	glGenTextures(1, &_positionBuffer);
+	glBindTexture(GL_TEXTURE_2D, _positionBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _positionBuffer, 0);
+
+	// Normal
+	glGenTextures(1, &_normalBuffer);
+	glBindTexture(GL_TEXTURE_2D, _normalBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, _normalBuffer, 0);
+
+	// Albedo
+	glGenTextures(1, &_albedoBuffer);
+	glBindTexture(GL_TEXTURE_2D, _albedoBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, _albedoBuffer, 0);
+
+	GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+	glDrawBuffers(3, attachments);
 
 	// The depth buffer
-	glGenRenderbuffers(1, &_depthrenderbuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER, _depthrenderbuffer);
+	glGenRenderbuffers(1, &_depthBuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, _depthBuffer);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthrenderbuffer);
-
-	// Set "renderedTexture" as our colour attachement #0
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _renderedTexture, 0);
-	//glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, _renderedTexture, 0);
-
-	// Set the list of draw buffers.
-	//GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
-	//glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthBuffer);
 
 	// Always check that our framebuffer is ok
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		ASSERT(false);
-
-	// Render to our framebuffer
-	// Render on the whole framebuffer, complete from the lower left corner to the upper right
-	//	glViewport(0, 0, 1024, 768); 
+	
 
 	_fullScreenPass = Game.Resources().LoadResource<Shader>(
 		"./Assets/Shaders/Include/RenderTexture.vsh",
 		"./Assets/Shaders/Include/RenderTexture.fsh");
 
-	/*
-	_bloomShader = Game.Resources().LoadResource<Shader>(
-		"./Assets/Shaders/Include/RenderTexture.vsh",
-		"./Assets/Shaders/Include/Bloom.fsh");
-	*/
+	_deferredPass = Game.Resources().LoadResource<Shader>(
+		"./Assets/Shaders/Include/DeferredPass.vsh",
+		"./Assets/Shaders/Include/DeferredPass.fsh");
+	_positionTarget = Game.Resources().CreateResource<RenderTarget>(_positionBuffer);
+	_normalTarget = Game.Resources().CreateResource<RenderTarget>(_normalBuffer);
+	_albedoTarget = Game.Resources().CreateResource<RenderTarget>(_albedoBuffer);
+	_directionaLightsCountParam = _deferredPass->GetParameter("u_directionalLightsCount");
+	_pointLightsCountParam = _deferredPass->GetParameter("u_pointLightsCount");
+	_eyePosParam = _deferredPass->GetParameter("u_eyePos");
+	for (int i = 0; i < kMaxDirecationalLights; i++)
+	{
+		string name = "u_directionalLights[" + to_string(i) + "]";
+		auto lprm = new LightShaderParameter(_deferredPass, name);
+		_dirLightParams.push_back(unique_ptr<LightShaderParameter>(lprm));
+	}
+
+	for (int i = 0; i < kMaxPointLights; i++)
+	{
+		string name = "u_pointLights[" + to_string(i) + "]";
+		auto lprm = new LightShaderParameter(_deferredPass, name);
+		_pointLightParams.push_back(unique_ptr<LightShaderParameter>(lprm));
+	}
 
 	_FXAAShader = Game.Resources().LoadResource<Shader>(
 		"./Assets/Shaders/Include/FXAA.vsh",
 		"./Assets/Shaders/Include/FXAA.fsh");
+}
 
-	int g = 0;
+RenderManager::~RenderManager()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDeleteBuffers(1, &_positionBuffer);
+	glDeleteBuffers(1, &_normalBuffer);
+	glDeleteBuffers(1, &_albedoBuffer);
+	glDeleteBuffers(1, &_depthBuffer);
+	glDeleteBuffers(1, &_frameBuffer);
+
+	Game.Resources().ReleaseResource(_fullScreenPass);
+	Game.Resources().ReleaseResource(_bloomShader);
+	Game.Resources().ReleaseResource(_FXAAShader);
+	Game.Resources().ReleaseResource(_deferredPass);
 }
 
 
@@ -140,7 +174,7 @@ void RenderManager::Render()
 #endif
 #endif
 
-	glBindFramebuffer(GL_FRAMEBUFFER, _framebufferName);
+	glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffer);
 	const Color clear = _cameras.size() > 0 ? _cameras[0]->GetClearColor() : Color::Black;
 	glClearColor(clear.r / 255.0f, clear.g / 255.0f, clear.b / 255.0f, 10.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -186,14 +220,7 @@ void RenderManager::Render()
 		}
 	}
 
-#if defined(INSPECTOR)
-	DrawCalls = 0;
-#if PROFILE_OPENGL
-	glEndQuery(GL_TIME_ELAPSED);	
-	_firstFrame = false;
-#endif	
-#endif
-
+	// Composite
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
@@ -201,16 +228,49 @@ void RenderManager::Render()
 
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
-	
-	_FXAAShader->Activate();
-	_FXAAShader->GetParameter("frameBufSize")->SetValue(
-		Vector2((float)width, (float)height)
-	);
-	uint program = _FXAAShader->GetProgram();	
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _renderedTexture);
+
+	_deferredPass->Activate();
+	_deferredPass->GetParameter("gbf_position")->SetValue(*_positionTarget);
+	_deferredPass->GetParameter("gbf_normal")->SetValue(*_normalTarget);
+	_deferredPass->GetParameter("gbf_albedo")->SetValue(*_albedoTarget);
+
+	auto viewMatrix = _cameras[0]->GetView();
+	auto viewInv = viewMatrix;
+	viewInv.Invert();
+	Vector3 eyePos = viewInv * Vector3(0, 0, 0);
+	_eyePosParam->SetValue(eyePos);
+
+	int pointLightsCount = 0;
+	int dirLightsCount = 0;
+	size_t maxDir = _dirLightParams.size();
+	size_t maxPoint = _pointLightParams.size();
+	for (auto l : _lights)
+	{
+		if (!l->GetEnbled())
+			continue;
+
+		if (l->GetLightType() == Light::DIRECTIONAL_LIGHT && dirLightsCount < (int)maxDir)
+		{
+			_dirLightParams[dirLightsCount++]->SetValue(*l);
+		}
+		else if (l->GetLightType() == Light::POINT_LIGHT && pointLightsCount < (int)maxPoint)
+		{
+			_pointLightParams[pointLightsCount++]->SetValue(*l);
+		}
+	}
+
+	_directionaLightsCountParam->SetValue(dirLightsCount);
+	_pointLightsCountParam->SetValue(pointLightsCount);
 	
 	RenderQuad();
+
+#if defined(INSPECTOR)
+	DrawCalls = 0;
+#if PROFILE_OPENGL
+	glEndQuery(GL_TIME_ELAPSED);
+	_firstFrame = false;
+#endif	
+#endif
 }
 
 void RenderManager::Add(Renderable* renderable)

@@ -72,3 +72,8 @@ void Texture::Reload()
 		stbi_image_free(data);
 	}
 }
+
+RenderTarget::RenderTarget(GLuint id)
+{
+	_texture = id;
+}
