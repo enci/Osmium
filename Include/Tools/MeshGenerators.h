@@ -5,7 +5,7 @@
 namespace Osm
 {
 	/// Generates an icosphere with radius size.
-	/// @param resilution: Number of subdivisions
+	/// @param resolution: Number of subdivisions
 	/// @param vertices: Resulting vertex positions
 	/// @param indices: Resulting indices for use with glDrawElements
 	void GenerateIcosphere(

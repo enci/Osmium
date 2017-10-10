@@ -9,6 +9,7 @@
 #include <Core/Resources.h>
 #include <Graphics/Texture.h>
 #include <Graphics/MeshRenderer.h>
+#include <Tools/MeshGenerators.h>
 
 #define PROFILE_OPENGL 1
 
@@ -70,34 +71,53 @@ RenderManager::RenderManager(World& world)
 	// Always check that our framebuffer is ok
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		ASSERT(false);
-	
 
+	_positionTarget = Game.Resources().CreateResource<RenderTarget>(_positionBuffer);
+	_normalTarget = Game.Resources().CreateResource<RenderTarget>(_normalBuffer);
+	_albedoTarget = Game.Resources().CreateResource<RenderTarget>(_albedoBuffer);
+	
 	_fullScreenPass = Game.Resources().LoadResource<Shader>(
 		"./Assets/Shaders/Include/RenderTexture.vsh",
 		"./Assets/Shaders/Include/RenderTexture.fsh");
 
+	/*
 	_deferredPass = Game.Resources().LoadResource<Shader>(
 		"./Assets/Shaders/Include/DeferredPass.vsh",
 		"./Assets/Shaders/Include/DeferredPass.fsh");
-	_positionTarget = Game.Resources().CreateResource<RenderTarget>(_positionBuffer);
-	_normalTarget = Game.Resources().CreateResource<RenderTarget>(_normalBuffer);
-	_albedoTarget = Game.Resources().CreateResource<RenderTarget>(_albedoBuffer);
-	_directionaLightsCountParam = _deferredPass->GetParameter("u_directionalLightsCount");
-	_pointLightsCountParam = _deferredPass->GetParameter("u_pointLightsCount");
-	_eyePosParam = _deferredPass->GetParameter("u_eyePos");
-	for (int i = 0; i < kMaxDirecationalLights; i++)
-	{
-		string name = "u_directionalLights[" + to_string(i) + "]";
-		auto lprm = new LightShaderParameter(_deferredPass, name);
-		_dirLightParams.push_back(unique_ptr<LightShaderParameter>(lprm));
-	}
+	*/
 
-	for (int i = 0; i < kMaxPointLights; i++)
-	{
-		string name = "u_pointLights[" + to_string(i) + "]";
-		auto lprm = new LightShaderParameter(_deferredPass, name);
-		_pointLightParams.push_back(unique_ptr<LightShaderParameter>(lprm));
-	}
+	_directionalPass = Game.Resources().LoadResource<Shader>(
+		"./Assets/Shaders/Include/DirectionalLightPass.vsh",
+		"./Assets/Shaders/Include/DirectionalLightPass.fsh");
+	_dlpDirectionParam = _directionalPass->GetParameter("u_direction");
+	_dlpColorParam = _directionalPass->GetParameter("u_color");
+
+
+	_pointPass = Game.Resources().LoadResource<Shader>(
+		"./Assets/Shaders/Include/PointLightPass.vsh",
+		"./Assets/Shaders/Include/PointLightPass.fsh");
+
+	_emissiveAndRimPass = Game.Resources().LoadResource<Shader>(
+		"./Assets/Shaders/Include/EmissiveAndRimPass.vsh",
+		"./Assets/Shaders/Include/EmissiveAndRimPass.fsh");
+
+	// _directionaLightsCountParam = _deferredPass->GetParameter("u_directionalLightsCount");
+	// _pointLightsCountParam = _deferredPass->GetParameter("u_pointLightsCount");
+	// _eyePosParam = _deferredPass->GetParameter("u_eyePos");
+	// for (int i = 0; i < kMaxDirecationalLights; i++)
+	// {
+		// string name = "u_directionalLights[" + to_string(i) + "]";
+		// auto lprm = new LightShaderParameter(_deferredPass, name);
+		// _dirLightParams.push_back(unique_ptr<LightShaderParameter>(lprm));
+	// }
+
+
+	// for (int i = 0; i < kMaxPointLights; i++)
+	// {
+	//		string name = "u_pointLights[" + to_string(i) + "]";
+	//	auto lprm = new LightShaderParameter(_deferredPass, name);
+	//		_pointLightParams.push_back(unique_ptr<LightShaderParameter>(lprm));
+	// }
 
 	_FXAAShader = Game.Resources().LoadResource<Shader>(
 		"./Assets/Shaders/Include/FXAA.vsh",
@@ -116,7 +136,8 @@ RenderManager::~RenderManager()
 	Game.Resources().ReleaseResource(_fullScreenPass);
 	Game.Resources().ReleaseResource(_bloomShader);
 	Game.Resources().ReleaseResource(_FXAAShader);
-	Game.Resources().ReleaseResource(_deferredPass);
+	// Game.Resources().ReleaseResource(_deferredPass);
+	Game.Resources().ReleaseResource(_directionalPass);
 }
 
 
@@ -151,6 +172,49 @@ void RenderQuad()
 	glBindVertexArray(0);
 }
 
+
+unsigned int sphereVAO = 0;
+// unsigned int sphereVBO;
+void RenderSphere()
+{
+	Mesh* m = nullptr;
+	if (sphereVAO == 0)
+	{
+		vector<Osm::VertexFormat> vertices;
+		vector<ushort> indices;
+		GenerateIcosphere(1.0f, 2, vertices, indices);
+		m = Game.Resources().CreateResource<Mesh>();
+		m->SetVertices(move(vertices));
+		m->SetIndices(move(indices));
+		m->Apply();
+		GLsizei size = sizeof(VertexFormat);
+
+		glGenVertexArrays(1, &sphereVAO);
+		glBindVertexArray(sphereVAO);
+
+		const GLuint* vbo = m->GetVertexBuffers();
+
+		// Bind the buffers to the global state
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(
+			0,				// attribute
+			3,				// number of elements per vertex element
+			GL_FLOAT,       // the type of each element
+			GL_FALSE,       // take our values as-is or normalize
+			size,			// no extra data between each position
+			0				// offset of first element
+		);
+
+		glBindVertexArray(0);
+	}
+	glBindVertexArray(sphereVAO);
+	glDrawElements(GL_TRIANGLES, m->GetIndexCount(), GL_UNSIGNED_SHORT, 0);
+	glBindVertexArray(0);
+}
+
 void RenderManager::Render()
 {
 	if (!_enabled)
@@ -174,9 +238,10 @@ void RenderManager::Render()
 #endif
 #endif
 
+	// Geometry pass
 	glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffer);
 	const Color clear = _cameras.size() > 0 ? _cameras[0]->GetClearColor() : Color::Black;
-	glClearColor(clear.r / 255.0f, clear.g / 255.0f, clear.b / 255.0f, 10.0f);
+	glClearColor(clear.r / 255.0f, clear.g / 255.0f, clear.b / 255.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
@@ -220,49 +285,102 @@ void RenderManager::Render()
 		}
 	}
 
-	// Composite
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+	// Light pass
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 
-	_deferredPass->Activate();
-	_deferredPass->GetParameter("gbf_position")->SetValue(*_positionTarget);
-	_deferredPass->GetParameter("gbf_normal")->SetValue(*_normalTarget);
-	_deferredPass->GetParameter("gbf_albedo")->SetValue(*_albedoTarget);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
+
+	// _deferredPass->Activate();
+	// _deferredPass->GetParameter("gbf_position")->SetValue(*_positionTarget);
+	// _deferredPass->GetParameter("gbf_normal")->SetValue(*_normalTarget);
+	// _deferredPass->GetParameter("gbf_albedo")->SetValue(*_albedoTarget);
 
 	auto viewMatrix = _cameras[0]->GetView();
 	auto viewInv = viewMatrix;
 	viewInv.Invert();
 	Vector3 eyePos = viewInv * Vector3(0, 0, 0);
-	_eyePosParam->SetValue(eyePos);
 
-	int pointLightsCount = 0;
-	int dirLightsCount = 0;
-	size_t maxDir = _dirLightParams.size();
-	size_t maxPoint = _pointLightParams.size();
+	_emissiveAndRimPass->Activate();
+	_emissiveAndRimPass->GetParameter("gbf_position")->SetValue(*_positionTarget);
+	_emissiveAndRimPass->GetParameter("gbf_normal")->SetValue(*_normalTarget);
+	_emissiveAndRimPass->GetParameter("gbf_albedo")->SetValue(*_albedoTarget);
+	_emissiveAndRimPass->GetParameter("u_eyePos")->SetValue(eyePos);
+	RenderQuad();
+
+	_directionalPass->Activate();
+	_directionalPass->GetParameter("gbf_position")->SetValue(*_positionTarget);
+	_directionalPass->GetParameter("gbf_normal")->SetValue(*_normalTarget);
+	_directionalPass->GetParameter("gbf_albedo")->SetValue(*_albedoTarget);
+
 	for (auto l : _lights)
 	{
 		if (!l->GetEnbled())
 			continue;
 
-		if (l->GetLightType() == Light::DIRECTIONAL_LIGHT && dirLightsCount < (int)maxDir)
+		if (l->GetLightType() == Light::DIRECTIONAL_LIGHT)
 		{
-			_dirLightParams[dirLightsCount++]->SetValue(*l);
-		}
-		else if (l->GetLightType() == Light::POINT_LIGHT && pointLightsCount < (int)maxPoint)
-		{
-			_pointLightParams[pointLightsCount++]->SetValue(*l);
+			_dlpDirectionParam->SetValue(l->GetDirection());
+			_dlpColorParam->SetValue(l->GetColor());
+			RenderQuad();
 		}
 	}
 
-	_directionaLightsCountParam->SetValue(dirLightsCount);
-	_pointLightsCountParam->SetValue(pointLightsCount);
+	_pointPass->Activate();
+	_pointPass->GetParameter("gbf_position")->SetValue(*_positionTarget);
+	_pointPass->GetParameter("gbf_normal")->SetValue(*_normalTarget);
+	_pointPass->GetParameter("gbf_albedo")->SetValue(*_albedoTarget);
+
+	for (auto l : _lights)
+	{
+		if (!l->GetEnbled())
+			continue;
+
+		if (l->GetLightType() == Light::POINT_LIGHT)
+		{
+			_pointPass->GetParameter("u_position")->SetValue(l->GetPosition());
+			_pointPass->GetParameter("u_color")->SetValue(l->GetColor());
+			_pointPass->GetParameter("u_radius")->SetValue(l->GetRadius());
+			RenderQuad();
+		}
+	}
+
+	/*
+	auto viewMatrix = _cameras[0]->GetView();
+	auto viewInv = viewMatrix;
+	viewInv.Invert();
+	Vector3 eyePos = viewInv * Vector3(0, 0, 0);
+	// _eyePosParam->SetValue(eyePos);
+
+	for (auto l : _lights)
+	{
+		if (!l->GetEnbled())
+			continue;
+
+		if (l->GetLightType() == Light::DIRECTIONAL_LIGHT)
+		{
+			_dlpDirectionParam->SetValue(l->GetDirection());
+			_dlpColorParam->SetValue(l->GetColor());
+			RenderQuad();
+		}
+		else if (l->GetLightType() == Light::POINT_LIGHT)
+		{
+		}
+	}
+	glDisable(GL_BLEND);
+	*/
+
+	// _directionaLightsCountParam->SetValue(dirLightsCount);
+	// _pointLightsCountParam->SetValue(pointLightsCount);
+
+	glDisable(GL_BLEND);
 	
-	RenderQuad();
 
 #if defined(INSPECTOR)
 	DrawCalls = 0;

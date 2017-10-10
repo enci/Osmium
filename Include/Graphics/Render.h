@@ -70,18 +70,28 @@ protected:
 	RenderTarget*				_normalTarget	= nullptr;
 	RenderTarget*				_albedoTarget	= nullptr;
 
-	const int kMaxDirecationalLights = 5;
-	const int kMaxPointLights = 10;
-	std::vector<std::unique_ptr<LightShaderParameter>> _dirLightParams;
-	std::vector<std::unique_ptr<LightShaderParameter>> _pointLightParams;
-	ShaderParameter* _directionaLightsCountParam = nullptr;
-	ShaderParameter* _pointLightsCountParam = nullptr;
-	ShaderParameter* _eyePosParam;
+	// const int kMaxDirecationalLights = 5;
+	// const int kMaxPointLights = 10;
+	// std::vector<std::unique_ptr<LightShaderParameter>> _dirLightParams;
+	// std::vector<std::unique_ptr<LightShaderParameter>> _pointLightParams;
+	// ShaderParameter* _directionaLightsCountParam = nullptr;
+	// ShaderParameter* _pointLightsCountParam = nullptr;
+	//ShaderParameter* _eyePosParam;
 
-	Shader*						_fullScreenPass	= nullptr;
-	Shader*						_bloomShader	= nullptr;
-	Shader*						_FXAAShader		= nullptr;
-	Shader*						_deferredPass	= nullptr;
+	Shader*						_fullScreenPass		= nullptr;
+	Shader*						_bloomShader		= nullptr;
+	Shader*						_FXAAShader			= nullptr;
+	//Shader*					_deferredPass		= nullptr;
+
+	Shader*						_directionalPass	= nullptr;
+	ShaderParameter*			_dlpDirectionParam	= nullptr;
+	ShaderParameter*			_dlpColorParam		= nullptr;
+
+	Shader*						_emissiveAndRimPass	= nullptr;
+	Shader*						_pointPass			= nullptr;
+	// ShaderParameter* _pointLightsCountParam = nullptr;
+
+	// Shader*						_pointLightPass		= nullptr;
 
 	
 #ifdef 	INSPECTOR
