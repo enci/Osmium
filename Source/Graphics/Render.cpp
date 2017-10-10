@@ -177,7 +177,7 @@ unsigned int sphereVAO = 0;
 // unsigned int sphereVBO;
 void RenderSphere()
 {
-	Mesh* m = nullptr;
+	static Mesh* m = nullptr;
 	if (sphereVAO == 0)
 	{
 		vector<Osm::VertexFormat> vertices;
@@ -291,7 +291,7 @@ void RenderManager::Render()
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glDisable(GL_CULL_FACE);
+	//glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 
 	glEnable(GL_BLEND);
@@ -337,17 +337,27 @@ void RenderManager::Render()
 	_pointPass->GetParameter("gbf_normal")->SetValue(*_normalTarget);
 	_pointPass->GetParameter("gbf_albedo")->SetValue(*_albedoTarget);
 
+	
+	Matrix44 view = _cameras[0]->GetView();
+	Matrix44 projection = _cameras[0]->Projection();
+
 	for (auto l : _lights)
 	{
 		if (!l->GetEnbled())
 			continue;
 
 		if (l->GetLightType() == Light::POINT_LIGHT)
-		{
+		{			
+			const float r = l->GetRadius();
+			const Matrix44& model = l->GetOwner().GetComponent<Transform>()->GetWorld();
 			_pointPass->GetParameter("u_position")->SetValue(l->GetPosition());
-			_pointPass->GetParameter("u_color")->SetValue(l->GetColor());
-			_pointPass->GetParameter("u_radius")->SetValue(l->GetRadius());
-			RenderQuad();
+			_pointPass->GetParameter("u_color")->SetValue(l->GetColorAsVector());
+			_pointPass->GetParameter("u_radius")->SetValue(r);
+			_pointPass->GetParameter("u_modelViewProjection")->SetValue(
+				projection * view * model * Matrix44::CreateScale(Vector3(r, r, r)));
+			RenderSphere();
+
+			//RenderQuad();
 		}
 	}
 
