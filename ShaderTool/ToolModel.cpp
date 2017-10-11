@@ -9,7 +9,7 @@
 
 using namespace Osm;
 
-ToolModel::ToolModel(Osm::World& world) : Entity(world)
+ToolModel::ToolModel()
 {
 	SetName("Model");
 

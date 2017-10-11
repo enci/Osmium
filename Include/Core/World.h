@@ -25,8 +25,8 @@ public:
 	virtual ~World();
 
 	/// Adds and entity to the collection
-	template<class T>
-	T* CreateEntity();
+	template<class T, typename... Args>
+	T* CreateEntity(Args... args);
 
 	/// Removes an entity from this collection
 	void RemoveEntity(Entity* e);
@@ -60,7 +60,9 @@ public:
 #endif
 
 protected:
-	// Note: The order is important
+
+	/// Use this to grab the next valid ID
+	uint _nextValidID = 1;
 
 	/// Queue so that removing can be done form the game loop itself
 	EntityRemoveQueue               _removeQueue;	// Keep this arround till last possible second
@@ -72,16 +74,18 @@ protected:
 	EntityInnerContainer            _entities;		// First delete entities that are active
 };
 
-template<class T>
-inline T* World::CreateEntity()
+template<class T, typename ... Args>
+T* World::CreateEntity(Args... args)
 {
-	T* entity = new T(*this);
+	T* entity = new T(args...);
+	entity->_ID		= _nextValidID++;
+	entity->_world	= this;
 	_addQueue.push_back(std::unique_ptr<T>(entity));
 	return entity;
 }
 
 template <class T>
-inline	std::vector<T*> World::GetEntitiesByType()
+std::vector<T*> World::GetEntitiesByType()
 {
 	std::vector<T*> selection;
 	for (auto& e : _entities)

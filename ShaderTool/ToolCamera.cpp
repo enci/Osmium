@@ -4,7 +4,7 @@
 
 using namespace Osm;
 
-ToolCamera::ToolCamera(World& world) : Entity(world)
+ToolCamera::ToolCamera()
 {
 	_transform = CreateComponent<Transform>();
 	_camera = CreateComponent<Camera>();

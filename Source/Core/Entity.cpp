@@ -5,13 +5,9 @@
 using namespace Osm;
 using namespace std;
 
-uint Entity::_nextValidID = 0;
+// uint Entity::_nextValidID = 0;
 
-Entity::Entity(World& world)
-	: _ID(GetNextValidID())
-	, _name("")
-	, _world(world)	
-{}
+Entity::Entity() : _name("") {}
 
 #ifdef INSPECTOR
 void Entity::Inspect()

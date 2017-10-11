@@ -16,8 +16,11 @@ class World;
 class Entity : public ComponentContainer<Entity>
 {
 public:
+	friend class World;
+
+public:
 	/// New entity with a world
-	Entity(World& world);
+	Entity();
 
 	/// Can't copy entities
 	Entity(Entity& other) = delete;
@@ -48,7 +51,7 @@ public:
 	void SetName(const std::string& name)	{ _name = name; }
 
 	/// Get the world this entity lives in
-	World& GetWorld() const					{ return _world; }
+	World& GetWorld() const { _ASSERT(_world); return *_world; }
 
 	/// Get a generic tag
 	uint GetTag() const					{ return _tag; }
@@ -59,25 +62,27 @@ public:
 private:
 
 	/// Use this to grab the next valid ID
-	static uint         GetNextValidID() { return ++_nextValidID; }
+	// static uint         GetNextValidID() { return ++_nextValidID; }
 
 	/// This can be used to reset the next ID (beginning of a level or such)
-	static void         ResetNextValidID() { _nextValidID = 1; }
+	// static void         ResetNextValidID() { _nextValidID = 1; }
+
+	//protected:
 
 private:
 
-	/// Each entity has a unique ID
-	uint				_ID;
+	/// Each entity has a unique ID (set by World). 0 is not a valid ID
+	uint				_ID		= 0;
 
 	/// A name for the entity, this helps when debugging
 	std::string			_name;	
 
-	/// Reference to the world
-	World&				_world;
+	/// Reference to the world  (set by World)
+	World*				_world	= nullptr;
 
 	/// This is the next valid ID. Each time a Entity2D is instantiated
 	/// this value is updated
-	static uint			_nextValidID;
+	// static uint			_nextValidID;
 
 	/// Just a generic tag
 	uint				_tag = 0;

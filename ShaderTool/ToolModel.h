@@ -14,7 +14,7 @@ class ToolModel : public Osm::Entity
 	};
 
 public:
-	ToolModel(Osm::World& world);
+	ToolModel();
 
 	void Update(float dt) override;
 

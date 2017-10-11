@@ -9,7 +9,7 @@ class ToolCamera : public Osm::Entity
 {
 public:
 
-	ToolCamera(Osm::World& world);
+	ToolCamera();
 
 	void  Update(float dt)  override;
 
