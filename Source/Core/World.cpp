@@ -120,6 +120,13 @@ void World::InspectEntity(Entity* entity, set<Entity*>& inspected, uint& selecte
 			}
 			ImGui::TreePop();
 		}
+		else
+		{
+			/*
+			for (auto child : childern)
+				inspected.insert(&child->GetOwner());
+			*/
+		}
 	}
 	else
 	{
@@ -157,7 +164,12 @@ void World::Inspect()
 		set<Entity*> inspected;
 		for (size_t i = 0; i < _entities.size(); i++)
 		{
-			InspectEntity(_entities[i].get(), inspected, selectedId);
+			auto e = _entities[i].get();
+			auto t = e->GetComponent<Transform>();
+			if(t && t->GetParent())
+				continue;
+
+			InspectEntity(e, inspected, selectedId);
 		}
 
 

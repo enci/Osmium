@@ -11,6 +11,14 @@ namespace Osm
 class Transform : public Component<Entity>
 {
 public:
+	enum ParentType
+	{
+		NORMAL,
+		POSITION,
+		OWNERSHIP
+	};
+
+public:
 	Transform(Entity& entity);
 
 	virtual ~Transform();
@@ -39,23 +47,26 @@ public:
 
 	void SetLocal(Matrix44 view);
 
-	void SetParent(Transform* parent);
+	void SetParent(Transform* parent, ParentType type = NORMAL);
 
 	Transform* GetParent() const						{ return _parent; }
 
 	const std::vector<Transform*>& GetChildern() const	{ return _childern; }
+
+	ParentType GetParentType() const					{ return _parentType; }
 
 #ifdef INSPECTOR
 	virtual void Inspect() override;
 #endif
 
 protected:
-
+	
+	Vector3					_position;
+	Matrix44				_orientation;	
+	Vector3					_scale;
 	Transform*				_parent;
 	std::vector<Transform*> _childern;
-	Matrix44				_orientation;
-	Vector3					_position;
-	Vector3					_scale;
+	ParentType				_parentType;
 };
 
 inline Transform::Transform(Entity& entity)
@@ -78,7 +89,18 @@ inline Matrix44 Transform::GetWorld() const
 	world.SetTranslation(_position);
 
 	if (_parent)
-		world = _parent->GetWorld() * world;
+	{
+		switch (_parentType)
+		{
+		case NORMAL:
+			world = _parent->GetWorld() * world;
+			break;
+		case POSITION:
+			world.SetTranslation(_position + _parent->GetWorld().GetTranslation());
+			break;
+		default:;
+		}		
+	}
 
 	return world;
 }

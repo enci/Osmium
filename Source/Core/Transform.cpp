@@ -43,10 +43,11 @@ void Transform::SetLocal(Matrix44 view)
 	_orientation.SetOrientation(x, y, z);
 }
 
-void Transform::SetParent(Transform* parent)
+void Transform::SetParent(Transform* parent, ParentType type)
 {
 	_parent = parent;
 	_parent->_childern.push_back(this);
+	_parentType = type;
 }
 
 #ifdef INSPECTOR
