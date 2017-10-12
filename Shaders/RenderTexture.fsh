@@ -4,7 +4,6 @@ out vec4 fragColor;
 in vec2 v_texture;
 uniform sampler2D s_texture;
 
-
 void main()
 {
   vec3 result = texture(s_texture, v_texture).rgb;

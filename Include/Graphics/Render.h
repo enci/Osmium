@@ -55,9 +55,9 @@ protected:
 	std::vector<Light*>			_lights;
 	std::vector<Camera*>		_cameras;
 
-	GLuint						_framebufferName;
-	GLuint						_renderedTexture;
-	GLuint						_depthrenderbuffer;
+	GLuint						_framebuffer;
+	GLuint						_colorbuffer;
+	GLuint						_depthbuffer;
 
 	Shader*						_fullScreenPass	= nullptr;
 	Shader*						_bloomShader	= nullptr;

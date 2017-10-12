@@ -9,7 +9,7 @@
 #include <Core/Resources.h>
 #include <Graphics/Texture.h>
 
-#define PROFILE_OPENGL 0
+#define PROFILE_OPENGL 1
 
 using namespace Osm;
 
@@ -17,8 +17,8 @@ using namespace Osm;
 
 RenderManager::RenderManager(World& world)
 	: Component(world)
-	, _framebufferName(0)
-	, _renderedTexture(0)
+	, _framebuffer(0)
+	, _colorbuffer(0)
 {
 #if defined(INSPECTOR) && PROFILE_OPENGL 
 	glGenQueries(RENDER_PASSES_NUM, _queries);
@@ -30,14 +30,14 @@ RenderManager::RenderManager(World& world)
 	const auto height = settings.ScreenHeight;
 
 	// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
-	glGenFramebuffers(1, &_framebufferName);
-	glBindFramebuffer(GL_FRAMEBUFFER, _framebufferName);
+	glGenFramebuffers(1, &_framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
 
 	// The texture we're going to render to
-	glGenTextures(1, &_renderedTexture);
+	glGenTextures(1, &_colorbuffer);
 
 	// "Bind" the newly created texture : all future texture functions will modify this texture
-	glBindTexture(GL_TEXTURE_2D, _renderedTexture);
+	glBindTexture(GL_TEXTURE_2D, _colorbuffer);
 
 	// Give an empty image to OpenGL ( the last "0" )
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
@@ -47,14 +47,14 @@ RenderManager::RenderManager(World& world)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
 	// The depth buffer
-	glGenRenderbuffers(1, &_depthrenderbuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER, _depthrenderbuffer);
+	glGenRenderbuffers(1, &_depthbuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, _depthbuffer);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthrenderbuffer);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthbuffer);
 
 	// Set "renderedTexture" as our colour attachement #0
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _renderedTexture, 0);
-	//glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, _renderedTexture, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _colorbuffer, 0);
+	//glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, _colorbuffer, 0);
 
 	// Set the list of draw buffers.
 	//GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
@@ -63,11 +63,7 @@ RenderManager::RenderManager(World& world)
 	// Always check that our framebuffer is ok
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		ASSERT(false);
-
-	// Render to our framebuffer
-	// Render on the whole framebuffer, complete from the lower left corner to the upper right
-	//	glViewport(0, 0, 1024, 768); 
-
+	
 	_fullScreenPass = Game.Resources().LoadResource<Shader>(
 		"./Assets/Shaders/Include/RenderTexture.vsh",
 		"./Assets/Shaders/Include/RenderTexture.fsh");
@@ -81,17 +77,15 @@ RenderManager::RenderManager(World& world)
 	_FXAAShader = Game.Resources().LoadResource<Shader>(
 		"./Assets/Shaders/Include/FXAA.vsh",
 		"./Assets/Shaders/Include/FXAA.fsh");
-
-	int g = 0;
 }
 
 
-// renderQuad() renders a 1x1 XY quad in NDC
-// -----------------------------------------
-unsigned int quadVAO = 0;
-unsigned int quadVBO;
+// RenderQuad() renders a 1x1 XY quad in NDC
 void RenderQuad()
 {
+	static unsigned int quadVAO = 0;
+	static unsigned int quadVBO = 0;
+
 	if (quadVAO == 0)
 	{
 		float quadVertices[] = {
@@ -140,7 +134,7 @@ void RenderManager::Render()
 #endif
 #endif
 
-	glBindFramebuffer(GL_FRAMEBUFFER, _framebufferName);
+	glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
 	const Color clear = _cameras.size() > 0 ? _cameras[0]->GetClearColor() : Color::Black;
 	glClearColor(clear.r / 255.0f, clear.g / 255.0f, clear.b / 255.0f, 10.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -163,8 +157,8 @@ void RenderManager::Render()
 
 	for (auto c : _cameras)
 	{
-		Matrix44 view = c->GetView();
-		Matrix44 projection = c->Projection();
+		// Matrix44 view = c->GetView();
+		// Matrix44 projection = c->Projection();
 
 		for (auto renderer : _renderables)
 		{
@@ -208,7 +202,7 @@ void RenderManager::Render()
 	);
 	uint program = _FXAAShader->GetProgram();	
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _renderedTexture);
+	glBindTexture(GL_TEXTURE_2D, _colorbuffer);
 	
 	RenderQuad();
 }

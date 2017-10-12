@@ -36,7 +36,7 @@ void MeshRenderer::SetShader(Shader* shader)
 	_textureParam = shader->GetParameter("u_texture");
 	_eyePosParam = shader->GetParameter("u_eyePos");
 	_modelViewParam = shader->GetParameter("u_modelView");
-	_modelViewProjParam = shader->GetParameter("u_modelViewProj");
+	_modelViewProjParam = shader->GetParameter("u_modelViewProjection");
 	_positionAttrib = shader->GetAttribute("a_position");
 	_normalAttrib = shader->GetAttribute("a_normal");
 	_textureAttrib = shader->GetAttribute("a_texture");
