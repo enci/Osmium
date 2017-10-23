@@ -139,6 +139,27 @@ void MeshRenderer::Draw()
 	glBindVertexArray(0);
 }
 
+void MeshRenderer::DrawDepth(Matrix44 viewProjection)
+{
+	glBindVertexArray(_vao);
+
+	glDrawElements(GL_TRIANGLES, _mesh->GetIndexCount(), GL_UNSIGNED_SHORT, nullptr);
+
+	glBindVertexArray(0);
+
+	/*
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(
+		0,						// attribute
+		3,						// number of elements per vertex element
+		GL_FLOAT,				// the type of each element
+		GL_FALSE,				// take our values as-is or normalize
+		sizeof(VertexFormat),	// no extra data between each position
+		0						// offset of first element
+	);
+	*/
+}
+
 bool MeshRenderer::CreateVAO()
 {
 	if (_vao != 0)

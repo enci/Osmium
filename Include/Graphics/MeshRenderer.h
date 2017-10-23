@@ -43,14 +43,16 @@ public:
 
 	void SetAmbient(Color ambient) { _ambient = ambient; }
 
-	virtual	void ActivateShader(
+	void ActivateShader(
 		Camera* camera,
 		const std::vector<Light*> lights) override;
 
-	virtual void Draw() override;
+	void Draw() override;
+
+	void DrawDepth(Matrix44 viewProjection) override;
 
 #ifdef INSPECTOR
-	virtual void Inspect() override;
+	void Inspect() override;
 #endif#endif
 
 

@@ -43,4 +43,11 @@ protected:
 	int _channels	= 0;
 };
 
+class RenderTarget : public Texture
+{
+public:
+	RenderTarget(GLuint id);
+	void Reload() override {};
+};
+
 }

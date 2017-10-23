@@ -17,7 +17,7 @@ class Renderable;
 class Light;
 class Camera;
 class Transform;
-class FullScreenPass;
+//class FullScreenPass;
 
 ///
 /// RenderManager
@@ -58,10 +58,13 @@ protected:
 	GLuint						_framebuffer;
 	GLuint						_colorbuffer;
 	GLuint						_depthbuffer;
+	GLuint						depthMapFBO;
+	GLuint						depthMap;
 
 	Shader*						_fullScreenPass	= nullptr;
 	Shader*						_bloomShader	= nullptr;
 	Shader*						_FXAAShader		= nullptr;
+	Shader*						_shadowPass		= nullptr;	
 	
 #ifdef 	INSPECTOR
 	enum
@@ -134,8 +137,19 @@ public:
 	/// for every Renderable 
 	virtual void Draw() = 0;
 
+	/// Used for the actual draw-call. Will get called
+	/// for every Renderable 
+	virtual void DrawDepth(Matrix44 viewProjection) = 0;
+
+	/// Check if this renderable casts a shadow
+	bool GetShadowCasting() const { return _castShadow; }
+
+	/// Set if this renderable should cast a shadow
+	void SetShadowCasting(bool castShadow) { _castShadow = castShadow; }
+
 protected:
-	Shader* _shader = nullptr;
+	Shader* _shader			= nullptr;
+	bool	_castShadow		= true;
 };
 
 ///
@@ -240,10 +254,14 @@ public:
 
 	void SetRadius(float radius) { _radius = radius; }
 
+	bool GetShadowCasting() const { return _castShadow; }
+
+	void SetShadowCasting(bool castShadow) { _castShadow = castShadow; }
+
 	Vector3 GetColorAsVector() const;
 
 #ifdef INSPECTOR
-	virtual void Inspect() override;
+	void Inspect() override;
 #endif
 
 protected:
@@ -254,6 +272,8 @@ protected:
 	Transform*	_transform		= nullptr;
 	float		_intensity		= 1.0f;
 	float		_radius			= 10.0f;
+	bool		_castShadow		= false;
+
 };
 
 inline Vector3 Light::GetColorAsVector() const

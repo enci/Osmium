@@ -13,7 +13,7 @@
 
 using namespace Osm;
 
-
+const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
 RenderManager::RenderManager(World& world)
 	: Component(world)
@@ -63,10 +63,39 @@ RenderManager::RenderManager(World& world)
 	// Always check that our framebuffer is ok
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		ASSERT(false);
+
+	// Shadows being made	
+	glGenFramebuffers(1, &depthMapFBO);	
+
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+		SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+
+	// Always check that our framebuffer is ok
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		ASSERT(false);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// Shadows end
 	
 	_fullScreenPass = Game.Resources().LoadResource<Shader>(
 		"./Assets/Shaders/Include/RenderTexture.vsh",
 		"./Assets/Shaders/Include/RenderTexture.fsh");
+
+	_shadowPass = Game.Resources().LoadResource<Shader>(
+		"./Assets/Shaders/Include/DepthOnly.vsh",
+		"./Assets/Shaders/Include/DepthOnly.fsh");
 
 	/*
 	_bloomShader = Game.Resources().LoadResource<Shader>(
@@ -134,14 +163,52 @@ void RenderManager::Render()
 #endif
 #endif
 
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
+
+	if (_lights.size() > 0)
+	{
+		Light* l = _lights[0];
+		l->GetPosition();
+
+		Matrix44 view = l->GetOwner().GetComponent<Transform>()->GetWorld();
+		view.Invert();
+
+		float size = 100.0f;
+		Matrix44 proj = Matrix44::CreateOrtho(
+			-size, size,
+			-size, size,
+			-200.0f,
+			200.0f);
+
+		_shadowPass->Activate();
+		for (auto r : _renderables)
+		{
+			Matrix44 model;
+			auto t = r->GetOwner().GetComponent<Transform>();
+			if(t)
+				model = t->GetWorld();
+			Matrix44 mvp = proj * view * model;
+			_shadowPass->GetParameter("u_modelViewProjection")->SetValue(mvp);
+			Matrix44 identity;
+			r->DrawDepth(identity);
+		}
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+	glViewport(0, 0, width, height);
 	glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
 	const Color clear = _cameras.size() > 0 ? _cameras[0]->GetClearColor() : Color::Black;
 	glClearColor(clear.r / 255.0f, clear.g / 255.0f, clear.b / 255.0f, 10.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
-
-	Shader* activeShader = nullptr;
+	
 
 	for (auto l : _lights)
 	{
@@ -153,8 +220,10 @@ void RenderManager::Render()
 				l->GetRadius(),
 				l->GetColor());
 		}
-	}
+	}	
 
+	Shader* activeShader = nullptr;
+	
 	for (auto c : _cameras)
 	{
 		// Matrix44 view = c->GetView();
@@ -202,7 +271,7 @@ void RenderManager::Render()
 	);
 	uint program = _FXAAShader->GetProgram();	
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _colorbuffer);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
 	
 	RenderQuad();
 }
