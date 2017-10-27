@@ -7,7 +7,8 @@ out vec4 fragColor;
 
 void main( void )
 {
-    fragColor = vec4(texture2D(buf0,texCoords).xyz, 1.0);
+    fragColor = vec4(texture(buf0,texCoords).xyz, 1.0);
+    /*
     return;
 
     float FXAA_SPAN_MAX = 8.0;
@@ -60,4 +61,5 @@ void main( void )
     {
       fragColor.xyz=rgbA;
     }
+    */
 }

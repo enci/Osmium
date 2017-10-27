@@ -17,6 +17,7 @@ class Renderable;
 class Light;
 class Camera;
 class Transform;
+class RenderTarget;
 //class FullScreenPass;
 
 ///
@@ -58,8 +59,8 @@ protected:
 	GLuint						_framebuffer;
 	GLuint						_colorbuffer;
 	GLuint						_depthbuffer;
-	GLuint						depthMapFBO;
-	GLuint						depthMap;
+	// GLuint						depthMapFBO;
+	// GLuint						depthMap;
 
 	Shader*						_fullScreenPass	= nullptr;
 	Shader*						_bloomShader	= nullptr;
@@ -67,7 +68,7 @@ protected:
 	Shader*						_shadowPass		= nullptr;	
 	
 #ifdef 	INSPECTOR
-	enum
+	enum RenderPasses
 	{
 		GEOMETRY_PASS = 0,
 		LIGHT_PASS,
@@ -76,7 +77,7 @@ protected:
 		FORWARD_PASS,
 		SHADOW_PASS,
 		RENDER_PASSES_NUM
-	} RenderPasses;
+	};
 	GLuint	_queries[RENDER_PASSES_NUM];
 	GLuint	_queryResults[RENDER_PASSES_NUM];
 	bool	_firstFrame = true;
@@ -230,6 +231,8 @@ public:
 
 	Light(Entity& entity);
 
+	virtual ~Light();
+
 	LightType GetLightType() const { return _lightType; }
 
 	void SetLightType(LightType lightType) { _lightType = lightType; }
@@ -260,20 +263,26 @@ public:
 
 	Vector3 GetColorAsVector() const;
 
+	void CreateShadowBuffer();
+
 #ifdef INSPECTOR
 	void Inspect() override;
+	int resSel;
 #endif
 
 protected:
 
-	LightType	_lightType		= DIRECTIONAL_LIGHT;
-	Color		_color			= Color::White;
-	float		_attenuation	= 0.5f;
-	Transform*	_transform		= nullptr;
-	float		_intensity		= 1.0f;
-	float		_radius			= 10.0f;
-	bool		_castShadow		= false;
-
+	LightType		_lightType			= DIRECTIONAL_LIGHT;
+	Color			_color				= Color::White;
+	float			_attenuation		= 0.5f;
+	Transform*		_transform			= nullptr;
+	float			_intensity			= 1.0f;
+	float			_radius				= 10.0f;
+	bool			_castShadow			= false;
+	GLuint			_shadowMapFBO		= 0;
+	GLuint			_shadowMap			= 0;
+	RenderTarget*	_shadowTexture		= nullptr;
+	int				_shadowResolution	= 512;
 };
 
 inline Vector3 Light::GetColorAsVector() const

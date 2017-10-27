@@ -64,27 +64,6 @@ RenderManager::RenderManager(World& world)
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		ASSERT(false);
 
-	// Shadows being made	
-	glGenFramebuffers(1, &depthMapFBO);	
-
-	glGenTextures(1, &depthMap);
-	glBindTexture(GL_TEXTURE_2D, depthMap);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
-		SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-
-	// Always check that our framebuffer is ok
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		ASSERT(false);
-
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	// Shadows end
@@ -109,7 +88,7 @@ RenderManager::RenderManager(World& world)
 }
 
 
-// RenderQuad() renders a 1x1 XY quad in NDC
+// Renders a 1x1 XY quad in NDC
 void RenderQuad()
 {
 	static unsigned int quadVAO = 0;
@@ -163,6 +142,7 @@ void RenderManager::Render()
 #endif
 #endif
 
+	/*
 	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -197,8 +177,8 @@ void RenderManager::Render()
 			r->DrawDepth(identity);
 		}
 	}
-
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	*/
 
 
 	glViewport(0, 0, width, height);
@@ -271,7 +251,7 @@ void RenderManager::Render()
 	);
 	uint program = _FXAAShader->GetProgram();	
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glBindTexture(GL_TEXTURE_2D, _colorbuffer);
 	
 	RenderQuad();
 }
@@ -358,6 +338,50 @@ Light::Light(Entity& entity)
 	ASSERT(_transform);
 }
 
+Light::~Light()
+{
+}
+
+void Light::CreateShadowBuffer()
+{
+	// Shadows being made	
+	glGenFramebuffers(1, &_shadowMapFBO);
+
+	glGenTextures(1, &_shadowMap);
+	glBindTexture(GL_TEXTURE_2D, _shadowMap);
+	glTexImage2D(
+		GL_TEXTURE_2D,
+		0,
+		GL_DEPTH_COMPONENT,
+		_shadowResolution,
+		_shadowResolution,
+		0,
+		GL_DEPTH_COMPONENT,
+		GL_FLOAT,
+		nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, _shadowMapFBO);
+	glFramebufferTexture2D(
+		GL_FRAMEBUFFER,
+		GL_DEPTH_ATTACHMENT,
+		GL_TEXTURE_2D,
+		_shadowMap,
+		0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+
+	// Check that our framebuffer is ok
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		ASSERT(false);
+
+	// _shadowTexture
+
+}
+
 #ifdef INSPECTOR
 
 void Camera::Inspect()
@@ -372,10 +396,30 @@ void Camera::Inspect()
 
 void Light::Inspect()
 {
+
 	ImGui::Checkbox("Enabled", &_enabled);
 	ImGui::OsmColor("Color", _color);
 	ImGui::DragFloat("Intensity", &_intensity, 0.01f);
 	ImGui::DragFloat("Radius", &_radius, 0.1f);
+	ImGui::Checkbox("Cast Shadows", &_castShadow);	
+	if(_castShadow)
+	{
+		ImGui::InputInt("Shadow Resolution", &_shadowResolution);
+		if (_shadowMap != 0)
+		{
+			ImTextureID id = (void*)((UINT_PTR)(_shadowMap));
+			ImGui::Image(id, ImVec2(128.0f, 128.0f));
+		}
+		
+		/*
+		const char* resolutions[] =
+		{
+			"128",
+
+		};
+		ImGui::ListBox()
+		*/
+	}
 }
 
 #endif

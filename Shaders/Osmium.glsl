@@ -105,7 +105,8 @@ vec3 CalculateRimLight(in vec3 normal)
   return u_diffuse * rim;
 }
 
-void AddFog(in out vec3 color, in vec3 viewPosition)
+//void AddFog(in out vec3 color, in vec3 viewPosition)
+void AddFog(inout vec3 color, in vec3 viewPosition)
 {
   float param = (u_fogFar - length(viewPosition)) / (u_fogFar - u_fogNear);
 	param = clamp(1 - param, 0.0, 1.0);
