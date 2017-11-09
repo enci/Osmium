@@ -32,3 +32,5 @@ Intermediate/
 MeshTool/Executable/
 *.tlog
 ShaderTool/Executable/
+Lib/
+*.user

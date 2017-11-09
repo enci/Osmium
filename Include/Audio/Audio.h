@@ -17,7 +17,7 @@ FMOD_VECTOR VectorToFmod(const Vector3& vector);
 
 FMOD_VECTOR VectorToFmod(const Vector2& vector);
 
-class AudioManager : Component<CGame>
+class AudioManager : public Component<CGame>
 {
 public:
 	AudioManager(CGame& owner);
