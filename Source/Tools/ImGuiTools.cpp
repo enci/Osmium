@@ -25,7 +25,7 @@ void ImGui::SetUIStyle(bool darkStyle, float alpha)
 	float const round = 2.0f;
 	style.Alpha = 1.0f;
 	style.FrameRounding = round;
-	style.ChildWindowRounding = round;
+	// style.ChildWindowRounding = round;
 	style.WindowRounding = round;
 	style.GrabRounding = 1.0f;
 	style.GrabMinSize = 20.0f;
@@ -49,7 +49,7 @@ void ImGui::SetUIStyle(bool darkStyle, float alpha)
 	style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.69f, 0.69f, 0.69f, 1.00f);
 	style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.59f, 0.59f, 0.59f, 1.00f);
 	style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.49f, 0.49f, 0.49f, 1.00f);
-	style.Colors[ImGuiCol_ComboBg] = ImVec4(0.86f, 0.86f, 0.86f, 0.99f);
+	//style.Colors[ImGuiCol_ComboBg] = ImVec4(0.86f, 0.86f, 0.86f, 0.99f);
 	style.Colors[ImGuiCol_CheckMark] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
 	style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.24f, 0.52f, 0.88f, 1.00f);
 	style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
