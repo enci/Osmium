@@ -41,10 +41,12 @@ public:
 
 	void Remove(Light* light);
 
-	void Remove(Camera* camera);
+	void Remove(Camera* camera);	
 
 #ifdef INSPECTOR
 	virtual void Inspect() override;
+
+	const Camera* GetCamera() const { ASSERT(_cameras.size()); return _cameras[0]; }
 
 	int DrawCalls = 0;
 	int ShaderSwitches = 0;
@@ -169,7 +171,7 @@ public:
 	void SetProjection(const Matrix44& p) { _projection = p; }
 
 	/// Get the view matrix
-	Matrix44 GetView();
+	Matrix44 GetView() const;
 
 	/// Set the view matrix. This will affect the trasform of the Camera
 	void SetView(Matrix44 view);

@@ -316,7 +316,7 @@ Camera::Camera(Entity& entity) : RenderManagerComponent(entity)
 	ASSERT(_transform);
 }
 
-Matrix44 Camera::GetView()
+Matrix44 Camera::GetView() const
 {
 	Matrix44 view = _transform->GetWorld();
 	view.Invert();
