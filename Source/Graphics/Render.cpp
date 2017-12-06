@@ -195,8 +195,6 @@ void RenderManager::Render()
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	
-
-	/*
 	for (auto l : _lights)
 	{
 		if (l->GetLightType() == Light::POINT_LIGHT)
@@ -208,7 +206,6 @@ void RenderManager::Render()
 				l->GetColor());
 		}
 	}
-	*/
 
 	Shader* activeShader = nullptr;
 	
