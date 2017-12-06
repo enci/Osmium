@@ -4,6 +4,7 @@ struct DirectionalLight
 {
     vec3 direction;
     vec3 color;
+    mat4 shadowInvTransform;
 };
 
 struct PointLight

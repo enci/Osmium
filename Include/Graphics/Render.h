@@ -220,6 +220,7 @@ protected:
 ///
 class Light : public RenderManagerComponent<Light>
 {
+	friend class RenderManager;
 public:
 	enum LightType
 	{
@@ -263,12 +264,20 @@ public:
 
 	Vector3 GetColorAsVector() const;
 
+	int GetShadowResolution() const { return _shadowResolution;  }
+
 	void CreateShadowBuffer();
+
+	void DeleteShadowBuffer();
 
 #ifdef INSPECTOR
 	void Inspect() override;
 	int resSel;
 #endif
+
+protected:
+
+	void UpdateShadowTransform();
 
 protected:
 
@@ -278,11 +287,13 @@ protected:
 	Transform*		_transform			= nullptr;
 	float			_intensity			= 1.0f;
 	float			_radius				= 10.0f;
+
 	bool			_castShadow			= false;
 	GLuint			_shadowMapFBO		= 0;
 	GLuint			_shadowMap			= 0;
 	RenderTarget*	_shadowTexture		= nullptr;
 	int				_shadowResolution	= 512;
+	Matrix44		_shadowMatrix;
 };
 
 inline Vector3 Light::GetColorAsVector() const

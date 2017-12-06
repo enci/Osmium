@@ -221,7 +221,8 @@ LightShaderParameter::LightShaderParameter(Shader* shader, const string& name) :
 	_directionParam(shader->GetParameter(name + ".direction")),
 	_colorParam(shader->GetParameter(name + ".color")),
 	_radiusParam(shader->GetParameter(name + ".radius")),
-	_attenuationParam(shader->GetParameter(name + ".attenuation"))
+	_attenuationParam(shader->GetParameter(name + ".attenuation")),
+	_shadowInvTransform(shader->GetParameter(name + ".shadowInvTransform"))
 {}
 
 void LightShaderParameter::SetValue(const Light& light)

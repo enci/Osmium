@@ -142,43 +142,49 @@ void RenderManager::Render()
 #endif
 #endif
 
-	/*
-	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_DEPTH_TEST);
-
-	if (_lights.size() > 0)
+	for (auto l : _lights)
 	{
-		Light* l = _lights[0];
-		l->GetPosition();
-
-		Matrix44 view = l->GetOwner().GetComponent<Transform>()->GetWorld();
-		view.Invert();
-
-		float size = 100.0f;
-		Matrix44 proj = Matrix44::CreateOrtho(
-			-size, size,
-			-size, size,
-			-200.0f,
-			200.0f);
-
-		_shadowPass->Activate();
-		for (auto r : _renderables)
+		if(l->GetShadowCasting())
 		{
-			Matrix44 model;
-			auto t = r->GetOwner().GetComponent<Transform>();
-			if(t)
-				model = t->GetWorld();
-			Matrix44 mvp = proj * view * model;
-			_shadowPass->GetParameter("u_modelViewProjection")->SetValue(mvp);
-			Matrix44 identity;
-			r->DrawDepth(identity);
+			if (!l->_shadowMapFBO)
+				l->CreateShadowBuffer();
+			ASSERT(l->_shadowMapFBO);
+
+			glViewport(0, 0, l->GetShadowResolution(), l->GetShadowResolution());
+			glBindFramebuffer(GL_FRAMEBUFFER, l->_shadowMapFBO);
+			glClear(GL_DEPTH_BUFFER_BIT);
+			glEnable(GL_CULL_FACE);
+			glEnable(GL_DEPTH_TEST);
+
+			Light* l = _lights[0];
+			l->GetPosition();
+
+			Matrix44 view = l->GetOwner().GetComponent<Transform>()->GetWorld();
+			view.Invert();
+
+			float size = 100.0f;
+			Matrix44 proj = Matrix44::CreateOrtho(
+				-size, size,
+				-size, size,
+				-200.0f,
+				200.0f);
+
+			_shadowPass->Activate();
+			for (auto r : _renderables)
+			{
+				Matrix44 model;
+				auto t = r->GetOwner().GetComponent<Transform>();
+				if (t)
+					model = t->GetWorld();
+				Matrix44 mvp = proj * view * model;
+				_shadowPass->GetParameter("u_modelViewProjection")->SetValue(mvp);
+				Matrix44 identity;
+				r->DrawDepth(identity);
+			}
+
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	*/
 
 
 	glViewport(0, 0, width, height);
@@ -382,6 +388,11 @@ void Light::CreateShadowBuffer()
 
 }
 
+void Light::DeleteShadowBuffer()
+{
+	// TODO: Cleanup here
+}
+
 #ifdef INSPECTOR
 
 void Camera::Inspect()
@@ -396,25 +407,38 @@ void Camera::Inspect()
 
 void Light::Inspect()
 {
-
 	ImGui::Checkbox("Enabled", &_enabled);
 	ImGui::OsmColor("Color", _color);
 	ImGui::DragFloat("Intensity", &_intensity, 0.01f);
 	ImGui::DragFloat("Radius", &_radius, 0.1f);
-	ImGui::Checkbox("Cast Shadows", &_castShadow);	
-	if(_castShadow)
+	// bool reCreateShadowBuff = false;
+	if(ImGui::Checkbox("Cast Shadows", &_castShadow))
 	{
-		ImGui::InputInt("Shadow Resolution", &_shadowResolution);
+		if (_castShadow)
+			CreateShadowBuffer();
+		else
+			DeleteShadowBuffer();
+	}
+
+	if (_castShadow)
+	{
+		if (ImGui::InputInt("Shadow Resolution", &_shadowResolution))
+		{
+			DeleteShadowBuffer();
+			CreateShadowBuffer();
+		}
+
 		if (_shadowMap != 0)
 		{
 			ImTextureID id = (void*)((UINT_PTR)(_shadowMap));
-			ImGui::Image(id, ImVec2(128.0f, 128.0f));
+			auto w = ImGui::GetWindowWidth();
+			ImGui::Image(id, ImVec2(w, w));
 		}
-		
+
 		/*
 		const char* resolutions[] =
 		{
-			"128",
+		"128",
 
 		};
 		ImGui::ListBox()
