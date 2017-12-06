@@ -384,8 +384,15 @@ void MultiGrid::DebugRender()
 }
 #endif
 
-AutoGrid::AutoGrid(const std::vector<PhysicsBody2D*>& bodies)
+AutoGrid::AutoGrid() : _minCellSize(0.0f)
+{}
+
+void AutoGrid::Update(const std::vector<PhysicsBody2D*>& bodies)
 {
+	// Resize grid
+	for (size_t i = 0; i < _grid.size(); i++)
+		_grid[i].clear();
+
 	// Set initial values
 	_min.x = FLT_MAX;
 	_min.y = FLT_MAX;
@@ -398,19 +405,8 @@ AutoGrid::AutoGrid(const std::vector<PhysicsBody2D*>& bodies)
 	// Go over all entities for find the bounds of the world
 	for (auto* b : bodies)
 	{
-		// Get the size
-		//float r = b->GetRadius();
-
-		// If no collision, then skip this entitiy
-		//if (r <= 0)
-		//	continue;
-
-		// Track max size
-		//if (2 * r > maxsize)
-		//	maxsize = 2 * r;
-
-		// Build the grid size
-		// Vector2 pos = b->GetPosition();
+		if (!b->GetEnbled())
+			continue;
 
 		auto bb = b->GetBoundingBox();
 
@@ -448,11 +444,7 @@ AutoGrid::AutoGrid(const std::vector<PhysicsBody2D*>& bodies)
 	// Collect all entities
 	for (auto* b : bodies)
 	{
-		// Get the size
-		float r = b->GetRadius();
-
-		// If no collision, then skip this entitiy
-		if (r <= 0)
+		if (!b->GetEnbled())
 			continue;
 
 		// Build the grid size
@@ -468,7 +460,9 @@ AutoGrid::AutoGrid(const std::vector<PhysicsBody2D*>& bodies)
 
 vector<PhysicsBody2D*> AutoGrid::GetNeighbours(PhysicsBody2D* body)
 {
-	vector<PhysicsBody2D*> neighbours;
+	static vector<PhysicsBody2D*> neighbours;
+	neighbours.clear();
+
 	float sizex = _max.x - _min.x;
 	float sizey = _max.y - _min.y;
 
@@ -486,7 +480,7 @@ vector<PhysicsBody2D*> AutoGrid::GetNeighbours(PhysicsBody2D* body)
 	{
 		for (int j = jfrom; j <= jto; j++)
 		{
-			for (auto b : _grid[i][j])
+			for (auto b : _grid[i][j])			
 				neighbours.push_back(b);
 		}
 	}
@@ -582,6 +576,13 @@ void AutoGrid::DebugRender()
 			}
 		}
 	}
+}
+#endif
+
+#ifdef INSPECTOR
+void Osm::AutoGrid::Inspect()
+{
+	//ImGui::InputFloat()
 }
 #endif
 
@@ -874,7 +875,14 @@ void PhysicsManager2D::Inspect()
 {
 	int* a = (int*)&_algorithm;
 	const char* algs[] = { "Brute Force", "Auto Grid", "Multi Grid" };
-	ImGui::Combo("Contacts Algorithm", a, algs, 3);
+	ImGui::Combo("BroadPhase", a, algs, 3);
+
+#ifdef DEBUG
+	if (_algorithm > CA_BRUTE_FORCE)
+	{
+		ImGui::Checkbox("Render Broad Phase", &_renderBroadPhase);
+	}
+#endif
 }
 #endif
 
@@ -935,23 +943,21 @@ void PhysicsManager2D::AccumulateContactsBruteForce()
 
 void PhysicsManager2D::AccumulateContactsAutoGrid()
 {
-	AutoGrid grid(_bodies);
-	//grid.DebugRender();
+	_autoGrid.Update(_bodies);
 
-	MultiGrid mgrid(_bodies);
-
-#ifdef  DEBUG
-	mgrid.DebugRender();
+#ifdef DEBUG
+	if(_renderBroadPhase)
+		_autoGrid.DebugRender();
 #endif
 
 	_collisions.clear();
 	for (auto b : _bodies)
 	{
-		auto neighbours = grid.GetNeighbours(b);
+		auto neighbours = _autoGrid.GetNeighbours(b);
 
 		for (auto n : neighbours)
 		{
-			if (n->GetOwner().GetID() < b->GetOwner().GetID())
+			if (n < b)
 			{
 				const AABB& box0 = b->GetBoundingBox();
 				const AABB& box1 = n->GetBoundingBox();
@@ -972,6 +978,17 @@ void PhysicsManager2D::AccumulateContactsAutoGrid()
 		}
 	}
 }
+
+void Osm::PhysicsManager2D::AccumulateContactsMultiGrid()
+{
+	MultiGrid grid(_bodies);
+
+#ifdef  DEBUG
+	grid.DebugRender();
+#endif
+}
+
+
 
 std::vector<PhysicsBody2D*> PhysicsManager2D::GetInRadiusBrute(const Vector2& position, float radius)
 {

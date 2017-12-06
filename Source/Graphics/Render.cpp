@@ -196,6 +196,7 @@ void RenderManager::Render()
 	glEnable(GL_DEPTH_TEST);
 	
 
+	/*
 	for (auto l : _lights)
 	{
 		if (l->GetLightType() == Light::POINT_LIGHT)
@@ -206,7 +207,8 @@ void RenderManager::Render()
 				l->GetRadius(),
 				l->GetColor());
 		}
-	}	
+	}
+	*/
 
 	Shader* activeShader = nullptr;
 	
@@ -322,7 +324,7 @@ Camera::Camera(Entity& entity) : RenderManagerComponent(entity)
 	ASSERT(_transform);
 }
 
-Matrix44 Camera::GetView()
+Matrix44 Camera::GetView() const
 {
 	Matrix44 view = _transform->GetWorld();
 	view.Invert();

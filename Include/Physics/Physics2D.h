@@ -185,7 +185,7 @@ public:
 
 
 #ifdef INSPECTOR
-	virtual void Inspect() override;
+	virtual void Inspect() override;	
 #endif
 
 private:
@@ -265,7 +265,9 @@ private:
 class AutoGrid
 {
 public:
-	AutoGrid(const std::vector<PhysicsBody2D*>& bodies);
+	AutoGrid();
+
+	void Update(const std::vector<PhysicsBody2D*>& bodies);
 
 	std::vector<PhysicsBody2D*> GetNeighbours(PhysicsBody2D* body);
 
@@ -275,13 +277,17 @@ public:
 	void DebugRender();
 #endif
 
+#ifdef INSPECTOR	
+	void Inspect();
+#endif
+
 private:
 
-	int _gridx;
-	int _gridy;
-
+	int		_gridx;
+	int		_gridy;
 	Vector2 _min;
 	Vector2 _max;
+	float	_minCellSize;
 	std::vector<std::vector<std::vector<PhysicsBody2D*>>> _grid;
 };
 
@@ -313,13 +319,13 @@ public:
 		uint TagMask = 0xFFFFFFFF);
 
 	/// A choice of algorithms for accumulating contacts
-	enum ContactsAlgorithm { CA_BRUTE_FORCE = 0, CA_AUTO_GRID = 1, CA_MULTI_GRID = 2 };
+	enum BroadPhase { CA_BRUTE_FORCE = 0, CA_AUTO_GRID = 1, CA_MULTI_GRID = 2 };
 
 	/// Set the contacts algorithm
-	void SetContactsAlgorithm(ContactsAlgorithm a) { _algorithm = a; }
+	void SetContactsAlgorithm(BroadPhase a) { _algorithm = a; }
 
 #ifdef INSPECTOR	
-	virtual void Inspect() override;
+	virtual void Inspect() override;	
 #endif
 
 private:
@@ -331,6 +337,9 @@ private:
 
 	/// Get collisions using brute force
 	void AccumulateContactsAutoGrid();
+
+	/// Get collisions using brute force
+	void AccumulateContactsMultiGrid();
 
 	/// Get all bodies in the specified reariuis arround the given postion
 	std::vector<PhysicsBody2D*> GetInRadiusBrute(const Vector2& position, float radius);
@@ -357,9 +366,13 @@ private:
 	/// Current collision
 	std::vector<Collision2D>	_collisions;
 
-	ContactsAlgorithm			_algorithm = CA_BRUTE_FORCE;
+	BroadPhase					_algorithm = CA_BRUTE_FORCE;
 
-	//Grid						_grid;
+	AutoGrid					_autoGrid;
+
+#ifdef DEBUG
+	bool						_renderBroadPhase = true;
+#endif
 };
 
 std::vector<Vector2> CreateConvexHull(const std::vector<Vector2>& vertices);
