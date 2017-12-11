@@ -113,6 +113,8 @@ protected:
 	ShaderParameter* _attenuationParam;
 	ShaderParameter* _radiusParam;
 	ShaderParameter* _shadowInvTransform;
+	ShaderParameter* _shadowMap;
+	ShaderParameter* _castShadow;
 };
 
 }

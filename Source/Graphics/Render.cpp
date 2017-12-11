@@ -156,11 +156,9 @@ void RenderManager::Render()
 			glEnable(GL_CULL_FACE);
 			glEnable(GL_DEPTH_TEST);
 
-			Light* l = _lights[0];
-			l->GetPosition();
-
 			Matrix44 view = l->GetOwner().GetComponent<Transform>()->GetWorld();
 			view.Invert();
+			//view = Matrix44::CreateIdentity();
 
 			float size = 100.0f;
 			Matrix44 proj = Matrix44::CreateOrtho(
@@ -169,14 +167,19 @@ void RenderManager::Render()
 				-200.0f,
 				200.0f);
 
+			l->_shadowMatrix = proj * view;
+
 			_shadowPass->Activate();
 			for (auto r : _renderables)
 			{
+				if(!r->GetEnbled())
+					continue;
+
 				Matrix44 model;
 				auto t = r->GetOwner().GetComponent<Transform>();
 				if (t)
 					model = t->GetWorld();
-				Matrix44 mvp = proj * view * model;
+				Matrix44 mvp = l->_shadowMatrix * model;
 				_shadowPass->GetParameter("u_modelViewProjection")->SetValue(mvp);
 				Matrix44 identity;
 				r->DrawDepth(identity);
@@ -338,6 +341,7 @@ void Camera::SetView(Matrix44 view)
 Light::Light(Entity& entity)
 	: RenderManagerComponent(entity)
 	, _lightType(DIRECTIONAL_LIGHT)
+	, _castShadow(false)
 {
 	_transform = _owner.GetComponent<Transform>();
 	ASSERT(_transform);
@@ -364,10 +368,12 @@ void Light::CreateShadowBuffer()
 		GL_DEPTH_COMPONENT,
 		GL_FLOAT,
 		nullptr);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+	// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_GREATER);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, _shadowMapFBO);
 	glFramebufferTexture2D(
@@ -383,8 +389,7 @@ void Light::CreateShadowBuffer()
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		ASSERT(false);
 
-	// _shadowTexture
-
+	_shadowTexture = new RenderTarget(_shadowMap);
 }
 
 void Light::DeleteShadowBuffer()

@@ -4,7 +4,9 @@ struct DirectionalLight
 {
     vec3 direction;
     vec3 color;
+    bool castShadow;
     mat4 shadowInvTransform;
+    sampler2D shadowMap;
 };
 
 struct PointLight
@@ -51,6 +53,37 @@ vec3 CalculateDirectionalLights(in vec3 normal)
   {
     vec3 light_dir = u_directionalLights[i].direction;
     float intensity = max(0.0, dot(normal, light_dir));
+    color += u_directionalLights[i].color * intensity * u_diffuse;
+  }
+
+  return color;
+}
+
+vec3 CalculateDirectionalLightsWithShadow(in vec3 position, in vec3 normal)
+{
+  vec3 color = vec3(0.0, 0.0, 0.0);
+
+  for(int i = 0; i < u_directionalLightsCount && i < DIR_LIGHT_COUNT; i++)
+  {
+    float shadow = 1.0;
+    if(u_directionalLights[i].castShadow == true)
+    {
+      vec4 posLightCoor = u_directionalLights[i].shadowInvTransform * vec4(position, 1.0);
+      vec3 projCoords = posLightCoor.xyz / posLightCoor.w;
+      projCoords = projCoords * 0.5 + 0.5;
+
+      float bias = 0.002;
+
+      float closestDepth = texture(u_directionalLights[i].shadowMap, projCoords.xy).r;   
+      float currentDepth = projCoords.z;  
+      shadow = abs(currentDepth - bias) > closestDepth  ? 0.0 : 1.0;
+
+
+      //shadow = texture(u_directionalLights[i].shadowMap, projCoords.xyz);   
+    }
+
+    vec3 light_dir = u_directionalLights[i].direction;
+    float intensity = max(0.0, dot(normal, light_dir)) * shadow;
     color += u_directionalLights[i].color * intensity * u_diffuse;
   }
 
@@ -106,7 +139,6 @@ vec3 CalculateRimLight(in vec3 normal)
   return u_diffuse * rim;
 }
 
-//void AddFog(in out vec3 color, in vec3 viewPosition)
 void AddFog(inout vec3 color, in vec3 viewPosition)
 {
   float param = (u_fogFar - length(viewPosition)) / (u_fogFar - u_fogNear);

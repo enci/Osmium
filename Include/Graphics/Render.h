@@ -272,6 +272,10 @@ public:
 
 	void DeleteShadowBuffer();
 
+	const Matrix44& GetShadowMatrix() const { return _shadowMatrix; }
+
+	const RenderTarget* GetRenderTarget() const { return _shadowTexture; }
+
 #ifdef INSPECTOR
 	void Inspect() override;
 	int resSel;
@@ -281,8 +285,6 @@ protected:
 
 	void UpdateShadowTransform();
 
-protected:
-
 	LightType		_lightType			= DIRECTIONAL_LIGHT;
 	Color			_color				= Color::White;
 	float			_attenuation		= 0.5f;
@@ -290,6 +292,8 @@ protected:
 	float			_intensity			= 1.0f;
 	float			_radius				= 10.0f;
 
+
+public:
 	bool			_castShadow			= false;
 	GLuint			_shadowMapFBO		= 0;
 	GLuint			_shadowMap			= 0;

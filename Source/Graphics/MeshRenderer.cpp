@@ -2,6 +2,7 @@
 #include <Core/Transform.h>
 #include <imgui/imgui.h>
 #include "Core/Game.h"
+#include <Graphics/Texture.h>
 
 using namespace Osm;
 
@@ -222,7 +223,9 @@ LightShaderParameter::LightShaderParameter(Shader* shader, const string& name) :
 	_colorParam(shader->GetParameter(name + ".color")),
 	_radiusParam(shader->GetParameter(name + ".radius")),
 	_attenuationParam(shader->GetParameter(name + ".attenuation")),
-	_shadowInvTransform(shader->GetParameter(name + ".shadowInvTransform"))
+	_shadowInvTransform(shader->GetParameter(name + ".shadowInvTransform")),
+	_shadowMap(shader->GetParameter(name + ".shadowMap")),
+	_castShadow(shader->GetParameter(name + ".castShadow"))
 {}
 
 void LightShaderParameter::SetValue(const Light& light)
@@ -233,6 +236,18 @@ void LightShaderParameter::SetValue(const Light& light)
 	{
 		Vector3 dir = light.GetDirection();
 		_directionParam->SetValue(dir);
+		
+		if(light.GetShadowCasting())
+		{
+			_castShadow->SetValue(true);
+			_shadowInvTransform->SetValue(light._shadowMatrix);
+			const Texture* shadowMap = light.GetRenderTarget();
+			_shadowMap->SetValue(*shadowMap);
+		}
+		else
+		{
+			_castShadow->SetValue(false);
+		}
 	}
 	else if (light.GetLightType() == Light::POINT_LIGHT)
 	{
