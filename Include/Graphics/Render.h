@@ -300,6 +300,7 @@ public:
 	RenderTarget*	_shadowTexture		= nullptr;
 	int				_shadowResolution	= 512;
 	Matrix44		_shadowMatrix;
+	Vector3			_shadowVolume		= Vector3(200.0f, 200.0f, 200.0f);
 };
 
 inline Vector3 Light::GetColorAsVector() const
