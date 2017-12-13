@@ -206,6 +206,7 @@
     <ClInclude Include="Include\Graphics\MeshRenderer.h" />
     <ClInclude Include="Include\Graphics\PerlinNoise.h" />
     <ClInclude Include="Include\Graphics\Render.h" />
+    <ClInclude Include="Include\Graphics\Uniforms.h" />
     <ClInclude Include="Include\Input\Input.h" />
     <ClInclude Include="Include\Math\Matrix33.h" />
     <ClInclude Include="Include\Math\Matrix44.h" />
