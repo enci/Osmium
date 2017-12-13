@@ -162,10 +162,9 @@ void RenderManager::Render()
 
 			float size = 100.0f;
 			Matrix44 proj = Matrix44::CreateOrtho(
-				-size, size,
-				-size, size,
-				-200.0f,
-				200.0f);
+				-l->_shadowVolume.x, l->_shadowVolume.x,
+				-l->_shadowVolume.y, l->_shadowVolume.y,
+				-l->_shadowVolume.z, l->_shadowVolume.y);
 
 			l->_shadowMatrix = proj * view;
 
