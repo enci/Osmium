@@ -15,10 +15,7 @@ using namespace Osm;
 
 const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
 
-RenderManager::RenderManager(World& world)
-	: Component(world)
-	, _framebuffer(0)
-	, _colorbuffer(0)
+RenderManager::RenderManager(World& world) : Component(world)
 {
 #if defined(INSPECTOR) && PROFILE_OPENGL 
 	glGenQueries(RENDER_PASSES_NUM, _queries);
@@ -29,45 +26,51 @@ RenderManager::RenderManager(World& world)
 	const auto width = settings.ScreenWidth;
 	const auto height = settings.ScreenHeight;
 
-	// The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
-	glGenFramebuffers(1, &_framebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
-
-	// The texture we're going to render to
-	glGenTextures(1, &_colorbuffer);
-
-	// "Bind" the newly created texture : all future texture functions will modify this texture
-	glBindTexture(GL_TEXTURE_2D, _colorbuffer);
-
-	// Give an empty image to OpenGL ( the last "0" )
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-
-	// Poor filtering. Needed !
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-	// The depth buffer
-	glGenRenderbuffers(1, &_depthbuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER, _depthbuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _depthbuffer);
-
-	// Set "renderedTexture" as our colour attachement #0
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _colorbuffer, 0);
-	//glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, _colorbuffer, 0);
-
-	// Set the list of draw buffers.
-	//GLenum DrawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
-	//glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
-
-	// Always check that our framebuffer is ok
+	//  -- MSAA framebuffer --
+	glGenFramebuffers(1, &_msaaFramebuffer);					// Create
+	glBindFramebuffer(GL_FRAMEBUFFER, _msaaFramebuffer);		// Bind FBO
+	// Color buffer
+	glGenTextures(1, &_msaaColorbuffer);						// Create MSAA color attachent
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, _msaaColorbuffer);	// Bind
+	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, settings.MSAASamples, GL_RGB, width, height, GL_TRUE); // Set storage
+	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);				// Unbind
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, _msaaColorbuffer, 0);	// Attach it
+	// Depth buffer
+	glGenRenderbuffers(1, &_msaaDepthbuffer);					// Create
+	glBindRenderbuffer(GL_RENDERBUFFER, _msaaDepthbuffer);		// Bind
+	glRenderbufferStorageMultisample(GL_RENDERBUFFER, settings.MSAASamples, GL_DEPTH_COMPONENT, width, height); // Set storage
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);						// Unbind
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _msaaDepthbuffer); // Attach
+	
+	// Check that our framebuffer is ok
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		ASSERT(false);
-
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	// Shadows end
+
+	// -- Resloved framebuffer --
+	glGenFramebuffers(1, &_reslovedFramebuffer);					// Create
+	glBindFramebuffer(GL_FRAMEBUFFER, _reslovedFramebuffer);		// Bind FBO
+	// Color buffer
+	glGenTextures(1, &_reslovedColorbuffer);						// Resolved
+	glBindTexture(GL_TEXTURE_2D, _reslovedColorbuffer);				// Bind
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);	// Set storage
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	// Filtering
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);	// Filtering
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _reslovedColorbuffer, 0);
+	// Depth buffer
+	glGenRenderbuffers(1, &_reslovedDepthbuffer);					// Create
+	glBindRenderbuffer(GL_RENDERBUFFER, _reslovedDepthbuffer);		// Bind
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height); // Set storage
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);							// Unbind
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, _reslovedDepthbuffer); // Attach
+
+	// Check that our framebuffer is ok
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		ASSERT(false);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	
+	// Shadows end stuff	
 	_fullScreenPass = Game.Resources().LoadResource<Shader>(
 		"./Assets/Shaders/Include/RenderTexture.vsh",
 		"./Assets/Shaders/Include/RenderTexture.fsh");
@@ -85,6 +88,19 @@ RenderManager::RenderManager(World& world)
 	_FXAAShader = Game.Resources().LoadResource<Shader>(
 		"./Assets/Shaders/Include/FXAA.vsh",
 		"./Assets/Shaders/Include/FXAA.fsh");
+}
+
+RenderManager::~RenderManager()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glDeleteTextures(1, &_msaaColorbuffer);
+	glDeleteRenderbuffers(1, &_msaaDepthbuffer);
+	glDeleteFramebuffers(1, &_msaaFramebuffer);
+
+	glDeleteTextures(1, &_reslovedColorbuffer);
+	glDeleteRenderbuffers(1, &_reslovedDepthbuffer);
+	glDeleteFramebuffers(1, &_reslovedFramebuffer);
 }
 
 
@@ -190,7 +206,7 @@ void RenderManager::Render()
 
 
 	glViewport(0, 0, width, height);
-	glBindFramebuffer(GL_FRAMEBUFFER, _framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, _msaaFramebuffer);
 	const Color clear = _cameras.size() > 0 ? _cameras[0]->GetClearColor() : Color::Black;
 	glClearColor(clear.r / 255.0f, clear.g / 255.0f, clear.b / 255.0f, 10.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -244,8 +260,11 @@ void RenderManager::Render()
 #endif	
 #endif
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, _msaaFramebuffer);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, _reslovedFramebuffer);
+	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -254,11 +273,11 @@ void RenderManager::Render()
 	
 	_FXAAShader->Activate();
 	_FXAAShader->GetParameter("frameBufSize")->SetValue(
-		Vector2((float)width, (float)height)
-	);
+		Vector2((float)width, (float)height));
+
 	uint program = _FXAAShader->GetProgram();	
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _colorbuffer);
+	glBindTexture(GL_TEXTURE_2D, _reslovedColorbuffer);
 	
 	RenderQuad();
 }

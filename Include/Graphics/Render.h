@@ -29,6 +29,8 @@ public:
 
 	RenderManager(World& world);
 
+	virtual ~RenderManager();
+
 	void Render();
 
 	void Add(Renderable* renderable);
@@ -58,9 +60,15 @@ protected:
 	std::vector<Light*>			_lights;
 	std::vector<Camera*>		_cameras;
 
-	GLuint						_framebuffer;
-	GLuint						_colorbuffer;
-	GLuint						_depthbuffer;
+	GLuint						_msaaFramebuffer = 0;
+	GLuint						_msaaColorbuffer = 0;
+	GLuint						_msaaDepthbuffer = 0;
+
+	GLuint						_reslovedFramebuffer = 0;
+	GLuint						_reslovedColorbuffer = 0;
+	GLuint						_reslovedDepthbuffer = 0;
+
+
 	// GLuint						depthMapFBO;
 	// GLuint						depthMap;
 
