@@ -129,6 +129,10 @@ public:
 
 	bool GetRight(Joystick joystick);
 
+	bool GetUp(Joystick joystick);
+
+	bool GetDown(Joystick joystick);
+
 #ifdef INSPECTOR
 	virtual void Inspect() override;
 #endif
