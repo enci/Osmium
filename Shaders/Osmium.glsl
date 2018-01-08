@@ -1,3 +1,6 @@
+
+// #pragma include "Uniforms.hs"
+
 // Geneal shader include file
 
 struct DirectionalLight
@@ -16,22 +19,27 @@ struct PointLight
     float radius;
 };
 
+
 // Uniforms
-uniform mat4 u_projection;
-uniform mat4 u_view;
+layout (std140) uniform ShaderActivationUniforms
+{
+  mat4 u_projection;
+  mat4 u_view;
+  int u_directionalLightsCount;
+  int u_pointLightsCount;
+  vec3 u_eyePos;
+  float u_fogFar;
+  float u_fogNear;
+  float u_fogExp;
+  float u_time;
+  vec4 u_fogColorNear;
+  vec4 u_fogColorFar;
+};
+
 uniform mat4 u_model;
 uniform mat4 u_modelViewProjection;
-uniform int u_directionalLightsCount;
-uniform int u_pointLightsCount;
 uniform vec3 u_ambient;
 uniform vec3 u_diffuse;
-uniform vec3 u_eyePos;
-uniform float u_fogFar;
-uniform float u_fogNear;
-uniform float u_fogExp;
-uniform float u_time;
-uniform vec4 u_fogColorNear;
-uniform vec4 u_fogColorFar;
 
 const float kRimGamma = 4.0;
 const float kLightRadius = 5.2;

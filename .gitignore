@@ -34,3 +34,4 @@ MeshTool/Executable/
 ShaderTool/Executable/
 Lib/
 *.user
+Examples/ModelViewer/Executable/

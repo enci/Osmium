@@ -600,7 +600,7 @@ bool Shader::LoadSource(const string& vertexShader,
 	glDeleteShader(geomShader);
 	glDeleteShader(fragShader);
 
-	LoadParameters();
+	//LoadParameters();
 
 	return true;
 }

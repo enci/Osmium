@@ -29,7 +29,7 @@ void MeshRenderer::SetMesh(Mesh* mesh)
 
 void MeshRenderer::SetShader(Shader* shader)
 {	
-	_shader = shader;
+	_shader = shader;		
 
 	_projParam = shader->GetParameter("u_projection");
 	_modelParam = shader->GetParameter("u_model");
@@ -66,13 +66,32 @@ void MeshRenderer::SetShader(Shader* shader)
 		_pointLightParams.push_back(unique_ptr<LightShaderParameter>(lprm));
 	}
 
+	auto id = _shader->GetProgram();
+	auto idx = glGetUniformBlockIndex(id, "ShaderActivationUniforms");
+	if (idx != 4294967295)
+	{
+		// Create UBO
+		glGenBuffers(1, &_ubo);
+		glBindBuffer(GL_UNIFORM_BUFFER, _ubo);
+		glBufferData(
+			GL_UNIFORM_BUFFER,
+			sizeof(ShaderActivationUniforms),
+			NULL,
+			GL_STATIC_DRAW);		
+		glUniformBlockBinding(id, idx, 0);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(_uniforms), &_uniforms);
+		//glBufferData(GL_UNIFORM_BUFFER, 0, sizeof(_uniforms), &_uniforms);
+		glBindBufferRange(GL_UNIFORM_BUFFER, 0, _ubo, 0, sizeof(_uniforms));
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	}
+
 	if(_mesh)
 		CreateVAO();
 }
 
 void MeshRenderer::ActivateShader(	Camera* camera,
-									const vector<Light*> lights)
-{
+					const vector<Light*> lights)
+{	
 	_viewMatrix = camera->GetView();
 	_projectionMatrix = camera->Projection();
 	//Vector3 eyePos = -1.0f * _viewMatrix.GetTranslation();
@@ -109,9 +128,58 @@ void MeshRenderer::ActivateShader(	Camera* camera,
 			_pointLightParams[pointLightsCount++]->SetValue(*l);
 		}
 	}
-
 	_directionaLightsCountParam->SetValue(dirLightsCount);
 	_pointLightsCountParam->SetValue(pointLightsCount);
+
+	if(_ubo == 4294967295)
+		return;	
+
+	_uniforms.u_projection = _projectionMatrix;
+	_uniforms.u_view = _viewMatrix;
+	_uniforms.u_eyePos = eyePos;
+	_uniforms.u_fogNear = camera->GetFogNear();
+	_uniforms.u_fogFar = camera->GetFogFar();
+	_uniforms.u_fogExp =  camera->GetFogGamma();
+	_uniforms.u_fogColorNear = ToVector4(camera->GetFogNearColor());
+	_uniforms.u_fogColorFar = ToVector4(camera->GetFogFarColor());
+	_uniforms.u_time = Game.Time().ElapsedTime;
+
+	/*
+	pointLightsCount = 0;
+	dirLightsCount = 0;
+	maxDir = _dirLightParams.size();
+	maxPoint = _pointLightParams.size();
+	for (auto l : lights)
+	{
+		if (!l->GetEnbled())
+			continue;
+
+		if (l->GetLightType() == Light::DIRECTIONAL_LIGHT && dirLightsCount < int(maxDir))
+		{
+			_uniforms.u_directionalLights[dirLightsCount].castShadow = l->GetShadowCasting();
+			_uniforms.u_directionalLights[dirLightsCount].direction = l->GetDirection();
+			_uniforms.u_directionalLights[dirLightsCount].color = l->GetColorAsVector();
+			_uniforms.u_directionalLights[dirLightsCount].shadowMatrix = l->GetShadowMatrix();
+			dirLightsCount++;
+
+		}
+		else if (l->GetLightType() == Light::POINT_LIGHT && pointLightsCount < int(maxPoint))
+		{
+			_uniforms.u_pointLights[pointLightsCount].position = l->GetPosition();
+			_uniforms.u_pointLights[pointLightsCount].radius = l->GetRadius();
+			_uniforms.u_pointLights[pointLightsCount].color = l->GetColorAsVector();
+
+		}
+	}
+	_uniforms.u_directionalLightsCount = dirLightsCount;
+	_uniforms.u_pointLightsCount = pointLightsCount;
+	*/
+
+	
+	glBindBuffer(GL_UNIFORM_BUFFER, _ubo);
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, _ubo, 0, sizeof(_uniforms));
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(_uniforms), &_uniforms);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 void MeshRenderer::Draw()

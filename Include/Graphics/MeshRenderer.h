@@ -2,6 +2,7 @@
 
 #include <Graphics/Render.h>
 #include <Graphics/Mesh.h>
+#include <Graphics/Uniforms.h>
 
 namespace Osm
 {
@@ -91,6 +92,8 @@ protected:
 	Matrix44 _projectionMatrix;
 	Color _diffuse;
 	Color _ambient;
+	GLuint _ubo = 4294967295;	// -1
+	ShaderActivationUniforms _uniforms;
 };
 
 ///

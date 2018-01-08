@@ -75,6 +75,8 @@ inline Vector3 ToVector3(const Color& color) { return Vector3(color.r / 255.0f, 
 
 inline Vector2 ToVector2(const Vector3& vec2) { return Vector2(vec2.x, vec2.z); }
 
+inline Vector4 ToVector4(const Color& color) { return Vector4(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f); }
+
 void UpdateMatrix44FromMatrix33(Matrix44& output, const Matrix33& input);
 
 inline void SwitchOnBitFlag(uint& flags, uint bit) { flags |= bit; }
