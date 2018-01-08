@@ -1,8 +1,9 @@
 
+#pragma include "Uniforms.glsl"
+
 // #pragma include "Uniforms.hs"
 
-// Geneal shader include file
-
+// General shader include file
 struct DirectionalLight
 {
     vec3 direction;
@@ -20,21 +21,22 @@ struct PointLight
 };
 
 
-// Uniforms
+/*
 layout (std140) uniform ShaderActivationUniforms
 {
-  mat4 u_projection;
-  mat4 u_view;
-  int u_directionalLightsCount;
-  int u_pointLightsCount;
-  vec3 u_eyePos;
-  float u_fogFar;
-  float u_fogNear;
-  float u_fogExp;
-  float u_time;
-  vec4 u_fogColorNear;
-  vec4 u_fogColorFar;
+  mat4 u_projection;                // 64
+  mat4 u_view;                      // 64
+  int u_directionalLightsCount;     // 4
+  int u_pointLightsCount;           // 4
+  vec3 u_eyePos;                    // 12
+  float u_fogFar;                   // 4
+  float u_fogNear;                  // 4
+  float u_fogExp;                   // 4
+  float u_time;                     // 4
+  vec4 u_fogColorNear;              // 16
+  vec4 u_fogColorFar;               // 16
 };
+*/
 
 uniform mat4 u_model;
 uniform mat4 u_modelViewProjection;

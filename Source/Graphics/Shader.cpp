@@ -493,6 +493,8 @@ bool Shader::Load()
 		geomShaderSource = preprocessor.Read(_geometryFilename);
 	string fragShaderSource = preprocessor.Read(_fragmentFilename);
 
+	std::cout << fragShaderSource;
+
 	return LoadSource(vertShaderSource, geomShaderSource, fragShaderSource);
 }
 

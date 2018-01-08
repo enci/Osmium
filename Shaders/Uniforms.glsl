@@ -1,4 +1,4 @@
-// Uniforms
+
 layout (std140) uniform ShaderActivationUniforms
 {
   mat4 u_projection;                // 64

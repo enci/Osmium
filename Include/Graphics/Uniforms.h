@@ -14,5 +14,5 @@
 #define uniform struct
 #define layout(x)
 
-#include "../Shaders/Uniforms.hs"
+#include "../Shaders/Uniforms.glsl"
 
