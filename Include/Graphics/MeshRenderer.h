@@ -7,9 +7,6 @@ struct ShaderActivationUniforms;
 
 namespace Osm
 {
-
-class LightShaderParameter;
-
 ///
 /// MeshRenderer
 ///
@@ -65,60 +62,25 @@ protected:
 	GLuint	_vao = 0;
 	Mesh*	_mesh = nullptr;
 	Texture* _texture = nullptr;
-	ShaderParameter* _projParam = nullptr;
 	ShaderParameter* _modelParam = nullptr;
-	ShaderParameter* _viewParam = nullptr;
-	ShaderParameter* _textureParam = nullptr;
-	ShaderParameter* _directionaLightsCountParam = nullptr;
-	ShaderParameter* _pointLightsCountParam = nullptr;
+	ShaderParameter* _textureParam = nullptr;	
 	ShaderParameter* _modelViewProjParam = nullptr;
 	ShaderParameter* _modelViewParam = nullptr;
-	ShaderParameter* _eyePosParam = nullptr;
 	ShaderParameter* _diffuseParam = nullptr;
 	ShaderParameter* _ambientParam = nullptr;
-	ShaderParameter* _fogNearParam = nullptr;
-	ShaderParameter* _fogFarParam = nullptr;
-	ShaderParameter* _fogExpParam = nullptr;
-	ShaderParameter* _fogNearColorParam = nullptr;
-	ShaderParameter* _fogFarColorParam = nullptr;
-	ShaderParameter* _timeParam = nullptr;
 	ShaderAttribute* _positionAttrib = nullptr;
 	ShaderAttribute* _normalAttrib = nullptr;
 	ShaderAttribute* _textureAttrib = nullptr;
-	std::vector<std::unique_ptr<LightShaderParameter>> _dirLightParams;
-	std::vector<std::unique_ptr<LightShaderParameter>> _pointLightParams;
+	
+	std::vector<ShaderParameter*> _shadowParams;
 
 	Transform* _transform = nullptr;
 	Matrix44 _viewMatrix;
 	Matrix44 _projectionMatrix;
 	Color _diffuse;
 	Color _ambient;
-	GLuint _ubo = 4294967295;	// -1
+	GLuint _ubo = 4294967295;	
 	ShaderActivationUniforms* _uniforms;
-};
-
-///
-/// A shortcut to setting up lights quickly
-///
-class LightShaderParameter
-{
-public:
-
-	/// Create a shader
-	LightShaderParameter(Shader* shader, const string& name);
-
-	/// Set a light. The type will be set from the type
-	void SetValue(const Light& light);
-
-protected:
-	ShaderParameter* _positionParam;
-	ShaderParameter* _directionParam;
-	ShaderParameter* _colorParam;
-	ShaderParameter* _attenuationParam;
-	ShaderParameter* _radiusParam;
-	ShaderParameter* _shadowInvTransform;
-	ShaderParameter* _shadowMap;
-	ShaderParameter* _castShadow;
 };
 
 }

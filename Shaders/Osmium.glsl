@@ -1,15 +1,6 @@
 
 #pragma include "Uniforms.glsl"
 
-
-uniform int u_pointLightsCount;           // 4
-uniform float u_fogFar;                   // 4
-uniform float u_fogNear;                  // 4
-uniform float u_fogExp;                   // 4
-uniform float u_time;                     // 4
-uniform vec4 u_fogColorNear;              // 16
-uniform vec4 u_fogColorFar;               // 16
-
 uniform mat4 u_model;
 uniform mat4 u_modelViewProjection;
 uniform vec3 u_ambient;
@@ -17,11 +8,6 @@ uniform vec3 u_diffuse;
 
 const float kRimGamma = 4.0;
 const float kLightRadius = 5.2;
-
-// All the directional lights
-uniform DirectionalLight    u_directionalLights[DIR_LIGHT_COUNT];
-// All the point lights
-uniform PointLight          u_pointLights[POINT_LIGHT_COUNT];
 
 uniform sampler2D s_shadowMaps[DIR_LIGHT_COUNT];
 

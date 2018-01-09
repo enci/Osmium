@@ -33,41 +33,26 @@ void MeshRenderer::SetShader(Shader* shader)
 {	
 	_shader = shader;		
 
-	_projParam = shader->GetParameter("u_projection");
 	_modelParam = shader->GetParameter("u_model");
-	_viewParam = shader->GetParameter("u_view");
 	_textureParam = shader->GetParameter("u_texture");
-	_eyePosParam = shader->GetParameter("u_eyePos");
 	_modelViewParam = shader->GetParameter("u_modelView");
 	_modelViewProjParam = shader->GetParameter("u_modelViewProjection");
+	_diffuseParam = shader->GetParameter("u_diffuse");
+	_ambientParam = shader->GetParameter("u_ambient");
+
 	_positionAttrib = shader->GetAttribute("a_position");
 	_normalAttrib = shader->GetAttribute("a_normal");
 	_textureAttrib = shader->GetAttribute("a_texture");
-	_directionaLightsCountParam = shader->GetParameter("u_directionalLightsCount");
-	_pointLightsCountParam = shader->GetParameter("u_pointLightsCount");
-	_diffuseParam = shader->GetParameter("u_diffuse");
-	_ambientParam = shader->GetParameter("u_ambient");
-	_fogNearParam = shader->GetParameter("u_fogNear");
-	_fogFarParam = shader->GetParameter("u_fogFar");
-	_fogExpParam = shader->GetParameter("u_fogExp");
-	_fogNearColorParam = shader->GetParameter("u_fogColorNear");
-	_fogFarColorParam = shader->GetParameter("u_fogColorFar");
-	_timeParam = shader->GetParameter("u_time");
+	
+	
 
 	for (int i = 0; i < kMaxDirecationalLights; i++)
 	{
 		string name = "u_directionalLights[" + to_string(i) + "]";
-		auto lprm = new LightShaderParameter(_shader, name);
-		_dirLightParams.push_back(unique_ptr<LightShaderParameter>(lprm));
+		// auto lprm = new LightShaderParameter(_shader, name);
+		// _dirLightParams.push_back(unique_ptr<LightShaderParameter>(lprm));
 	}
-
-	for (int i = 0; i < kMaxPointLights; i++)
-	{
-		string name = "u_pointLights[" + to_string(i) + "]";
-		auto lprm = new LightShaderParameter(_shader, name);
-		_pointLightParams.push_back(unique_ptr<LightShaderParameter>(lprm));
-	}
-
+	
 	auto id = _shader->GetProgram();
 	auto idx = glGetUniformBlockIndex(id, "ShaderActivationUniforms");
 	if (idx != 4294967295)
@@ -102,36 +87,6 @@ void MeshRenderer::ActivateShader(	Camera* camera,
 	Vector3 eyePos = viewInv * Vector3(0, 0, 0);
 
 	_shader->Activate();
-	_projParam->SetValue(_projectionMatrix);
-	_viewParam->SetValue(_viewMatrix);
-	_eyePosParam->SetValue(eyePos);
-	_fogNearParam->SetValue(camera->GetFogNear());
-	_fogFarParam->SetValue(camera->GetFogFar());
-	_fogExpParam->SetValue(camera->GetFogGamma());
-	_fogNearColorParam->SetValue(camera->GetFogNearColor());
-	_fogFarColorParam->SetValue(camera->GetFogFarColor());
-	_timeParam->SetValue(Game.Time().ElapsedTime);
-
-	int pointLightsCount = 0;
-	int dirLightsCount = 0;
-	size_t maxDir = _dirLightParams.size();
-	size_t maxPoint = _pointLightParams.size();
-	for (auto l : lights)
-	{
-		if(!l->GetEnbled())
-			continue;
-
-		if (l->GetLightType() == Light::DIRECTIONAL_LIGHT && dirLightsCount < (int)maxDir)
-		{
-			_dirLightParams[dirLightsCount++]->SetValue(*l);
-		}
-		else if (l->GetLightType() == Light::POINT_LIGHT && pointLightsCount < (int)maxPoint)
-		{
-			_pointLightParams[pointLightsCount++]->SetValue(*l);
-		}
-	}
-	_directionaLightsCountParam->SetValue(dirLightsCount);
-	_pointLightsCountParam->SetValue(pointLightsCount);
 
 	if(_ubo == 4294967295)
 		return;	
@@ -139,18 +94,17 @@ void MeshRenderer::ActivateShader(	Camera* camera,
 	_uniforms->u_projection = _projectionMatrix;
 	_uniforms->u_view = _viewMatrix;
 	_uniforms->u_eyePos = eyePos;
-	//_uniforms->u_fogNear = camera->GetFogNear();
-	//_uniforms->u_fogFar = camera->GetFogFar();
-	//_uniforms->u_fogExp =  camera->GetFogGamma();
-	//_uniforms->u_fogColorNear = ToVector4(camera->GetFogNearColor());
-	//_uniforms->u_fogColorFar = ToVector4(camera->GetFogFarColor());
-	//_uniforms->u_time = Game.Time().ElapsedTime;
+	_uniforms->u_fogNear = camera->GetFogNear();
+	_uniforms->u_fogFar = camera->GetFogFar();
+	_uniforms->u_fogExp =  camera->GetFogGamma();
+	_uniforms->u_fogColorNear = ToVector4(camera->GetFogNearColor());
+	_uniforms->u_fogColorFar = ToVector4(camera->GetFogFarColor());
+	_uniforms->u_time = Game.Time().ElapsedTime;
 
-	
-	pointLightsCount = 0;
-	dirLightsCount = 0;
-	maxDir = _dirLightParams.size();
-	maxPoint = _pointLightParams.size();
+	int pointLightsCount = 0;
+	int dirLightsCount = 0;
+	size_t maxDir = DIR_LIGHT_COUNT;
+	size_t maxPoint = POINT_LIGHT_COUNT;
 	for (auto l : lights)
 	{
 		if (!l->GetEnbled())
@@ -158,24 +112,23 @@ void MeshRenderer::ActivateShader(	Camera* camera,
 
 		if (l->GetLightType() == Light::DIRECTIONAL_LIGHT && dirLightsCount < int(maxDir))
 		{
-			// _uniforms.u_directionalLights[dirLightsCount].castShadow = l->GetShadowCasting();
-			// _uniforms.u_directionalLights[dirLightsCount].direction = l->GetDirection();
-			// _uniforms.u_directionalLights[dirLightsCount].color = l->GetColorAsVector();
+			_uniforms->u_directionalLights[dirLightsCount].castShadow = l->GetShadowCasting();
+			_uniforms->u_directionalLights[dirLightsCount].direction = l->GetDirection();
+			_uniforms->u_directionalLights[dirLightsCount].color = l->GetColorAsVector();
 			// _uniforms.u_directionalLights[dirLightsCount].shadowMatrix = l->GetShadowMatrix();
 			dirLightsCount++;
 
 		}
 		else if (l->GetLightType() == Light::POINT_LIGHT && pointLightsCount < int(maxPoint))
 		{
-			// _uniforms.u_pointLights[pointLightsCount].position = l->GetPosition();
-			// _uniforms.u_pointLights[pointLightsCount].radius = l->GetRadius();
-			// _uniforms.u_pointLights[pointLightsCount].color = l->GetColorAsVector();
+			_uniforms->u_pointLights[pointLightsCount].position = l->GetPosition();
+			_uniforms->u_pointLights[pointLightsCount].radius = l->GetRadius();
+			_uniforms->u_pointLights[pointLightsCount].color = l->GetColorAsVector();
+			pointLightsCount++;
 		}
 	}
 	_uniforms->u_directionalLightsCount = dirLightsCount;
-	//_uniforms.u_pointLightsCount = pointLightsCount;
-	
-
+	_uniforms->u_pointLightsCount = pointLightsCount;
 	
 	glBindBuffer(GL_UNIFORM_BUFFER, _ubo);
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, _ubo, 0, sizeof(ShaderActivationUniforms));
@@ -285,45 +238,5 @@ void MeshRenderer::Inspect()
 	ImGui::OsmColor("Ambient", _ambient);		
 }
 #endif
-
-LightShaderParameter::LightShaderParameter(Shader* shader, const string& name) :
-	_positionParam(shader->GetParameter(name + ".position")),
-	_directionParam(shader->GetParameter(name + ".direction")),
-	_colorParam(shader->GetParameter(name + ".color")),
-	_radiusParam(shader->GetParameter(name + ".radius")),
-	_attenuationParam(shader->GetParameter(name + ".attenuation")),
-	_shadowInvTransform(shader->GetParameter(name + ".shadowInvTransform")),
-	_shadowMap(shader->GetParameter(name + ".shadowMap")),
-	_castShadow(shader->GetParameter(name + ".castShadow"))
-{}
-
-void LightShaderParameter::SetValue(const Light& light)
-{
-	_colorParam->SetValue(light.GetColorAsVector());
-
-	if (light.GetLightType() == Light::DIRECTIONAL_LIGHT)
-	{
-		Vector3 dir = light.GetDirection();
-		_directionParam->SetValue(dir);
-		
-		if(light.GetShadowCasting())
-		{
-			_castShadow->SetValue(true);
-			_shadowInvTransform->SetValue(light._shadowMatrix);
-			const Texture* shadowMap = light.GetRenderTarget();
-			_shadowMap->SetValue(*shadowMap);
-		}
-		else
-		{
-			_castShadow->SetValue(false);
-		}
-	}
-	else if (light.GetLightType() == Light::POINT_LIGHT)
-	{
-		Vector3 pos = light.GetPosition();
-		_positionParam->SetValue(pos);
-		_radiusParam->SetValue(light.GetRadius());
-	}
-}
 
 
