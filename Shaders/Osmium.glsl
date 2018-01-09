@@ -1,42 +1,14 @@
 
 #pragma include "Uniforms.glsl"
 
-// #pragma include "Uniforms.hs"
 
-// General shader include file
-struct DirectionalLight
-{
-    vec3 direction;
-    vec3 color;
-    bool castShadow;
-    mat4 shadowInvTransform;
-    sampler2D shadowMap;
-};
-
-struct PointLight
-{
-    vec3 position;
-    vec3 color;
-    float radius;
-};
-
-
-/*
-layout (std140) uniform ShaderActivationUniforms
-{
-  mat4 u_projection;                // 64
-  mat4 u_view;                      // 64
-  int u_directionalLightsCount;     // 4
-  int u_pointLightsCount;           // 4
-  vec3 u_eyePos;                    // 12
-  float u_fogFar;                   // 4
-  float u_fogNear;                  // 4
-  float u_fogExp;                   // 4
-  float u_time;                     // 4
-  vec4 u_fogColorNear;              // 16
-  vec4 u_fogColorFar;               // 16
-};
-*/
+uniform int u_pointLightsCount;           // 4
+uniform float u_fogFar;                   // 4
+uniform float u_fogNear;                  // 4
+uniform float u_fogExp;                   // 4
+uniform float u_time;                     // 4
+uniform vec4 u_fogColorNear;              // 16
+uniform vec4 u_fogColorFar;               // 16
 
 uniform mat4 u_model;
 uniform mat4 u_modelViewProjection;
@@ -46,14 +18,12 @@ uniform vec3 u_diffuse;
 const float kRimGamma = 4.0;
 const float kLightRadius = 5.2;
 
-// Lights
-#define DIR_LIGHT_COUNT     5
-#define POINT_LIGHT_COUNT   10
-
 // All the directional lights
 uniform DirectionalLight    u_directionalLights[DIR_LIGHT_COUNT];
 // All the point lights
 uniform PointLight          u_pointLights[POINT_LIGHT_COUNT];
+
+uniform sampler2D s_shadowMaps[DIR_LIGHT_COUNT];
 
 vec3 CalculateDirectionalLights(in vec3 normal)
 {
@@ -78,18 +48,15 @@ vec3 CalculateDirectionalLightsWithShadow(in vec3 position, in vec3 normal)
     float shadow = 1.0;
     if(u_directionalLights[i].castShadow == true)
     {
-      vec4 posLightCoor = u_directionalLights[i].shadowInvTransform * vec4(position, 1.0);
+      vec4 posLightCoor = u_directionalLights[i].shadowMatrix * vec4(position, 1.0);
       vec3 projCoords = posLightCoor.xyz / posLightCoor.w;
       projCoords = projCoords * 0.5 + 0.5;
 
       float bias = 0.002;
 
-      float closestDepth = texture(u_directionalLights[i].shadowMap, projCoords.xy).r;   
+      float closestDepth = texture(s_shadowMaps[i], projCoords.xy).r;   
       float currentDepth = projCoords.z;  
       shadow = abs(currentDepth - bias) > closestDepth  ? 0.0 : 1.0;
-
-
-      //shadow = texture(u_directionalLights[i].shadowMap, projCoords.xyz);   
     }
 
     vec3 light_dir = u_directionalLights[i].direction;

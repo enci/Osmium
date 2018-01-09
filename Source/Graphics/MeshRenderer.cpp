@@ -3,6 +3,7 @@
 #include <imgui/imgui.h>
 #include "Core/Game.h"
 #include <Graphics/Texture.h>
+#include <Graphics/Uniforms.h>
 
 using namespace Osm;
 
@@ -10,6 +11,7 @@ MeshRenderer::MeshRenderer(Entity& entity)
 	: Renderable(entity)	
 	, _diffuse(Color::White)
 	, _ambient(Color::Black)
+	, _uniforms(new ShaderActivationUniforms)
 {
 }
 
@@ -79,9 +81,9 @@ void MeshRenderer::SetShader(Shader* shader)
 			NULL,
 			GL_STATIC_DRAW);		
 		glUniformBlockBinding(id, idx, 0);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(_uniforms), &_uniforms);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ShaderActivationUniforms), _uniforms);
 		//glBufferData(GL_UNIFORM_BUFFER, 0, sizeof(_uniforms), &_uniforms);
-		glBindBufferRange(GL_UNIFORM_BUFFER, 0, _ubo, 0, sizeof(_uniforms));
+		glBindBufferRange(GL_UNIFORM_BUFFER, 0, _ubo, 0, sizeof(ShaderActivationUniforms));
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
@@ -134,17 +136,17 @@ void MeshRenderer::ActivateShader(	Camera* camera,
 	if(_ubo == 4294967295)
 		return;	
 
-	_uniforms.u_projection = _projectionMatrix;
-	_uniforms.u_view = _viewMatrix;
-	_uniforms.u_eyePos = eyePos;
-	_uniforms.u_fogNear = camera->GetFogNear();
-	_uniforms.u_fogFar = camera->GetFogFar();
-	_uniforms.u_fogExp =  camera->GetFogGamma();
-	_uniforms.u_fogColorNear = ToVector4(camera->GetFogNearColor());
-	_uniforms.u_fogColorFar = ToVector4(camera->GetFogFarColor());
-	_uniforms.u_time = Game.Time().ElapsedTime;
+	_uniforms->u_projection = _projectionMatrix;
+	_uniforms->u_view = _viewMatrix;
+	_uniforms->u_eyePos = eyePos;
+	//_uniforms->u_fogNear = camera->GetFogNear();
+	//_uniforms->u_fogFar = camera->GetFogFar();
+	//_uniforms->u_fogExp =  camera->GetFogGamma();
+	//_uniforms->u_fogColorNear = ToVector4(camera->GetFogNearColor());
+	//_uniforms->u_fogColorFar = ToVector4(camera->GetFogFarColor());
+	//_uniforms->u_time = Game.Time().ElapsedTime;
 
-	/*
+	
 	pointLightsCount = 0;
 	dirLightsCount = 0;
 	maxDir = _dirLightParams.size();
@@ -156,29 +158,28 @@ void MeshRenderer::ActivateShader(	Camera* camera,
 
 		if (l->GetLightType() == Light::DIRECTIONAL_LIGHT && dirLightsCount < int(maxDir))
 		{
-			_uniforms.u_directionalLights[dirLightsCount].castShadow = l->GetShadowCasting();
-			_uniforms.u_directionalLights[dirLightsCount].direction = l->GetDirection();
-			_uniforms.u_directionalLights[dirLightsCount].color = l->GetColorAsVector();
-			_uniforms.u_directionalLights[dirLightsCount].shadowMatrix = l->GetShadowMatrix();
+			// _uniforms.u_directionalLights[dirLightsCount].castShadow = l->GetShadowCasting();
+			// _uniforms.u_directionalLights[dirLightsCount].direction = l->GetDirection();
+			// _uniforms.u_directionalLights[dirLightsCount].color = l->GetColorAsVector();
+			// _uniforms.u_directionalLights[dirLightsCount].shadowMatrix = l->GetShadowMatrix();
 			dirLightsCount++;
 
 		}
 		else if (l->GetLightType() == Light::POINT_LIGHT && pointLightsCount < int(maxPoint))
 		{
-			_uniforms.u_pointLights[pointLightsCount].position = l->GetPosition();
-			_uniforms.u_pointLights[pointLightsCount].radius = l->GetRadius();
-			_uniforms.u_pointLights[pointLightsCount].color = l->GetColorAsVector();
-
+			// _uniforms.u_pointLights[pointLightsCount].position = l->GetPosition();
+			// _uniforms.u_pointLights[pointLightsCount].radius = l->GetRadius();
+			// _uniforms.u_pointLights[pointLightsCount].color = l->GetColorAsVector();
 		}
 	}
-	_uniforms.u_directionalLightsCount = dirLightsCount;
-	_uniforms.u_pointLightsCount = pointLightsCount;
-	*/
+	_uniforms->u_directionalLightsCount = dirLightsCount;
+	//_uniforms.u_pointLightsCount = pointLightsCount;
+	
 
 	
 	glBindBuffer(GL_UNIFORM_BUFFER, _ubo);
-	glBindBufferRange(GL_UNIFORM_BUFFER, 0, _ubo, 0, sizeof(_uniforms));
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(_uniforms), &_uniforms);
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, _ubo, 0, sizeof(ShaderActivationUniforms));
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ShaderActivationUniforms), _uniforms);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
