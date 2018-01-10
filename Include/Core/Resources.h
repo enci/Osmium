@@ -1,8 +1,13 @@
 #pragma once
+
+#define GLFW_INCLUDE_NONE
+#include <GLFW/glfw3.h>
 #include <Core/Component.h>
 #include <Core/Resource.h>
 #include <Core/Game.h>
 #include <unordered_map>
+
+#define PROFILE_LOADING_TIME 1
 
 namespace Osm
 {
@@ -66,7 +71,15 @@ T* ResourceManager::LoadResource(Args... args)
 	if(resource)
 		return resource;
 
+#if PROFILE_LOADING_TIME
+	const auto start = glfwGetTime();
 	resource = new T(args...);
+	auto time = glfwGetTime() - start;
+	LOG("(%2.4f) Loaded asset %s", time, resource->Path().c_str());
+#else
+	resource = new T(args...);
+#endif
+
 	_resources.insert(std::make_pair(id, resource));
 	_refCounters.insert(std::make_pair(id, 1));
 	resource->_resourceID = id;
