@@ -2,7 +2,7 @@
 #include <regex>
 #include <sstream>
 #include <Defines.h>
-#include "../../../Blast/Tools/SharedTools.h"
+#include <Utils.h>
 
 #define ENABLE_PROFILING 0
 #define ENABLE_CACHING 0
