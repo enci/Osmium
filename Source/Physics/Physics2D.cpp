@@ -1056,7 +1056,7 @@ bool PhysicsManager2D::ResolveCollision(Collision2D& collision, PhysicsBody2D& f
 	rAP = rAP.Perpendicular();
 	Vector2 velA = first._velocity + first._angularVelocity * rAP;
 
-	// Get velocity of point contact on first body
+	// Get velocity of point contact on second body
 	Vector2 rBP = collision.Position1 - second._position;
 	rBP = rBP.Perpendicular();
 	Vector2 velB = second._velocity + second._angularVelocity * rBP;
@@ -1073,10 +1073,10 @@ bool PhysicsManager2D::ResolveCollision(Collision2D& collision, PhysicsBody2D& f
 		return true;
 	}
 
-	float inverseMass = 1 / first._mass + 1 / second._mass;
+	float inverseMassSum = 1 / first._mass + 1 / second._mass;
 	float denominator = Sqr(rAP.Dot(collision.Normal)) / first._momentOfInertia +
 		Sqr(rBP.Dot(collision.Normal)) / second._momentOfInertia +
-		inverseMass;
+		inverseMassSum;
 	float impulse = (-(1 + collision.Restitution) * separatingVelocity) / denominator;
 			
 	first._velocity += (impulse / first._mass) * collision.Normal;
