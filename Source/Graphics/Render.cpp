@@ -8,6 +8,7 @@
 #include <Graphics/DebugRenderer.h>
 #include <Core/Resources.h>
 #include <Graphics/Texture.h>
+#include <Graphics/Uniforms.h>
 
 #define PROFILE_OPENGL 1
 
@@ -88,6 +89,20 @@ RenderManager::RenderManager(World& world) : Component(world)
 	_FXAAShader = Game.Resources().LoadResource<Shader>(
 		"./Assets/Shaders/Include/FXAA.vsh",
 		"./Assets/Shaders/Include/FXAA.fsh");
+
+	
+	// Create UBO
+	_uniforms = new ShaderActivationUniforms();
+	glGenBuffers(1, &_ubo);
+	glBindBuffer(GL_UNIFORM_BUFFER, _ubo);
+	glBufferData(
+		GL_UNIFORM_BUFFER,
+		sizeof(ShaderActivationUniforms),
+		_uniforms,
+		GL_STATIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	glBindBufferBase(GL_UNIFORM_BUFFER, 3, _ubo);	// Hardcode to slot 3
 }
 
 RenderManager::~RenderManager()
@@ -101,6 +116,8 @@ RenderManager::~RenderManager()
 	glDeleteTextures(1, &_reslovedColorbuffer);
 	glDeleteRenderbuffers(1, &_reslovedDepthbuffer);
 	glDeleteFramebuffers(1, &_reslovedFramebuffer);
+
+	glDeleteBuffers(1, &_ubo);
 }
 
 
@@ -229,9 +246,8 @@ void RenderManager::Render()
 	Shader* activeShader = nullptr;
 	
 	for (auto c : _cameras)
-	{
-		// Matrix44 view = c->GetView();
-		// Matrix44 projection = c->Projection();
+	{	
+		UpdateUBO(c);
 
 		for (auto renderer : _renderables)
 		{
@@ -242,6 +258,7 @@ void RenderManager::Render()
 			{
 				renderer->ActivateShader(c, _lights);
 				activeShader = renderer->GetShader();
+				//activeShader->Activate();
 #ifdef INSPECTOR
 				ShaderSwitches++;
 #endif
@@ -282,6 +299,64 @@ void RenderManager::Render()
 	
 	RenderQuad();
 }
+
+void RenderManager::UpdateUBO(Camera* camera)
+{
+	auto _viewMatrix = camera->GetView();
+	auto _projectionMatrix = camera->Projection();
+	//Vector3 eyePos = -1.0f * _viewMatrix.GetTranslation();
+	auto viewInv = _viewMatrix;
+	viewInv.Invert();
+	Vector3 eyePos = viewInv * Vector3(0, 0, 0);
+
+	_uniforms->u_projection = _projectionMatrix;
+	_uniforms->u_view = _viewMatrix;
+	_uniforms->u_eyePos = eyePos;
+	_uniforms->u_fogNear = camera->GetFogNear();
+	_uniforms->u_fogFar = camera->GetFogFar();
+	_uniforms->u_fogExp = camera->GetFogGamma();
+	_uniforms->u_fogColorNear = ToVector4(camera->GetFogNearColor());
+	_uniforms->u_fogColorFar = ToVector4(camera->GetFogFarColor());
+	_uniforms->u_time = Game.Time().ElapsedTime;
+
+	int pointLightsCount = 0;
+	int dirLightsCount = 0;
+	size_t maxDir = DIR_LIGHT_COUNT;
+	size_t maxPoint = POINT_LIGHT_COUNT;
+	for (auto l : _lights)
+	{
+		if (!l->GetEnbled())
+			continue;
+
+		if (l->GetLightType() == Light::DIRECTIONAL_LIGHT && dirLightsCount < int(maxDir))
+		{
+			_uniforms->u_directionalLights[dirLightsCount].castShadow = l->GetShadowCasting();
+			_uniforms->u_directionalLights[dirLightsCount].direction = l->GetDirection();
+			_uniforms->u_directionalLights[dirLightsCount].color = l->GetColorAsVector();
+			// _uniforms.u_directionalLights[dirLightsCount].shadowMatrix = l->GetShadowMatrix();
+			dirLightsCount++;
+
+		}
+		else if (l->GetLightType() == Light::POINT_LIGHT && pointLightsCount < int(maxPoint))
+		{
+			_uniforms->u_pointLights[pointLightsCount].position = l->GetPosition();
+			_uniforms->u_pointLights[pointLightsCount].radius = l->GetRadius();
+			_uniforms->u_pointLights[pointLightsCount].color = l->GetColorAsVector();
+			pointLightsCount++;
+		}
+	}
+	_uniforms->u_directionalLightsCount = dirLightsCount;
+	_uniforms->u_pointLightsCount = pointLightsCount;
+
+	glBindBuffer(GL_UNIFORM_BUFFER, _ubo);
+	glBufferData(
+		GL_UNIFORM_BUFFER,
+		sizeof(ShaderActivationUniforms),
+		_uniforms,
+		GL_STATIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
 
 void RenderManager::Add(Renderable* renderable)
 {

@@ -8,6 +8,8 @@
 #include <Core/Transform.h>
 #include <Graphics/Mesh.h>
 
+struct ShaderActivationUniforms;
+
 namespace Osm
 {
 
@@ -56,6 +58,8 @@ public:
 
 protected:
 
+	void UpdateUBO(Camera* camera);
+
 	std::vector<Renderable*>	_renderables;
 	std::vector<Light*>			_lights;
 	std::vector<Camera*>		_cameras;
@@ -68,6 +72,8 @@ protected:
 	GLuint						_reslovedColorbuffer = 0;
 	GLuint						_reslovedDepthbuffer = 0;
 
+	GLuint						_ubo		= 0;
+	ShaderActivationUniforms*	_uniforms	= nullptr;
 
 	// GLuint						depthMapFBO;
 	// GLuint						depthMap;

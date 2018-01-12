@@ -43,34 +43,11 @@ void MeshRenderer::SetShader(Shader* shader)
 	_positionAttrib = shader->GetAttribute("a_position");
 	_normalAttrib = shader->GetAttribute("a_normal");
 	_textureAttrib = shader->GetAttribute("a_texture");
-	
-	
 
-	for (int i = 0; i < kMaxDirecationalLights; i++)
-	{
-		string name = "u_directionalLights[" + to_string(i) + "]";
-		// auto lprm = new LightShaderParameter(_shader, name);
-		// _dirLightParams.push_back(unique_ptr<LightShaderParameter>(lprm));
-	}
-	
-	auto id = _shader->GetProgram();
-	auto idx = glGetUniformBlockIndex(id, "ShaderActivationUniforms");
-	if (idx != 4294967295)
-	{
-		// Create UBO
-		glGenBuffers(1, &_ubo);
-		glBindBuffer(GL_UNIFORM_BUFFER, _ubo);
-		glBufferData(
-			GL_UNIFORM_BUFFER,
-			sizeof(ShaderActivationUniforms),
-			NULL,
-			GL_STATIC_DRAW);		
-		glUniformBlockBinding(id, idx, 0);
-		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ShaderActivationUniforms), _uniforms);
-		//glBufferData(GL_UNIFORM_BUFFER, 0, sizeof(_uniforms), &_uniforms);
-		glBindBufferRange(GL_UNIFORM_BUFFER, 0, _ubo, 0, sizeof(ShaderActivationUniforms));
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
-	}
+	const auto program = _shader->GetProgram();
+	const auto index = glGetUniformBlockIndex(program, "ShaderActivationUniforms");
+	if(index != GL_INVALID_INDEX)
+		glUniformBlockBinding(program, index, 3);
 
 	if(_mesh)
 		CreateVAO();
@@ -79,61 +56,9 @@ void MeshRenderer::SetShader(Shader* shader)
 void MeshRenderer::ActivateShader(	Camera* camera,
 					const vector<Light*> lights)
 {	
+	_shader->Activate();	
 	_viewMatrix = camera->GetView();
 	_projectionMatrix = camera->Projection();
-	//Vector3 eyePos = -1.0f * _viewMatrix.GetTranslation();
-	auto viewInv = _viewMatrix;
-	viewInv.Invert();
-	Vector3 eyePos = viewInv * Vector3(0, 0, 0);
-
-	_shader->Activate();
-
-	if(_ubo == 4294967295)
-		return;	
-
-	_uniforms->u_projection = _projectionMatrix;
-	_uniforms->u_view = _viewMatrix;
-	_uniforms->u_eyePos = eyePos;
-	_uniforms->u_fogNear = camera->GetFogNear();
-	_uniforms->u_fogFar = camera->GetFogFar();
-	_uniforms->u_fogExp =  camera->GetFogGamma();
-	_uniforms->u_fogColorNear = ToVector4(camera->GetFogNearColor());
-	_uniforms->u_fogColorFar = ToVector4(camera->GetFogFarColor());
-	_uniforms->u_time = Game.Time().ElapsedTime;
-
-	int pointLightsCount = 0;
-	int dirLightsCount = 0;
-	size_t maxDir = DIR_LIGHT_COUNT;
-	size_t maxPoint = POINT_LIGHT_COUNT;
-	for (auto l : lights)
-	{
-		if (!l->GetEnbled())
-			continue;
-
-		if (l->GetLightType() == Light::DIRECTIONAL_LIGHT && dirLightsCount < int(maxDir))
-		{
-			_uniforms->u_directionalLights[dirLightsCount].castShadow = l->GetShadowCasting();
-			_uniforms->u_directionalLights[dirLightsCount].direction = l->GetDirection();
-			_uniforms->u_directionalLights[dirLightsCount].color = l->GetColorAsVector();
-			// _uniforms.u_directionalLights[dirLightsCount].shadowMatrix = l->GetShadowMatrix();
-			dirLightsCount++;
-
-		}
-		else if (l->GetLightType() == Light::POINT_LIGHT && pointLightsCount < int(maxPoint))
-		{
-			_uniforms->u_pointLights[pointLightsCount].position = l->GetPosition();
-			_uniforms->u_pointLights[pointLightsCount].radius = l->GetRadius();
-			_uniforms->u_pointLights[pointLightsCount].color = l->GetColorAsVector();
-			pointLightsCount++;
-		}
-	}
-	_uniforms->u_directionalLightsCount = dirLightsCount;
-	_uniforms->u_pointLightsCount = pointLightsCount;
-	
-	glBindBuffer(GL_UNIFORM_BUFFER, _ubo);
-	glBindBufferRange(GL_UNIFORM_BUFFER, 0, _ubo, 0, sizeof(ShaderActivationUniforms));
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ShaderActivationUniforms), _uniforms);
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 void MeshRenderer::Draw()
@@ -165,22 +90,9 @@ void MeshRenderer::Draw()
 void MeshRenderer::DrawDepth(Matrix44 viewProjection)
 {
 	glBindVertexArray(_vao);
-
 	glDrawElements(GL_TRIANGLES, _mesh->GetIndexCount(), GL_UNSIGNED_SHORT, nullptr);
-
 	glBindVertexArray(0);
 
-	/*
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(
-		0,						// attribute
-		3,						// number of elements per vertex element
-		GL_FLOAT,				// the type of each element
-		GL_FALSE,				// take our values as-is or normalize
-		sizeof(VertexFormat),	// no extra data between each position
-		0						// offset of first element
-	);
-	*/
 }
 
 bool MeshRenderer::CreateVAO()
