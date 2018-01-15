@@ -130,7 +130,7 @@ static void APIENTRY DebugCallback(GLenum source, GLenum type, GLuint id, GLenum
 	}
 
 	std::string error = FormatDebugOutput(source, type, id, severity, message);
-	std::cout << error << std::endl;
+	LOG(error.c_str());
 }
 
 static void InitDebugMessages()

@@ -56,8 +56,6 @@ void Texture::CreateGLTextureWithData(GLubyte* data, int width, int height, int 
 
 	glBindTexture(GL_TEXTURE_2D, _texture);                                 // Bind
 
-
-
 	if (genMipMaps)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);    // Minmization
 	else
