@@ -11,12 +11,18 @@ class Texture : public Resource
 {
 	friend class ResourceManager;
 
+	enum Format
+	{
+		RGBA8,
+		R8
+	};
+
 public:
 	/// Get the texture ID in OpenGL
 	GLuint GetTexture() const { return _texture; }
 
 	/// Creates a texture from RGBA provided data
-	void CreateGLTextureWithData(GLubyte* data, bool genMipMaps);
+	void CreateGLTextureWithData(GLubyte* data, int width, int height, int channels, bool genMipMaps);
 
 protected:
 	/// Create a texture by loading from a file
@@ -37,10 +43,10 @@ protected:
 	Texture() : Resource(RESOURCE_TYPE_TEXTURE) {}
 
 protected:
-	GLuint _texture = 0;
-	int _width		= 0;
-	int _height		= 0;
-	int _channels	= 0;
+	GLuint	_texture	= 0;
+	int		_width		= 0;
+	int		_height		= 0;
+	int		_channels	= 0;
 };
 
 class RenderTarget : public Texture
