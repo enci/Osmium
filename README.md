@@ -50,4 +50,4 @@ Asteroid* asteroid = blastWorld->CreateEntity<Asteroid>();
 ```
 
 
-Special thanks to the NHTV.
+Special thanks to the NHTV and students at IGAD.
