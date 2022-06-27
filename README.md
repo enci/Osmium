@@ -17,7 +17,8 @@ Osmium is a framework, rather than a game engine. It build to a static library t
 - Inspector Window - A look into everything that makes up the game.
 
 Here is a view:
-image
+
+![Screenshot 2022-06-27 145028](https://user-images.githubusercontent.com/762458/175953391-3b250a5a-b577-4297-8710-78d4ca9f8650.png)
 
 ## Dependencies
 Osmium is currently tested only on Windows with Visual Studio. It has the following dependencies:
@@ -50,4 +51,4 @@ Asteroid* asteroid = blastWorld->CreateEntity<Asteroid>();
 ```
 
 
-Special thanks to the NHTV and students at IGAD.
+Special thanks to BUas and students in the Games programme.
