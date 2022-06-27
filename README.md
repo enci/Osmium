@@ -4,7 +4,7 @@ Osmium is a game development framework that has multiple purposes. Firstly, it's
 ## Have a Blast
 The framework is tightly coupled to that game that is being used in. Have a Blast is a fast-paced, local-multiplayer, arcade shooter. You get to blast all your friends to pieces, or get  blasted, in less than a minute. Here are some screenshot to give an idea about what this game plays like.
 
-image
+![ss_e68920b5f808ca7387531d12523c3e13982edd1a 1920x1080](https://user-images.githubusercontent.com/762458/175943143-0d72f27b-7a98-4267-9e0e-2a9d11d37e82.jpg)
 
 ## Overview
 Osmium is a framework, rather than a game engine. It build to a static library that can be used to create a game with. It favors readability and simplicity over performance. Osmium has the following features:
